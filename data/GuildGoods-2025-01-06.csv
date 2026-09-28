@@ -1,0 +1,101 @@
+eraID;era;good;produceable;instock
+3;Iron Age;Cloth;792;99483
+3;Iron Age;Ebony;792;100923
+3;Iron Age;Jewelry;792;99371
+3;Iron Age;Iron;792;98497
+3;Iron Age;Limestone;792;101261
+4;Early Middle Age;Copper;116;33076
+4;Early Middle Age;Gold;116;34364
+4;Early Middle Age;Granite;116;26512
+4;Early Middle Age;Honey;116;47713
+4;Early Middle Age;Alabaster;116;31017
+5;High Middle Age;Brick;563;41628
+5;High Middle Age;Glass;563;58391
+5;High Middle Age;Dried Herbs;563;41672
+5;High Middle Age;Ropes;563;40327
+5;High Middle Age;Salt;563;37684
+6;Late Middle Age;Basalt;104;38639
+6;Late Middle Age;Brass;104;35719
+6;Late Middle Age;Gunpowder;104;42811
+6;Late Middle Age;Silk;104;36669
+6;Late Middle Age;Talc Powder;104;47475
+7;Colonial Age;Coffee;1281;24683
+7;Colonial Age;Paper;1281;79877
+7;Colonial Age;Porcelain;1281;51544
+7;Colonial Age;Tar;1281;42888
+7;Colonial Age;Wire;1281;34513
+8;Industrial Age;Coke;2026;58306
+8;Industrial Age;Fertilizer;2026;45887
+8;Industrial Age;Rubber;2026;94718
+8;Industrial Age;Textiles;2026;101525
+8;Industrial Age;Whale Oil;2026;108959
+9;Progressive Era;Asbestos;856;112672
+9;Progressive Era;Explosives;856;77370
+9;Progressive Era;Machine Parts;856;98044
+9;Progressive Era;Gasoline;856;61441
+9;Progressive Era;Tinplate;856;89596
+10;Modern Era;Convenience Food;154;17812
+10;Modern Era;Ferroconcrete;154;17370
+10;Modern Era;Flavorants;154;14638
+10;Modern Era;Luxury Materials;154;19815
+10;Modern Era;Packaging;154;849
+11;Postmodern Era;Genome Data;62;12346
+11;Postmodern Era;Industrial Filters;62;9090
+11;Postmodern Era;Renewable Resources;62;11373
+11;Postmodern Era;Semiconductors;62;20255
+11;Postmodern Era;Steel;62;10637
+12;Contemporary Era;Bionics Data;124;18326
+12;Contemporary Era;Electromagnets;124;12084
+12;Contemporary Era;Gas;124;22131
+12;Contemporary Era;Plastics;124;23259
+12;Contemporary Era;Robots;124;16061
+13;Tomorrow Era;Nutrition Research;484;51356
+13;Tomorrow Era;Papercrete;484;45008
+13;Tomorrow Era;Preservatives;484;39132
+13;Tomorrow Era;Smart Materials;484;34518
+13;Tomorrow Era;Translucent Concrete;484;52682
+14;Future Era;Algae;39;94333
+14;Future Era;Biogeochemical Data;39;90900
+14;Future Era;Nanoparticles;39;99280
+14;Future Era;Purified Water;39;105497
+14;Future Era;Superconductors;39;124970
+15;Arctic Future;AI data;319;51485
+15;Arctic Future;Bioplastics;319;72884
+15;Arctic Future;Nanowire;319;80405
+15;Arctic Future;Paper Batteries;319;75977
+15;Arctic Future;Transester gas;319;86403
+16;Oceanic Future;Artificial Scales;763;70941
+16;Oceanic Future;Biolight;763;115146
+16;Oceanic Future;Corals;763;168029
+16;Oceanic Future;Pearls;763;152281
+16;Oceanic Future;Plankton;763;92600
+17;Virtual Future;Cryptocash;377;81051
+17;Virtual Future;Data Crystals;377;80384
+17;Virtual Future;Golden Rice;377;74868
+17;Virtual Future;Nanites;377;88547
+17;Virtual Future;Tea Silk;377;80486
+18;Space Age Mars;BioTech Crops;51;216302
+18;Space Age Mars;Fusion Reactors;51;198700
+18;Space Age Mars;Lubricants;51;224867
+18;Space Age Mars;Mars Microbes;51;224775
+18;Space Age Mars;Superalloys;51;228078
+19;Space Age Asteroid Belt;Bromine;333;110918
+19;Space Age Asteroid Belt;Compound Fluid;333;108050
+19;Space Age Asteroid Belt;Nickel;333;103462
+19;Space Age Asteroid Belt;Platinum Crystal;333;76353
+19;Space Age Asteroid Belt;Processed Material;333;92750
+20;Space Age Venus;Glowing Seaweed;163;76402
+20;Space Age Venus;Herbal Snack;163;72963
+20;Space Age Venus;Microgreen Supplements;163;68688
+20;Space Age Venus;Soy Proteins;163;72337
+20;Space Age Venus;Sugar Crystals;163;74573
+21;Space Age Jupiter Moon;Advanced DNA Data;1164;37461
+21;Space Age Jupiter Moon;Bio Creatures;1164;36480
+21;Space Age Jupiter Moon;Enhanced Porifera;1164;37120
+21;Space Age Jupiter Moon;Red Algae;1164;37024
+21;Space Age Jupiter Moon;Topological Records;1164;32820
+22;Space Age Titan;Compressed Matter Capsule;0;629
+22;Space Age Titan;Experimental Data;0;629
+22;Space Age Titan;Isolated Molecules;0;629
+22;Space Age Titan;Liquid Binder;0;629
+22;Space Age Titan;Upcycled Hydrocarbons;0;629
