@@ -10,60 +10,60 @@
   :root { --bg:#eef1f4; --panel:#fff; --ink:#16202b; --muted:#5d6b7a; --line:#d5dbe2; --accent:#0f766e; }
   * { box-sizing: border-box; }
   body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 "IBM Plex Sans", system-ui, sans-serif; }
-  header { padding:32px 5vw 8px; display:flex; flex-wrap:wrap; gap:16px 32px; align-items:end; justify-content:space-between; }
+  header { padding:32px 5vw 8px; }
   h1 { margin:0; font:600 clamp(28px,4vw,42px)/1.1 Fraunces, Georgia, serif; }
   header p { margin:6px 0 0; color:var(--muted); max-width:60ch; }
-  label { display:block; font-size:14px; color:var(--muted); margin-bottom:4px; }
+  label { font-size:14px; color:var(--muted); margin-right:8px; }
   select { font:inherit; padding:8px 12px; border:1px solid var(--line); border-radius:6px; background:var(--panel); min-width:240px; }
   select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
   main { padding:16px 5vw 48px; display:grid; gap:20px; }
   section { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:16px 16px 8px; }
   h2 { margin:0 0 4px; font-size:17px; font-weight:600; }
   section > p { margin:0 0 8px; font-size:14px; color:var(--muted); }
+  .picker { margin:8px 0 4px; }
   .chart { width:100%; height:420px; }
-  #heat { height:560px; }
+  #stock { height:680px; }
   #status { padding:0 5vw; color:var(--muted); }
 </style>
 </head>
 <body>
 <header>
-  <div>
-    <h1>Guild treasury tracker</h1>
-    <p id="summary">Loading data…</p>
-  </div>
-  <div><label for="era">Show</label><select id="era"></select></div>
+  <h1>Guild treasury tracker</h1>
+  <p id="summary">Loading data…</p>
 </header>
 <div id="status"></div>
 <main>
-  <section><h2 id="t1"></h2><p>Goods in stock at each weekly snapshot. Lines break where snapshots are missing.</p><div id="stock" class="chart"></div></section>
-  <section><h2 id="t2"></h2><p>Change since the previous snapshot. Shown only when the snapshots are 10 days apart or less.</p><div id="delta" class="chart"></div></section>
-  <section><h2>Stock by era</h2><p>Total goods in stock for each era. Blank cells mean the era had no data that week.</p><div id="heat" class="chart"></div></section>
+  <section>
+    <h2>Total Stock by Era</h2>
+    <p>Total goods in stock for each era at every weekly snapshot. Lines break where snapshots are missing.</p>
+    <div id="stock" class="chart"></div>
+  </section>
+  <section>
+    <h2 id="t1"></h2>
+    <p>Stock of each of the era's goods at every weekly snapshot. Lines break where snapshots are missing.</p>
+    <div class="picker"><label for="era1">Era</label><select id="era1"></select></div>
+    <div id="goods" class="chart"></div>
+  </section>
 </main>
 <script>
-const GAP_DAYS = 10;          // max spacing for a valid week-over-week change
-const BREAK_DAYS = 45;        // line charts break when snapshots are further apart than this
+const BREAK_DAYS = 45;        // lines break when snapshots are further apart than this
 const days = (a, b) => (new Date(b) - new Date(a)) / 864e5;
-const fmt = new Intl.NumberFormat("en");
-const layoutBase = { margin:{t:10,r:10,b:40,l:64}, paper_bgcolor:"rgba(0,0,0,0)", plot_bgcolor:"rgba(0,0,0,0)",
+const shift = (d, n) => new Date(new Date(d).getTime() + n * 864e5).toISOString().slice(0, 10);
+const layoutBase = { margin:{t:10,r:24,b:40,l:72}, paper_bgcolor:"rgba(0,0,0,0)", plot_bgcolor:"rgba(0,0,0,0)",
   font:{family:"IBM Plex Sans, system-ui, sans-serif", color:"#16202b"}, hovermode:"x unified",
-  xaxis:{gridcolor:"#e6eaee"}, yaxis:{gridcolor:"#e6eaee", tickformat:","}, legend:{orientation:"h", y:-0.18} };
+  xaxis:{gridcolor:"#e6eaee"}, yaxis:{gridcolor:"#e6eaee", tickformat:",", rangemode:"tozero"}, legend:{orientation:"h", y:-0.12} };
+const cfg = {responsive:true, displaylogo:false};
 
 fetch("data.json").then(r => r.json()).then(rows => {
+  if (typeof Plotly === "undefined") { document.getElementById("status").textContent = "Plotly failed to load. Check that plotly.min.js is next to index.html."; return; }
   const dates = [...new Set(rows.map(r => r.date))].sort();
   const eras = [...new Map(rows.map(r => [r.eraID, r.era])).entries()].sort((a, b) => a[0] - b[0]);
-  document.getElementById("summary").textContent =
-    `${dates.length} weekly snapshots, ${dates[0]} to ${dates[dates.length - 1]}.`;
+  document.getElementById("summary").textContent = `${dates.length} weekly snapshots, ${dates[0]} to ${dates[dates.length - 1]}.`;
 
-  const sel = document.getElementById("era");
-  sel.add(new Option("All eras (totals)", "all"));
-  eras.forEach(([id, name]) => sel.add(new Option(name, id)));
-
-  // total stock per era per date
-  const totals = {};
+  const totals = {};      // total stock per era per date
   rows.forEach(r => { ((totals[r.eraID] ??= {})[r.date] ??= 0); totals[r.eraID][r.date] += r.instock; });
 
-  // Build x/y with a null inserted wherever there is a long gap
-  function series(map) {
+  function series(map) {  // x/y with a null inserted wherever there is a long gap
     const x = [], y = [];
     dates.filter(d => d in map).forEach((d, i, arr) => {
       if (i > 0 && days(arr[i - 1], d) > BREAK_DAYS) { x.push(d); y.push(null); }
@@ -71,44 +71,27 @@ fetch("data.json").then(r => r.json()).then(rows => {
     });
     return { x, y };
   }
-  // week-over-week change, only across normal-length gaps
-  function deltas(map) {
-    const have = dates.filter(d => d in map), x = [], y = [];
-    for (let i = 1; i < have.length; i++)
-      if (days(have[i - 1], have[i]) <= GAP_DAYS) { x.push(have[i]); y.push(map[have[i]] - map[have[i - 1]]); }
-    return { x, y };
+
+  // Chart 1: stock per era. Padded x-range keeps the first and last points off the edges.
+  const eraTraces = eras.filter(([id]) => totals[id])
+    .map(([id, name]) => ({ name, mode:"lines+markers", marker:{size:7}, ...series(totals[id]), connectgaps:false }));
+  const lineLayout = {...layoutBase, xaxis:{...layoutBase.xaxis, range:[shift(dates[0], -10), shift(dates[dates.length - 1], 20)]}};
+  Plotly.newPlot("stock", eraTraces, lineLayout, cfg);
+
+  // Chart 2: the goods of one era
+  const sel1 = document.getElementById("era1");
+  eras.forEach(([id, name]) => sel1.add(new Option(name, id)));
+  function drawGoods() {
+    const id = sel1.value, sub = rows.filter(r => r.eraID == id);
+    document.getElementById("t1").textContent = `${eras.find(e => e[0] == id)[1]}: goods in stock`;
+    const traces = [...new Set(sub.map(r => r.good))].map(g => {
+      const m = {}; sub.filter(r => r.good === g).forEach(r => m[r.date] = r.instock);
+      return { name:g, mode:"lines+markers", marker:{size:7}, ...series(m), connectgaps:false };
+    });
+    Plotly.react("goods", traces, lineLayout, cfg);
   }
-
-  function draw() {
-    const v = sel.value, all = v === "all", traces = [], dtraces = [];
-    if (all) {
-      eras.forEach(([id, name]) => { if (totals[id]) traces.push({ name, mode:"lines", ...series(totals[id]), connectgaps:false }); });
-      const grand = {}; rows.forEach(r => grand[r.date] = (grand[r.date] || 0) + r.instock);
-      dtraces.push({ type:"bar", name:"All eras", marker:{color:"#0f766e"}, ...deltas(grand) });
-      t1.textContent = "Stock over time, by era"; t2.textContent = "Weekly change, all eras";
-    } else {
-      const sub = rows.filter(r => r.eraID == v);
-      [...new Set(sub.map(r => r.good))].forEach(g => {
-        const m = {}; sub.filter(r => r.good === g).forEach(r => m[r.date] = r.instock);
-        traces.push({ name:g, mode:"lines+markers", marker:{size:4}, ...series(m), connectgaps:false });
-      });
-      dtraces.push({ type:"bar", name:"Era total", marker:{color:"#0f766e"}, ...deltas(totals[v]) });
-      const name = eras.find(e => e[0] == v)[1];
-      t1.textContent = `${name}: stock over time`; t2.textContent = `${name}: weekly change in total stock`;
-    }
-    Plotly.react("stock", traces, layoutBase, {responsive:true, displaylogo:false});
-    Plotly.react("delta", dtraces, {...layoutBase, showlegend:false}, {responsive:true, displaylogo:false});
-  }
-
-  // heatmap: era x date
-  const z = eras.map(([id]) => dates.map(d => totals[id]?.[d] ?? null));
-  Plotly.newPlot("heat", [{ type:"heatmap", x:dates, y:eras.map(e => e[1]), z, colorscale:"Teal", hoverongaps:false,
-      colorbar:{tickformat:",", thickness:12}, xgap:0, ygap:1 }],
-    {...layoutBase, hovermode:"closest", margin:{t:10,r:10,b:40,l:170}, yaxis:{autorange:"reversed"}},
-    {responsive:true, displaylogo:false});
-
-  sel.onchange = draw; draw();
-}).catch(err => { document.getElementById("status").textContent = "Could not load data.json: " + err.message; });
+  sel1.onchange = drawGoods; drawGoods();
+}).catch(err => { document.getElementById("status").textContent = "Something went wrong: " + err.message; });
 </script>
 </body>
 </html>
