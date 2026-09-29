@@ -13,5 +13,5 @@ for f in sorted(Path("data").glob("GuildGoods-*.csv")):
 
 out = pd.concat(frames, ignore_index=True).sort_values(["date", "eraID"], kind="stable")
 out = out[["date", "eraID", "era", "good", "produceable", "instock"]]
-out.to_json("site/data.json", orient="records")
+out.to_json("docs/data.json", orient="records")
 print(f"{out['date'].nunique()} weeks, {len(out)} rows -> site/data.json")
