@@ -54,6 +54,7 @@
       <a href="#treasury" data-k="treasury">Guild Treasury</a>
       <a href="#qi" data-k="qi">Quantum Incursions</a>
       <a href="#gbg" data-k="gbg">Guild Battlegrounds</a>
+    <a href="#ge" data-k="ge">Guild Expeditions</a>
     </div>
   </nav>
   <div class="content">
@@ -72,7 +73,8 @@ const BREAK_DAYS = 45;    // lines break where snapshots are further apart than 
 const cfg = {responsive:true, displaylogo:false};
 const base = { margin:{t:10,r:24,b:40,l:72}, paper_bgcolor:"rgba(0,0,0,0)", plot_bgcolor:"rgba(0,0,0,0)",
   font:{family:"IBM Plex Sans, system-ui, sans-serif", color:"#16202b"}, hovermode:"x unified",
-  xaxis:{gridcolor:"#e6eaee"}, yaxis:{gridcolor:"#e6eaee", tickformat:",", rangemode:"tozero"}, legend:{orientation:"h", y:-0.12} };
+  xaxis:{gridcolor:"#e6eaee"}, yaxis:{gridcolor:"#e6eaee", tickformat:",", rangemode:"tozero"}, legend:{orientation:"h", y:-0.12},
+  hoverlabel:{bgcolor:"#ffffff", bordercolor:"#9aa5b1", font:{color:"#16202b"}} };
 
 const card = (title, desc, id, picker = "", cls = "") =>
   `<section><h2>${title}</h2><p>${desc}</p>${picker}<div id="${id}" class="chart ${cls}"></div></section>`;
@@ -117,37 +119,76 @@ function treasury({rows}) {
 const SCORE = {
   qi:  { unit:"Progress", round:"round", parts:r => [["Progress", r.s]], extra:r => `Actions: ${fmt.format(r.a)}` },
   gbg: { unit:"Total points", round:"season", parts:r => [["Negotiations (×2)", 2 * r.n], ["Battles", r.b]],
-         extra:r => `Negotiations ${r.n}, battles ${r.b}` }
+         extra:r => `Negotiations ${r.n}, battles ${r.b}` },
+  ge:  { unit:"Solved encounters", round:"week", trial:true, max:80, parts:r => [["Solved encounters", r.s]],
+         titles:{team:"Team Percentage per Week", board:"Weekly Leaderboard", player:"Player History"},
+         extra:r => `Expedition points: ${fmt.format(r.p)}<br>Trial level: ${r.t ?? "n/a"}` }
 };
-function scoreboard(key, {names, rows}) {
-  const S = SCORE[key];
+/* Guild Expeditions: grey = before Trials existed, colour ramp = trial level, dashed line = first week with trial data */
+const GREY = "#9aa5b1", RAMP = [[0, "#c6e6e1"], [1, "#0b4f49"]];
+const trialMarker = (t, lo, hi, size, title = "Trial level") => ({color:t, colorscale:RAMP, cmin:lo, cmax:hi, showscale:true,
+  colorbar:{title:{text:title}, thickness:12, len:0.7}, ...(size ? {size, line:{width:1, color:"#fff"}} : {})});
+const lerp = (v, lo, hi) => { const f = hi > lo ? Math.min(1, Math.max(0, (v - lo) / (hi - lo))) : 1, a = [198, 230, 225], b = [11, 79, 73];
+  return `rgb(${a.map((x, i) => Math.round(x + (b[i] - x) * f)).join(",")})`; };   // same ramp as RAMP, for per-point colours
+const TEAL = "#0f766e";
+const legendDot = (name, color) => ({x:[null], y:[null], mode:"markers", name, marker:{color, size:9}, hoverinfo:"skip"});   // legend-only entry
+const withTrialLine = (L, T0) => !T0 ? L : {...L, margin:{...L.margin, t:34},
+  shapes:[{type:"line", xref:"x", yref:"paper", x0:T0, x1:T0, y0:0, y1:1, line:{color:"#5d6b7a", width:1, dash:"dash"}}],
+  annotations:[{x:T0, xref:"x", y:1, yref:"paper", text:"Trials introduced", showarrow:false, xanchor:"left", yanchor:"bottom", xshift:4, yshift:4, font:{size:12, color:"#5d6b7a"}}]};
+function scoreboard(key, {names, rows: allRows, meta}) {
+  const S = SCORE[key], T0 = S.trial ? meta?.trialStart : null;
+  const rows = allRows.filter(r => r.s > 0);                    // active players only (GE data also carries inactive players)
   if (!rows.length) { $("summary").textContent = "No data yet."; $("view").innerHTML = ""; return; }
-  const dates = [...new Set(rows.map(r => r.date))].sort(), last = dates.at(-1);
+  const dates = [...new Set(allRows.map(r => r.date))].sort(), last = dates.at(-1);
   const nm = id => names[id] || id;
-  $("summary").textContent = `${dates.length} ${S.round}s, ${dates[0]} to ${last}. Only active players (score above zero) are shown.`;
+  const cap = S.max ? S.max : 0;
+  const tmax = Math.max(1, ...rows.map(r => r.t ?? 0)), tnote = T0 ? ` Grey is from before Trials were introduced (${T0}); afterwards the colour shows the trial level.` : "";
+  const TT = S.titles || {team:`Team ${S.unit.toLowerCase()} per ${S.round}`, board:"Leaderboard", player:"Player history"};
+  $("summary").textContent = `${dates.length} ${S.round}s, ${dates[0]} to ${last}. ` + (cap
+    ? "The team percentage includes inactive players; the leaderboard and player list show active players only."
+    : "Only active players (score above zero) are shown.");
   $("view").innerHTML =
-    card(`Team ${S.unit.toLowerCase()} per ${S.round}`, `Team total for each ${S.round}. Hover over a point to see the number of active players. Lines break where ${S.round}s are missing.`, "team") +
-    card("Leaderboard", `Active players in the selected ${S.round}.`, "board", picker("date", `${S.round[0].toUpperCase() + S.round.slice(1)} ended`)) +
-    card("Player history", `The selected player's score in every ${S.round} they were active.`, "player", picker("who", "Player"));
+    card(TT.team, cap ? `Total encounters solved divided by the maximum possible (${cap} per player), counting every player in the guild that week, including inactive ones. Hover over a point for details.${T0 ? ` Grey points are from before Trials were introduced (${T0}).` : ""} Lines break where weeks are missing.`
+                      : `Team total for each ${S.round}. Hover over a point to see the number of active players. Lines break where ${S.round}s are missing.`, "team") +
+    card(TT.board, cap ? `Active players in the selected week, ranked by encounters solved, then trial level, then expedition points.${tnote}` : `Active players in the selected ${S.round}.`,
+         "board", picker("date", `${S.round[0].toUpperCase() + S.round.slice(1)} ended`)) +
+    card(TT.player, cap ? `The selected player's solved encounters in every week they were in the guild, including weeks with none.${tnote}`
+                        : `The selected player's score in every ${S.round} they were active.`, "player", picker("who", "Player"));
 
-  // team totals
-  const tot = {}, cnt = {};
+  // team chart
+  const tot = {}, cnt = {}, ros = {};
+  allRows.forEach(r => ros[r.date] = (ros[r.date] || 0) + 1);
   rows.forEach(r => { tot[r.date] = (tot[r.date] || 0) + r.s; cnt[r.date] = (cnt[r.date] || 0) + 1; });
-  const tr = series(dates, tot);
-  Plotly.newPlot("team", [{name:`Team ${S.unit.toLowerCase()}`, mode:"lines+markers", marker:{size:7}, ...tr,
-    customdata:tr.x.map(d => cnt[d]), hovertemplate:"%{y:,}<br>Active players: %{customdata}<extra></extra>", connectgaps:false}],
-    {...lineLayout(dates), showlegend:false}, cfg);
+  if (cap) {
+    const pct = {}; dates.forEach(d => pct[d] = 100 * (tot[d] || 0) / (cap * ros[d]));
+    const ds = dates.filter(d => d in pct);
+    Plotly.newPlot("team", [
+      {...series(dates, pct), mode:"lines", line:{color:"#b8c4cf", width:2}, hoverinfo:"skip", showlegend:false, connectgaps:false},
+      {x:ds, y:ds.map(d => pct[d]), mode:"markers", showlegend:false, marker:{color:ds.map(d => d < T0 ? GREY : TEAL), size:9},
+       customdata:ds.map(d => [tot[d] || 0, cap * ros[d], cnt[d] || 0, ros[d]]),
+       hovertemplate:"%{y:.1f}%<br>Solved: %{customdata[0]:,} of %{customdata[1]:,}<br>Active players: %{customdata[2]} of %{customdata[3]}<extra></extra>"},
+      legendDot("Before trials", GREY), legendDot("After trials", TEAL)],
+      withTrialLine({...lineLayout(dates), yaxis:{...base.yaxis, tickformat:",.0f", ticksuffix:"%"}}, T0), cfg);
+  } else {
+    const tr = series(dates, tot);
+    Plotly.newPlot("team", [{name:`Team ${S.unit.toLowerCase()}`, mode:"lines+markers", marker:{size:7}, ...tr,
+      customdata:tr.x.map(d => cnt[d]), hovertemplate:"%{y:,}<br>Active players: %{customdata}<extra></extra>", connectgaps:false}],
+      {...lineLayout(dates), showlegend:false}, cfg);
+  }
 
-  // leaderboard
+  // leaderboard: GE ranks by solved encounters, then trial level (the game's own rank is ignored)
+  const order = S.trial ? (a, b) => b.s - a.s || (b.t ?? 0) - (a.t ?? 0) || (b.p || 0) - (a.p || 0)
+                        : (a, b) => b.s - a.s || (b.p || 0) - (a.p || 0);
   const dsel = fill("date", [...dates].reverse().map(d => [d, d]));
   const board = () => {
-    const sub = rows.filter(r => r.date === dsel.value).sort((a, b) => b.s - a.s);
-    $("board").style.height = Math.max(240, 90 + 24 * sub.length) + "px";
+    const sub = rows.filter(r => r.date === dsel.value).sort(order);
+    const H = Math.max(240, 90 + 24 * sub.length);
+    $("board").style.height = H + "px";
     Plotly.react("board", S.parts(sub[0] || {s:0, n:0, b:0}).map(([label], i) => ({
       type:"bar", orientation:"h", name:label, x:sub.map(r => S.parts(r)[i][1]), y:sub.map(r => nm(r.id)),
       customdata:sub.map(S.extra), hovertemplate:`%{y}<br>${label}: %{x:,}<br>%{customdata}<extra></extra>`,
-      marker:{color:["#0f766e", "#b7791f"][i]}})),
-      {...base, barmode:"stack", hovermode:"closest", margin:{t:10,r:24,b:40,l:170},
+      marker:!T0 ? {color:["#0f766e", "#b7791f"][i]} : dsel.value >= T0 ? trialMarker(sub.map(r => r.t ?? 0), 0, tmax) : {color:GREY}})),
+      {...base, height:H, barmode:"stack", hovermode:"closest", margin:{t:10,r:T0 ? 90 : 24,b:40,l:170},
        yaxis:{autorange:"reversed", automargin:true}, xaxis:{gridcolor:"#e6eaee", tickformat:","}, showlegend:S.parts({}).length > 1}, cfg);
   };
   dsel.onchange = board; board();
@@ -155,13 +196,25 @@ function scoreboard(key, {names, rows}) {
   // player history
   const ids = [...new Set(rows.map(r => r.id))].sort((a, b) => nm(a).localeCompare(nm(b)));
   const wsel = fill("who", ids.map(id => [id, nm(id)]));
-  wsel.value = rows.filter(r => r.date === last).sort((a, b) => b.s - a.s)[0]?.id ?? ids[0];
+  wsel.value = rows.filter(r => r.date === last).sort(order)[0]?.id ?? ids[0];
   const hist = () => {
+    if (cap) {                                                  // GE: line graph, zeros included
+      const sub = allRows.filter(r => r.id == wsel.value), m = {};
+      sub.forEach(r => m[r.date] = r.s);
+      Plotly.react("player", [
+        {...series(dates, m), mode:"lines", line:{color:"#b8c4cf", width:2}, hoverinfo:"skip", showlegend:false, connectgaps:false},
+        {x:sub.map(r => r.date), y:sub.map(r => r.s), customdata:sub.map(S.extra), mode:"markers", showlegend:false,
+         marker:{size:9, color:sub.map(r => r.date < T0 ? GREY : lerp(r.t ?? 0, 0, tmax))},
+         hovertemplate:"Solved: %{y}<br>%{customdata}<extra></extra>"},
+        legendDot("Before trials", GREY), legendDot("After trials", TEAL),
+        {x:[dates[0]], y:[-1000], mode:"markers", showlegend:false, hoverinfo:"skip", marker:trialMarker([0], 0, tmax, 6)}],   // draws the trial-level colour bar
+        withTrialLine({...lineLayout(dates), margin:{...base.margin, r:90}, yaxis:{...base.yaxis, range:[0, cap + 4]}}, T0), cfg);
+      return;
+    }
     const sub = rows.filter(r => r.id == wsel.value);
-    Plotly.react("player", S.parts(sub[0]).map(([label], i) => ({
-      type:"bar", name:label, x:sub.map(r => r.date), y:sub.map(r => S.parts(r)[i][1]),
-      customdata:sub.map(S.extra), hovertemplate:`${label}: %{y:,}<br>%{customdata}<extra></extra>`,
-      marker:{color:["#0f766e", "#b7791f"][i]}})),
+    const bar = (list, name, marker, show, i = 0) => ({type:"bar", name, x:list.map(r => r.date), y:list.map(r => S.parts(r)[i][1]),
+      customdata:list.map(S.extra), hovertemplate:`${name}: %{y:,}<br>%{customdata}<extra></extra>`, marker, showlegend:show});
+    Plotly.react("player", S.parts(sub[0]).map(([label], i) => bar(sub, label, {color:["#0f766e", "#b7791f"][i]}, S.parts({}).length > 1, i)),
       {...lineLayout(dates), barmode:"stack", showlegend:S.parts({}).length > 1}, cfg);
   };
   wsel.onchange = hist; hist();
@@ -171,7 +224,8 @@ function scoreboard(key, {names, rows}) {
 const ROUTES = {
   treasury:["Guild Treasury", "data/treasury.json", treasury],
   qi:["Quantum Incursions", "data/qi.json", d => scoreboard("qi", d)],
-  gbg:["Guild Battlegrounds", "data/gbg.json", d => scoreboard("gbg", d)]
+  gbg:["Guild Battlegrounds", "data/gbg.json", d => scoreboard("gbg", d)],
+  ge:["Guild Expeditions", "data/ge.json", d => scoreboard("ge", d)]
 };
 const cache = {};
 async function route() {
