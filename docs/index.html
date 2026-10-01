@@ -204,11 +204,11 @@ function scoreboard(key, {names, rows: allRows, meta}) {
       Plotly.react("player", [
         {...series(dates, m), mode:"lines", line:{color:"#b8c4cf", width:2}, hoverinfo:"skip", showlegend:false, connectgaps:false},
         {x:sub.map(r => r.date), y:sub.map(r => r.s), customdata:sub.map(S.extra), mode:"markers", showlegend:false,
-         marker:{size:9, color:sub.map(r => r.date < T0 ? GREY : lerp(r.t ?? 0, 0, tmax))},
+         cliponaxis:false, marker:{size:9, color:sub.map(r => r.date < T0 ? GREY : lerp(r.t ?? 0, 0, tmax))},
          hovertemplate:"Solved: %{y}<br>%{customdata}<extra></extra>"},
         legendDot("Before trials", GREY), legendDot("After trials", TEAL),
-        {x:[dates[0]], y:[-1000], mode:"markers", showlegend:false, hoverinfo:"skip", marker:trialMarker([0], 0, tmax, 6)}],   // draws the trial-level colour bar
-        withTrialLine({...lineLayout(dates), margin:{...base.margin, r:90}, yaxis:{...base.yaxis, range:[0, cap + 4]}}, T0), cfg);
+        {x:[dates[0]], y:[0], mode:"markers", showlegend:false, hoverinfo:"skip", marker:{...trialMarker([0], 0, tmax, 6), opacity:0}}],   // invisible point that draws the trial-level colour bar
+        withTrialLine({...lineLayout(dates), margin:{...base.margin, r:90}, yaxis:{...base.yaxis, range:[0, cap + 8], tickvals:[0, 20, 40, 60, 80], fixedrange:true}}, T0), cfg);   // 0 to 80 with headroom; fixed so autoscale cannot change it
       return;
     }
     const sub = rows.filter(r => r.id == wsel.value);
