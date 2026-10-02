@@ -34,6 +34,12 @@
   select { font:inherit; padding:8px 12px; border:1px solid var(--line); border-radius:6px; background:var(--panel); min-width:220px; max-width:100%; }
   select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
   .picker { margin:8px 0 4px; }
+  .tbl-wrap { overflow-x:auto; padding-bottom:8px; }
+  table.tbl { border-collapse:collapse; font-size:14px; min-width:320px; }
+  .tbl th, .tbl td { text-align:left; padding:6px 24px 6px 0; border-bottom:1px solid var(--line); }
+  .tbl th { font-weight:600; color:var(--muted); font-size:13px; }
+  .tbl td.num, .tbl th.num { text-align:right; font-variant-numeric:tabular-nums; padding-right:0; }
+  .tbl td.num { padding-left:24px; }
   .chart { width:100%; height:420px; }
   .tall { height:680px; }
   @media (max-width:800px) {
@@ -61,7 +67,7 @@
     <header><h1 id="title"></h1><p id="summary"></p></header>
     <div id="status"></div>
     <main id="view"></main>
-    <footer>This tracker is not affiliated with InnoGames</footer>
+    <footer><div>All data is pulled using FoE Helper as soon after Monday 8am server time as possible.</div><div>This tracker is not affiliated with InnoGames.</div></footer>
   </div>
 </div>
 <script>
@@ -92,13 +98,22 @@ function series(dates, map) {   // x/y for a {date: value} map, with a null wher
 const lineLayout = dates => ({...base, xaxis:{...base.xaxis, range:[shift(dates[0], -10), shift(dates.at(-1), 20)]}});
 
 /* ---------- Guild Treasury ---------- */
+const LOW_STOCK = 100000;    // goods below this quantity are listed in the Guild Treasury low-stock table
 function treasury({rows}) {
   const dates = [...new Set(rows.map(r => r.date))].sort();
   const eras = [...new Map(rows.map(r => [r.eraID, r.era])).entries()].sort((a, b) => a[0] - b[0]);
   $("summary").textContent = `${dates.length} weekly snapshots, ${dates[0]} to ${dates.at(-1)}.`;
   $("view").innerHTML =
     card("Total Stock by Era", "Total goods in stock for each era at every weekly snapshot. Lines break where snapshots are missing.", "stock", "", "tall") +
-    card("Goods in stock", "Stock of each of the era's goods at every weekly snapshot.", "goods", picker("era", "Era"));
+    card("Goods in stock", "Stock of each of the era's goods at every weekly snapshot.", "goods", picker("era", "Era")) +
+    `<section><h2 id="lowTitle"></h2><p id="lowNote"></p><div id="low" class="tbl-wrap"></div></section>`;
+  const last = dates.at(-1), low = rows.filter(r => r.date === last && r.instock < LOW_STOCK); // keeps the order of the GuildGoods file
+  $("lowTitle").textContent = `Low stock as of ${last}`;
+  $("lowNote").textContent = low.length ? `Goods in the latest snapshot with fewer than ${fmt.format(LOW_STOCK)} in stock.`
+    : `Well done! There are no goods below ${fmt.format(LOW_STOCK)} in stock.`;
+  $("low").innerHTML = low.length
+    ? `<table class="tbl"><thead><tr><th>Good</th><th>Age</th><th class="num">Quantity</th></tr></thead><tbody>${
+        low.map(r => `<tr><td>${r.good}</td><td>${r.era}</td><td class="num">${fmt.format(r.instock)}</td></tr>`).join("")}</tbody></table>` : "";
   const totals = {};
   rows.forEach(r => { ((totals[r.eraID] ??= {})[r.date] ??= 0); totals[r.eraID][r.date] += r.instock; });
   const L = lineLayout(dates);
