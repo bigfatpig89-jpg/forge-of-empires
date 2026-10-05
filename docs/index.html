@@ -38,7 +38,7 @@
   table.tbl { border-collapse:collapse; font-size:14px; min-width:320px; }
   .tbl th, .tbl td { text-align:left; padding:6px 24px 6px 0; border-bottom:1px solid var(--line); }
   .tbl th { font-weight:600; color:var(--muted); font-size:13px; }
-  .tbl td.num, .tbl th.num { text-align:right; font-variant-numeric:tabular-nums; padding-right:0; }
+  .tbl td.num, .tbl th.num { text-align:right; font-variant-numeric:tabular-nums; }
   .tbl td.num { padding-left:24px; }
   .chart { width:100%; height:420px; }
   .tall { height:680px; }
@@ -132,10 +132,14 @@ function treasury({rows}) {
 
 /* ---------- Quantum Incursions and Guild Battlegrounds (active players only) ---------- */
 const SCORE = {
-  qi:  { unit:"Progress", round:"round", parts:r => [["Progress", r.s]], extra:r => `Actions: ${fmt.format(r.a)}` },
+  qi:  { unit:"Progress", round:"season", parts:r => [["Progress", r.s]], extra:r => `Actions: ${fmt.format(r.a)}`,
+         best:{head:"Progress", desc:"Ranking of the best record of each player over all seasons.", val:r => r.s, ok:r => r.s > 0} },
   gbg: { unit:"Total points", round:"season", parts:r => [["Negotiations (×2)", 2 * r.n], ["Battles", r.b]],
+         best:{head:"Score", desc:"Ranking of the best record of each player over all seasons.", val:r => r.s, ok:r => r.s > 0},    // score = battles + negotiations x 2
          extra:r => `Negotiations ${r.n}, battles ${r.b}` },
   ge:  { unit:"Solved encounters", round:"week", trial:true, max:80, parts:r => [["Solved encounters", r.s]],
+         best:{head:"Highest trial", desc:"Ranking of the highest trial completed of each player over all expeditions.",
+               val:r => r.t, ok:(r, cap) => r.s >= cap && (r.t ?? 0) > 0},         // a trial counts as completed when all 80 encounters are solved
          titles:{team:"Team Percentage per Week", board:"Weekly Leaderboard", player:"Player History"},
          extra:r => `Expedition points: ${fmt.format(r.p)}<br>Trial level: ${r.t ?? "n/a"}` }
 };
@@ -158,14 +162,15 @@ function scoreboard(key, {names, rows: allRows, meta}) {
   const nm = id => names[id] || id;
   const cap = S.max ? S.max : 0;
   const tmax = Math.max(1, ...rows.map(r => r.t ?? 0)), tnote = T0 ? ` Grey is from before Trials were introduced (${T0}); afterwards the colour shows the trial level.` : "";
-  const TT = S.titles || {team:`Team ${S.unit.toLowerCase()} per ${S.round}`, board:"Leaderboard", player:"Player history"};
+  const TT = S.titles || {team:`Team ${S.unit.toLowerCase()} per ${S.round}`, board:"Seasonal Leaderboard", player:"Player history"};
   $("summary").textContent = `${dates.length} ${S.round}s, ${dates[0]} to ${last}. ` + (cap
     ? "The team percentage includes inactive players; the leaderboard and player list show active players only."
     : "Only active players (score above zero) are shown.");
   $("view").innerHTML =
     card(TT.team, cap ? `Total encounters solved divided by the maximum possible (${cap} per player), counting every player in the guild that week, including inactive ones. Hover over a point for details.${T0 ? ` Grey points are from before Trials were introduced (${T0}).` : ""} Lines break where weeks are missing.`
                       : `Team total for each ${S.round}. Hover over a point to see the number of active players. Lines break where ${S.round}s are missing.`, "team") +
-    card(TT.board, cap ? `Active players in the selected week, ranked by encounters solved, then trial level, then expedition points.${tnote}` : `Active players in the selected ${S.round}.`,
+    `<section><h2>All-Time Best Performances</h2><p>${S.best.desc}</p><div id="best" class="tbl-wrap"></div></section>` +
+    card(TT.board, cap ? `Active players in the selected week, ranked by encounters solved, then trial level, then expedition points.${tnote}` : "Active players in the selected season.",
          "board", picker("date", `${S.round[0].toUpperCase() + S.round.slice(1)} ended`)) +
     card(TT.player, cap ? `The selected player's solved encounters in every week they were in the guild, including weeks with none.${tnote}`
                         : `The selected player's score in every ${S.round} they were active.`, "player", picker("who", "Player"));
@@ -190,6 +195,19 @@ function scoreboard(key, {names, rows: allRows, meta}) {
       customdata:tr.x.map(d => cnt[d]), hovertemplate:"%{y:,}<br>Active players: %{customdata}<extra></extra>", connectgaps:false}],
       {...lineLayout(dates), showlegend:false}, cfg);
   }
+
+  // all-time best performances: each player's best record (earliest date if repeated); tied players share a rank (1, 2, 2, 4); ranks up to 20
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;"}[c]));
+  const bestOf = {};
+  allRows.forEach(r => { if (!S.best.ok(r, cap)) return; const v = S.best.val(r), c = bestOf[r.id];
+    if (!c || v > c.v || (v === c.v && r.date < c.date)) bestOf[r.id] = {id:r.id, v, date:r.date}; });
+  const list = Object.values(bestOf).sort((a, b) => b.v - a.v || a.date.localeCompare(b.date) || nm(a.id).localeCompare(nm(b.id)));
+  list.forEach((x, i) => x.rank = i && x.v === list[i - 1].v ? list[i - 1].rank : i + 1);
+  const top = list.filter(x => x.rank <= 20);
+  $("best").innerHTML = top.length
+    ? `<table class="tbl"><thead><tr><th>Rank</th><th>Player</th><th class="num">${S.best.head}</th><th>Date</th></tr></thead><tbody>${
+        top.map(x => `<tr><td>${x.rank}</td><td>${esc(nm(x.id))}</td><td class="num">${fmt.format(x.v)}</td><td>${x.date}</td></tr>`).join("")}</tbody></table>`
+    : "<p>No records yet.</p>";
 
   // leaderboard: GE ranks by solved encounters, then trial level (the game's own rank is ignored)
   const order = S.trial ? (a, b) => b.s - a.s || (b.t ?? 0) - (a.t ?? 0) || (b.p || 0) - (a.p || 0)
