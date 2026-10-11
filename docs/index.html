@@ -10,6 +10,30 @@
   :root { --bg:#eef1f4; --panel:#fff; --ink:#16202b; --muted:#5d6b7a; --line:#d5dbe2; --accent:#0f766e; }
   * { box-sizing: border-box; }
   body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 "IBM Plex Sans", system-ui, sans-serif; }
+  .top { background:#0e1620; display:flex; flex-wrap:wrap; align-items:center; gap:4px 24px; padding:10px 4vw; min-height:52px; }
+  .top .site { font:600 18px/1.2 Fraunces, Georgia, serif; color:#fff; text-decoration:none; }
+  .tabs { display:flex; flex-wrap:wrap; gap:4px; }
+  .tabs a { color:#cbd5df; text-decoration:none; padding:6px 12px; border-radius:6px; font-size:15px; }
+  .tabs a:hover { background:#243244; color:#fff; }
+  .tabs a.on { background:var(--accent); color:#fff; }
+  .tabs a:focus-visible, .top .site:focus-visible { outline:2px solid #fff; outline-offset:2px; }
+  .app.solo { display:block; }
+  .app.solo nav { display:none; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:20px; }
+  .tile { display:block; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:20px; color:inherit; text-decoration:none; }
+  a.tile:hover { border-color:var(--accent); box-shadow:0 2px 10px rgba(15,118,110,.15); }
+  a.tile:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .tile h2 { font:600 22px/1.2 Fraunces, Georgia, serif; margin:4px 0 8px; }
+  .tile .kicker { font-size:13px; color:var(--accent); font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+  .tile p { margin:0; color:var(--muted); font-size:14px; }
+  .tile.soon { opacity:.65; }
+  .scroll { max-height:440px; overflow:auto; }
+  .scroll .tbl thead th { position:sticky; top:0; background:var(--panel); }
+  .fields { display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; margin:8px 0; }
+  input[type=text], textarea { font:inherit; padding:8px 12px; border:1px solid var(--line); border-radius:6px; background:var(--panel); }
+  textarea { width:100%; max-width:680px; font-family:ui-monospace, Menlo, monospace; font-size:14px; }
+  button { font:inherit; padding:8px 16px; border:0; border-radius:6px; background:var(--accent); color:#fff; cursor:pointer; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
   .app { display:grid; grid-template-columns:230px 1fr; min-height:100vh; }
   nav { background:var(--ink); padding:28px 16px; position:sticky; top:0; height:100vh; }
   .brand { margin:0 8px 24px; }
@@ -53,21 +77,23 @@
 </style>
 </head>
 <body>
-<div class="app">
+<div class="top"><a class="site" href="#/">RMoose's Forge of Empires Assortment</a>
+  <div class="tabs"><a href="#/en19/treasury" data-t="en19">en19 (Uceria)</a><a href="#/en5" data-t="en5">en5 (East-Nagach)</a><a href="#/report" data-t="report">Report Generator</a></div></div>
+<div class="app" id="app">
   <nav aria-label="Sections">
     <div class="brand"><div class="guild">Team Targets</div><div class="game">Forge of Empires · en19 (Uceria)</div></div>
     <div class="links">
-      <a href="#treasury" data-k="treasury">Guild Treasury</a>
-      <a href="#qi" data-k="qi">Quantum Incursions</a>
-      <a href="#gbg" data-k="gbg">Guild Battlegrounds</a>
-    <a href="#ge" data-k="ge">Guild Expeditions</a>
+      <a href="#/en19/treasury" data-k="treasury">Guild Treasury</a>
+      <a href="#/en19/qi" data-k="qi">Quantum Incursions</a>
+      <a href="#/en19/gbg" data-k="gbg">Guild Battlegrounds</a>
+    <a href="#/en19/ge" data-k="ge">Guild Expeditions</a>
     </div>
   </nav>
   <div class="content">
     <header><h1 id="title"></h1><p id="summary"></p></header>
     <div id="status"></div>
     <main id="view"></main>
-    <footer><div>All data is pulled using FoE Helper as soon after Monday 8am server time as possible.</div><div>This tracker is not affiliated with InnoGames.</div></footer>
+    <footer><div id="helperNote">All data is pulled using FoE Helper as soon after Monday 8am server time as possible.</div><div id="reportNote" hidden>Your data is not saved on this site and will be cleared once you leave the page.</div><div>This website is not affiliated with InnoGames.</div></footer>
   </div>
 </div>
 <script>
@@ -253,23 +279,98 @@ function scoreboard(key, {names, rows: allRows, meta}) {
   wsel.onchange = hist; hist();
 }
 
-/* ---------- routing ---------- */
-const ROUTES = {
-  treasury:["Guild Treasury", "data/treasury.json", treasury],
-  qi:["Quantum Incursions", "data/qi.json", d => scoreboard("qi", d)],
-  gbg:["Guild Battlegrounds", "data/gbg.json", d => scoreboard("gbg", d)],
-  ge:["Guild Expeditions", "data/ge.json", d => scoreboard("ge", d)]
+/* ---------- Guild Expeditions Report Generator ---------- */
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const FULL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const ord = n => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ({1:"st", 2:"nd", 3:"rd"})[n % 10] || "th");
+const weekISO = v => { const m = String(v).trim().match(/^(\d{1,2})\/(\w{3})\/(\d{4})$/);       // 05/Oct/2026 -> 2026-10-05
+  return m ? `${m[3]}-${String(MON.indexOf(m[2][0].toUpperCase() + m[2].slice(1).toLowerCase()) + 1).padStart(2, "0")}-${m[1].padStart(2, "0")}` : String(v).trim().slice(0, 10); };
+function parseCsv(text) {
+  const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter(l => l.trim());
+  const sep = (lines[0] || "").includes(";") ? ";" : ",", head = (lines[0] || "").split(sep).map(s => s.trim().toLowerCase());
+  const [w, s, p] = ["gexweek", "solvedencounters", "expeditionpoints"].map(n => head.indexOf(n));
+  if (w < 0 || s < 0 || p < 0) throw new Error("This does not look like a Guild Expeditions file (expected the columns gexWeek, solvedEncounters and expeditionPoints).");
+  const out = lines.slice(1).map(l => { const c = l.split(sep); return {week:weekISO(c[w]), solved:+c[s] || 0, points:+c[p] || 0, cells:c}; });
+  out.head = lines[0].split(sep).map(x => x.trim());      // the file's own column names
+  return out;
+}
+const escHtml = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;"}[c]));
+function report() {
+  $("view").innerHTML = `<section><h2>Guild Expeditions report</h2>
+    <p>Upload a Guild Expeditions CSV file (by default called Participation.csv). It is read in your browser and is not uploaded anywhere.</p>
+    <div class="fields"><input type="file" id="rfile" accept=".csv,text/csv" aria-label="Guild Expeditions CSV file"></div>
+    <div class="fields" id="rweekbox" hidden><label for="rweek">Week</label><select id="rweek"></select></div>
+    <div class="fields"><label for="rrank">Ranking</label><input type="text" id="rrank" size="10"><label for="rpower">Guild Power</label><input type="text" id="rpower" size="16"></div>
+    <textarea id="rout" rows="12" aria-label="Report text" placeholder="The report appears here after you choose a file."></textarea>
+    <div class="fields"><button type="button" id="rcopy">Copy report</button><span id="rmsg" role="status"></span></div></section>
+    <section id="rdata" hidden><h2>Uploaded data</h2><p id="rdatanote"></p><div id="rtbl" class="tbl-wrap scroll"></div></section>`;
+  let rows = [];
+  const draw = () => {
+    const wk = $("rweek").value; if (!rows.length || !wk) return;
+    const r = rows.filter(x => x.week === wk), n = (lo, hi) => r.filter(x => x.solved >= lo && x.solved <= hi).length;
+    const m = k => `${k} ${k === 1 ? "member" : "members"}`, [y, mo, d] = wk.split("-").map(Number);
+    $("rout").value = [`Date: ${ord(d)} ${FULL[mo - 1]} ${y}`, `Ranking: ${$("rrank").value}`,
+      `Expedition Points: ${fmt.format(r.reduce((a, x) => a + x.points, 0))}`, `Guild Power: ${$("rpower").value}`,
+      `${m(n(80, 1e9))} completed level 5 (80 encounters)`, `${m(n(64, 79))} completed level 4 (64-79 encounters)`,
+      `${m(n(48, 63))} completed level 3 (48-63 encounters)`, `${m(n(32, 47))} completed level 2 (32-47 encounters)`,
+      `${m(n(16, 31))} completed level 1 (16-31 encounters)`, `${m(n(1, 15))} did not complete level 1 (1-15 encounters)`,
+      `${m(n(0, 0))} did not start (0 encounters)`].join("\n");
+    const head = rows.head, num = head.map((_, i) => r.every(x => /^-?[\d,.]+$/.test(x.cells[i] ?? "")));
+    $("rtbl").innerHTML = `<table class="tbl"><thead><tr>${head.map((t, i) => `<th${num[i] ? ' class="num"' : ""}>${escHtml(t)}</th>`).join("")}</tr></thead><tbody>${
+      r.map(x => `<tr>${head.map((_, i) => `<td${num[i] ? ' class="num"' : ""}>${escHtml(x.cells[i] ?? "")}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+    $("rdatanote").textContent = `${r.length} rows for the selected week, as they appear in the file.`; $("rdata").hidden = false;
+  };
+  $("rfile").onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    try {
+      rows = parseCsv(await f.text());
+      const weeks = [...new Set(rows.map(x => x.week))].sort().reverse();
+      $("rweek").innerHTML = ""; weeks.forEach(w => $("rweek").add(new Option(w, w)));
+      $("rweekbox").hidden = weeks.length < 2; $("rmsg").textContent = ""; draw();
+    } catch (err) { rows = []; $("rout").value = ""; $("rdata").hidden = true; $("rmsg").textContent = err.message; }
+  };
+  $("rweek").onchange = $("rrank").oninput = $("rpower").oninput = draw;
+  $("rcopy").onclick = async () => { const t = $("rout").value; if (!t) return;
+    try { await navigator.clipboard.writeText(t); } catch { $("rout").select(); document.execCommand("copy"); }
+    $("rmsg").textContent = "Copied"; };
+}
+
+/* ---------- main menu ---------- */
+const SITE = "RMoose's Forge of Empires Assortment";
+const menu = () => { $("view").innerHTML = `<div class="cards">
+  <a class="tile" href="#/en19/treasury"><div class="kicker">en19 (Uceria)</div><h2>Team Targets Guild Dashboard</h2><p>Guild Treasury, Quantum Incursions, Guild Battlegrounds and Guild Expeditions.</p></a>
+  <div class="tile soon"><div class="kicker">en5 (East-Nagach)</div><h2>Freyja's Warriors Guild Dashboard</h2><p>Coming soon.</p></div>
+  <a class="tile" href="#/report"><div class="kicker">Tool</div><h2>Guild Expeditions Report Generator</h2><p>Upload a Guild Expeditions CSV file and get a report ready to copy.</p></a></div>`; };
+
+/* ---------- routing: #/  #/en19/<section>  #/en5  #/report ---------- */
+const SECTIONS = {
+  treasury:["Guild Treasury", treasury],
+  qi:["Quantum Incursions", d => scoreboard("qi", d)],
+  gbg:["Guild Battlegrounds", d => scoreboard("gbg", d)],
+  ge:["Guild Expeditions", d => scoreboard("ge", d)]
 };
 const cache = {};
 async function route() {
-  const k = ROUTES[location.hash.slice(1)] ? location.hash.slice(1) : "treasury", [title, url, render] = ROUTES[k];
-  document.querySelectorAll("nav a").forEach(a => a.classList.toggle("on", a.dataset.k === k));
-  document.title = `${title} | Team Targets (en19)`;
-  $("title").textContent = title; $("summary").textContent = ""; $("view").innerHTML = "";
-  if (typeof Plotly === "undefined") { $("status").textContent = "Plotly failed to load. Check that plotly.min.js is next to index.html."; return; }
-  $("status").textContent = "Loading…";
-  try { cache[k] ??= await (await fetch(url)).json(); $("status").textContent = ""; render(cache[k]); }
-  catch (err) { $("status").textContent = "Something went wrong: " + err.message; }
+  const h = location.hash.slice(1);
+  if (SECTIONS[h]) { location.replace("#/en19/" + h); return; }                       // old links such as #qi
+  const [a, b] = h.replace(/^\/+|\/+$/g, "").split("/");
+  if (a === "en19" && !SECTIONS[b]) { location.replace("#/en19/treasury"); return; }
+  const dash = a === "en19";
+  $("app").classList.toggle("solo", !dash); $("helperNote").hidden = !dash; $("reportNote").hidden = a !== "report";
+  document.querySelectorAll(".tabs a").forEach(t => t.classList.toggle("on", t.dataset.t === a));
+  document.querySelectorAll("nav a").forEach(x => x.classList.toggle("on", x.dataset.k === b));
+  $("summary").textContent = ""; $("status").textContent = ""; $("view").innerHTML = "";
+  if (dash) {
+    const [title, render] = SECTIONS[b];
+    $("title").textContent = title; document.title = `${title} | Team Targets (en19)`;
+    if (typeof Plotly === "undefined") { $("status").textContent = "Plotly failed to load. Check that plotly.min.js is next to index.html."; return; }
+    $("status").textContent = "Loading…";
+    try { cache[b] ??= await (await fetch(`data/en19/${b}.json`)).json(); $("status").textContent = ""; render(cache[b]); }
+    catch (err) { $("status").textContent = "Something went wrong: " + err.message; }
+  } else if (a === "report") { $("title").textContent = document.title = "Guild Expeditions Report Generator"; report(); }
+  else if (a === "en5") { $("title").textContent = document.title = "en5 (East-Nagach): Freyja's Warriors Guild Dashboard";
+    $("view").innerHTML = "<section><h2>Coming soon</h2><p>This dashboard is not available yet.</p></section>"; }
+  else { $("title").textContent = document.title = SITE; $("summary").textContent = "Choose a dashboard or tool."; menu(); }
 }
 window.addEventListener("hashchange", route); route();
 </script>
