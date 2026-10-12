@@ -3,7 +3,7 @@
 Dashboards for Guild Treasury, Quantum Incursions (QI), Guild Battlegrounds (GBG) and Guild Expeditions (GE).
 Live site: https://bigfatpig89-jpg.github.io/forge-of-empires/
 
-Each section has its own page: `#treasury`, `#qi`, `#gbg` and `#ge` (for example `.../forge-of-empires/#qi`).
+The site opens on a main menu (RMoose's Forge of Empires Assortment) with the en19 (Uceria) Team Targets dashboard, a coming-soon card for en5 (East-Nagach), and the Guild Expeditions Report Generator (upload a GE CSV, get a copyable report; it runs in the browser). Dashboard pages are `#/en19/treasury`, `#/en19/qi`, `#/en19/gbg` and `#/en19/ge`; the generator is `#/report`.
 
 ## Weekly update
 
@@ -11,10 +11,10 @@ Each section has its own page: `#treasury`, `#qi`, `#gbg` and `#ge` (for example
 
    | Section | Folder | File name |
    |---|---|---|
-   | Guild Treasury | `data/treasury/` | `GuildGoods-YYYY-MM-DD.csv` |
-   | Quantum Incursions | `data/qi/` | `QI-YYYY-MM-DD.csv` |
-   | Guild Battlegrounds | `data/gbg/` | `GBG-YYYY-MM-DD.csv` |
-| Guild Expeditions | `data/ge/` | `GE-YYYY-MM-DD.csv` |
+   | Guild Treasury | `data/en19/treasury/` | `GuildGoods-YYYY-MM-DD.csv` |
+   | Quantum Incursions | `data/en19/qi/` | `QI-YYYY-MM-DD.csv` |
+   | Guild Battlegrounds | `data/en19/gbg/` | `GBG-YYYY-MM-DD.csv` |
+| Guild Expeditions | `data/en19/ge/` | `GE-YYYY-MM-DD.csv` |
 
 2. Rebuild the data files (run from the project folder, the one containing `build.py`):
 
@@ -45,12 +45,12 @@ Open http://localhost:8000. Stop the server with Ctrl+C, then `cd ..` to return 
 
 ## How it fits together
 
-- `data/treasury/`, `data/qi/`, `data/gbg/`, `data/ge/`: one CSV per snapshot (`;`-separated).
+- `data/en19/treasury/`, `data/en19/qi/`, `data/en19/gbg/`, `data/en19/ge/`: one CSV per snapshot (`;`-separated).
   - Treasury columns: eraID, era, good, produceable, instock
   - QI columns: Player_ID, Player, Actions, Progress (Progress is a per-round score)
   - GBG columns: player_id, player, negotiations, battles, total (total = 2 x negotiations + battles)
   - GE columns: gexWeek, player ID, player, expeditionPoints, solvedEncounters, rank, trial (the week comes from the `gexWeek` column, not the file name; a file can hold one week or several)
-- `build.py`: reads every CSV and writes `docs/data/treasury.json`, `qi.json`, `gbg.json` and `ge.json`.
+- `build.py`: reads every CSV and writes `docs/data/en19/treasury.json`, `qi.json`, `gbg.json` and `ge.json`.
 - `eras.py`: maps era names to eraIDs.
 - `docs/`: the website served by GitHub Pages.
   - `index.html`: the whole dashboard (sidebar and all three sections).
@@ -68,3 +68,4 @@ Open http://localhost:8000. Stop the server with Ctrl+C, then `cd ..` to return 
 - GE leaderboard ranks active players (at least one solved encounter) by encounters solved, then trial level, then expedition points. The rank in the game's export is not used.
 - GE player history is a line graph that includes weeks with 0 solved. `trial` (the difficulty level a player picks each week) was only added in May 2025, so earlier points are grey, later points are coloured by trial level, and a dashed line marks the first week with trial data (found automatically from the data).
 - QI, GBG and GE each have an "All-Time Best Performances" table (top 20 ranks, tied players share a rank, e.g. 1, 2, 2, 4). It uses each player's best record over all data, with the earliest date if the best was repeated. For GE the ranking is the highest trial completed, counting only weeks with all 80 encounters solved.
+- The Guild Contributions Processor (`#/contributions`) takes a Guild Treasury contributions CSV (Player ID, Player name, Era, Good, Amount, Message, Date/Time) and shows each player's total per message type plus a Grand Total, with negative values in red. Like the report generator, it runs in the browser and nothing is saved.

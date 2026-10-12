@@ -29,6 +29,7 @@
   .tile.soon { opacity:.65; }
   .scroll { max-height:440px; overflow:auto; }
   .scroll .tbl thead th { position:sticky; top:0; background:var(--panel); }
+  .tbl td.neg { background:#d93025; color:#fff; font-weight:600; }
   .fields { display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; margin:8px 0; }
   input[type=text], textarea { font:inherit; padding:8px 12px; border:1px solid var(--line); border-radius:6px; background:var(--panel); }
   textarea { width:100%; max-width:680px; font-family:ui-monospace, Menlo, monospace; font-size:14px; }
@@ -78,7 +79,7 @@
 </head>
 <body>
 <div class="top"><a class="site" href="#/">RMoose's Forge of Empires Assortment</a>
-  <div class="tabs"><a href="#/en19/treasury" data-t="en19">en19 (Uceria)</a><a href="#/en5" data-t="en5">en5 (East-Nagach)</a><a href="#/report" data-t="report">Report Generator</a></div></div>
+  <div class="tabs"><a href="#/en19/treasury" data-t="en19">en19 (Uceria)</a><a href="#/en5" data-t="en5">en5 (East-Nagach)</a><a href="#/report" data-t="report">Report Generator</a><a href="#/contributions" data-t="contributions">Contributions Processor</a></div></div>
 <div class="app" id="app">
   <nav aria-label="Sections">
     <div class="brand"><div class="guild">Team Targets</div><div class="game">Forge of Empires · en19 (Uceria)</div></div>
@@ -335,12 +336,50 @@ function report() {
     $("rmsg").textContent = "Copied"; };
 }
 
+/* ---------- Guild Contributions Processor ---------- */
+const KNOWN_MSG = ["Battlegrounds: Place Building", "Building production", "Guild expedition: Difficulty unlocked", "Guild treasury donation"];
+const fmtDay = iso => { const [y, mo, d] = iso.split("-").map(Number); return `${ord(d)} ${FULL[mo - 1]} ${y}`; };
+function parseContrib(text) {
+  const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter(l => l.trim());
+  const sep = (lines[0] || "").includes(";") ? ";" : ",", head = (lines[0] || "").split(sep).map(s => s.trim().toLowerCase());
+  const [i, n, a, m, t] = ["player id", "player name", "amount", "message", "date/time"].map(k => head.indexOf(k));
+  if ([i, n, a, m, t].some(x => x < 0)) throw new Error("This does not look like a Guild Treasury contributions file (expected the columns Player ID, Player name, Amount, Message and Date/Time).");
+  return lines.slice(1).map(l => { const c = l.split(sep), d = (c[t] || "").trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s*(\d{1,2}:\d{2}(?::\d{2})?)?/);
+    return {id:c[i].trim(), name:c[n].trim(), amount:+c[a] || 0, msg:c[m].trim(),
+            at:d ? `${d[3]}-${d[2].padStart(2, "0")}-${d[1].padStart(2, "0")} ${(d[4] || "").replace(/^(\d):/, "0$1:")}` : ""}; });
+}
+function contributions() {
+  $("view").innerHTML = `<section><h2>Guild Contributions Processor</h2>
+    <p id="cdesc">Upload a Guild Treasury contributions CSV file. It is read in your browser and is not uploaded anywhere.</p>
+    <div class="fields"><input type="file" id="cfile" accept=".csv,text/csv" aria-label="Guild Treasury contributions CSV file"><span id="cmsg" role="status"></span></div>
+    <div id="ctbl" class="tbl-wrap scroll" style="max-height:70vh"></div></section>`;
+  $("cfile").onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    try {
+      const rows = parseContrib(await f.text()), days = rows.map(r => r.at.slice(0, 10)).filter(Boolean).sort();
+      if (!rows.length || !days.length) throw new Error("The file has no usable data rows.");
+      $("cdesc").textContent = `Cumulative Treasury Contribution data from ${fmtDay(days[0])} to ${fmtDay(days.at(-1))}`;
+      const cols = [...KNOWN_MSG], key = s => cols.find(c => c.toLowerCase() === s.toLowerCase());
+      rows.forEach(r => { if (!key(r.msg)) cols.push(r.msg); });                      // any other message type gets its own column
+      const by = {};
+      rows.forEach(r => { const p = by[r.id] ??= {name:r.name, at:r.at, sums:{}, total:0}; if (r.at >= p.at) { p.at = r.at; p.name = r.name; }   // latest name per player ID
+        const k = key(r.msg); p.sums[k] = (p.sums[k] ?? 0) + r.amount; p.total += r.amount; });
+      const list = Object.values(by).sort((a, b) => a.name.localeCompare(b.name, undefined, {sensitivity:"base"}));
+      const td = v => v === undefined ? `<td class="num"></td>` : v < 0 ? `<td class="num neg">(${fmt.format(-v)})</td>` : `<td class="num">${fmt.format(v)}</td>`;
+      $("ctbl").innerHTML = `<table class="tbl"><thead><tr><th>Player name</th>${cols.map(c => `<th class="num">${escHtml(c)}</th>`).join("")}<th class="num">Grand Total</th></tr></thead><tbody>${
+        list.map(p => `<tr><td>${escHtml(p.name)}</td>${cols.map(c => td(p.sums[c])).join("")}${td(p.total)}</tr>`).join("")}</tbody></table>`;
+      $("cmsg").textContent = "";
+    } catch (err) { $("ctbl").innerHTML = ""; $("cmsg").textContent = err.message; }
+  };
+}
+
 /* ---------- main menu ---------- */
 const SITE = "RMoose's Forge of Empires Assortment";
 const menu = () => { $("view").innerHTML = `<div class="cards">
   <a class="tile" href="#/en19/treasury"><div class="kicker">en19 (Uceria)</div><h2>Team Targets Guild Dashboard</h2><p>Guild Treasury, Quantum Incursions, Guild Battlegrounds and Guild Expeditions.</p></a>
   <div class="tile soon"><div class="kicker">en5 (East-Nagach)</div><h2>Freyja's Warriors Guild Dashboard</h2><p>Coming soon.</p></div>
-  <a class="tile" href="#/report"><div class="kicker">Tool</div><h2>Guild Expeditions Report Generator</h2><p>Upload a Guild Expeditions CSV file and get a report ready to copy.</p></a></div>`; };
+  <a class="tile" href="#/report"><div class="kicker">Tool</div><h2>Guild Expeditions Report Generator</h2><p>Upload a Guild Expeditions CSV file and get a report ready to copy.</p></a>
+  <a class="tile" href="#/contributions"><div class="kicker">Tool</div><h2>Guild Contributions Processor</h2><p>Upload a Guild Treasury contributions CSV file and get each player's totals by contribution type.</p></a></div>`; };
 
 /* ---------- routing: #/  #/en19/<section>  #/en5  #/report ---------- */
 const SECTIONS = {
@@ -356,7 +395,7 @@ async function route() {
   const [a, b] = h.replace(/^\/+|\/+$/g, "").split("/");
   if (a === "en19" && !SECTIONS[b]) { location.replace("#/en19/treasury"); return; }
   const dash = a === "en19";
-  $("app").classList.toggle("solo", !dash); $("helperNote").hidden = !dash; $("reportNote").hidden = a !== "report";
+  $("app").classList.toggle("solo", !dash); $("helperNote").hidden = !dash; $("reportNote").hidden = a !== "report" && a !== "contributions";
   document.querySelectorAll(".tabs a").forEach(t => t.classList.toggle("on", t.dataset.t === a));
   document.querySelectorAll("nav a").forEach(x => x.classList.toggle("on", x.dataset.k === b));
   $("summary").textContent = ""; $("status").textContent = ""; $("view").innerHTML = "";
@@ -368,6 +407,7 @@ async function route() {
     try { cache[b] ??= await (await fetch(`data/en19/${b}.json`)).json(); $("status").textContent = ""; render(cache[b]); }
     catch (err) { $("status").textContent = "Something went wrong: " + err.message; }
   } else if (a === "report") { $("title").textContent = document.title = "Guild Expeditions Report Generator"; report(); }
+  else if (a === "contributions") { $("title").textContent = document.title = "Guild Contributions Processor"; contributions(); }
   else if (a === "en5") { $("title").textContent = document.title = "en5 (East-Nagach): Freyja's Warriors Guild Dashboard";
     $("view").innerHTML = "<section><h2>Coming soon</h2><p>This dashboard is not available yet.</p></section>"; }
   else { $("title").textContent = document.title = SITE; $("summary").textContent = "Choose a dashboard or tool."; menu(); }

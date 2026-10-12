@@ -56,16 +56,21 @@ def guild_expeditions(folder):
     return {"names": {str(k): v for k, v in names.items()},
             "meta": {"trialStart": None if pd.isna(first_trial) else first_trial}, "rows": rows}
 
-out = {}
-t = load("data/treasury", "GuildGoods")
-if "eraID" not in t: t["eraID"] = t["era"].map(ERA_ID)
-out["treasury"] = {"rows": t.sort_values(["date", "eraID"], kind="stable")
-                   [["date", "eraID", "era", "good", "produceable", "instock"]].to_dict("records")}
-out["qi"] = scores(load("data/qi", "QI"), "Player_ID", "Player", {"a": "Actions", "s": "Progress"})
-out["gbg"] = scores(load("data/gbg", "GBG", gbg_columns), "player_id", "player", {"n": "negotiations", "b": "battles", "s": "total"})
-out["ge"] = guild_expeditions("data/ge")
+DASHBOARDS = ["en19"]    # one folder per dashboard: data/<name>/{treasury,qi,gbg,ge}; add "en5" here when its data exists
 
-Path("docs/data").mkdir(parents=True, exist_ok=True)
-for name, d in out.items():
-    Path(f"docs/data/{name}.json").write_text(json.dumps(d, separators=(",", ":")))
-    print(name, len(d["rows"]), "rows")
+def build(dash):
+    base, out = f"data/{dash}", {}
+    t = load(f"{base}/treasury", "GuildGoods")
+    if not t.empty and "eraID" not in t: t["eraID"] = t["era"].map(ERA_ID)
+    out["treasury"] = {"rows": [] if t.empty else t.sort_values(["date", "eraID"], kind="stable")
+                       [["date", "eraID", "era", "good", "produceable", "instock"]].to_dict("records")}
+    out["qi"] = scores(load(f"{base}/qi", "QI"), "Player_ID", "Player", {"a": "Actions", "s": "Progress"})
+    out["gbg"] = scores(load(f"{base}/gbg", "GBG", gbg_columns), "player_id", "player", {"n": "negotiations", "b": "battles", "s": "total"})
+    out["ge"] = guild_expeditions(f"{base}/ge")
+    Path(f"docs/data/{dash}").mkdir(parents=True, exist_ok=True)
+    for name, d in out.items():
+        Path(f"docs/data/{dash}/{name}.json").write_text(json.dumps(d, separators=(",", ":")))
+        print(dash, name, len(d["rows"]), "rows")
+
+for dash in DASHBOARDS:
+    build(dash)
