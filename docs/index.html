@@ -29,6 +29,7 @@
   .tile.soon { opacity:.65; }
   .scroll { max-height:440px; overflow:auto; }
   .scroll .tbl thead th { position:sticky; top:0; background:var(--panel); }
+  .tbl tr.sum td { font-weight:600; border-top:2px solid var(--ink); }
   .tbl td.neg { background:#d93025; color:#fff; font-weight:600; }
   .fields { display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; margin:8px 0; }
   input[type=text], textarea { font:inherit; padding:8px 12px; border:1px solid var(--line); border-radius:6px; background:var(--panel); }
@@ -79,17 +80,9 @@
 </head>
 <body>
 <div class="top"><a class="site" href="#/">RMoose's Forge of Empires Assortment</a>
-  <div class="tabs"><a href="#/en19/treasury" data-t="en19">en19 (Uceria)</a><a href="#/en5" data-t="en5">en5 (East-Nagach)</a><a href="#/report" data-t="report">Report Generator</a><a href="#/contributions" data-t="contributions">Contributions Processor</a></div></div>
+  <div class="tabs"><a href="#/en19" data-t="en19">en19 (Uceria)</a><a href="#/en5" data-t="en5">en5 (East-Nagach)</a><a href="#/report" data-t="report">Report Generator</a><a href="#/contributions" data-t="contributions">Contributions Processor</a></div></div>
 <div class="app" id="app">
-  <nav aria-label="Sections">
-    <div class="brand"><div class="guild">Team Targets</div><div class="game">Forge of Empires · en19 (Uceria)</div></div>
-    <div class="links">
-      <a href="#/en19/treasury" data-k="treasury">Guild Treasury</a>
-      <a href="#/en19/qi" data-k="qi">Quantum Incursions</a>
-      <a href="#/en19/gbg" data-k="gbg">Guild Battlegrounds</a>
-    <a href="#/en19/ge" data-k="ge">Guild Expeditions</a>
-    </div>
-  </nav>
+  <nav aria-label="Sections" id="side"></nav>
   <div class="content">
     <header><h1 id="title"></h1><p id="summary"></p></header>
     <div id="status"></div>
@@ -186,9 +179,10 @@ function scoreboard(key, {names, rows: allRows, meta}) {
   const rows = allRows.filter(r => r.s > 0);                    // active players only (GE data also carries inactive players)
   if (!rows.length) { $("summary").textContent = "No data yet."; $("view").innerHTML = ""; return; }
   const dates = [...new Set(allRows.map(r => r.date))].sort(), last = dates.at(-1);
+  const hasPre = !!T0 && dates[0] < T0;                          // any data from before Trials? (en5 has none)
   const nm = id => names[id] || id;
   const cap = S.max ? S.max : 0;
-  const tmax = Math.max(1, ...rows.map(r => r.t ?? 0)), tnote = T0 ? ` Grey is from before Trials were introduced (${T0}); afterwards the colour shows the trial level.` : "";
+  const tmax = Math.max(1, ...rows.map(r => r.t ?? 0)), tnote = T0 && dates[0] < T0 ? ` Grey is from before Trials were introduced (${T0}); afterwards the colour shows the trial level.` : "";
   const TT = S.titles || {team:`Team ${S.unit.toLowerCase()} per ${S.round}`, board:"Seasonal Leaderboard", player:"Player history"};
   $("summary").textContent = `${dates.length} ${S.round}s, ${dates[0]} to ${last}. ` + (cap
     ? "The team percentage includes inactive players; the leaderboard and player list show active players only."
@@ -214,8 +208,8 @@ function scoreboard(key, {names, rows: allRows, meta}) {
       {x:ds, y:ds.map(d => pct[d]), mode:"markers", showlegend:false, marker:{color:ds.map(d => d < T0 ? GREY : TEAL), size:9},
        customdata:ds.map(d => [tot[d] || 0, cap * ros[d], cnt[d] || 0, ros[d]]),
        hovertemplate:"%{y:.1f}%<br>Solved: %{customdata[0]:,} of %{customdata[1]:,}<br>Active players: %{customdata[2]} of %{customdata[3]}<extra></extra>"},
-      legendDot("Before trials", GREY), legendDot("After trials", TEAL)],
-      withTrialLine({...lineLayout(dates), yaxis:{...base.yaxis, tickformat:",.0f", ticksuffix:"%"}}, T0), cfg);
+      ...(hasPre ? [legendDot("Before trials", GREY)] : []), legendDot("After trials", TEAL)],
+      withTrialLine({...lineLayout(dates), yaxis:{...base.yaxis, tickformat:",.0f", ticksuffix:"%"}}, hasPre ? T0 : null), cfg);
   } else {
     const tr = series(dates, tot);
     Plotly.newPlot("team", [{name:`Team ${S.unit.toLowerCase()}`, mode:"lines+markers", marker:{size:7}, ...tr,
@@ -266,9 +260,9 @@ function scoreboard(key, {names, rows: allRows, meta}) {
         {x:sub.map(r => r.date), y:sub.map(r => r.s), customdata:sub.map(S.extra), mode:"markers", showlegend:false,
          cliponaxis:false, marker:{size:9, color:sub.map(r => r.date < T0 ? GREY : lerp(r.t ?? 0, 0, tmax))},
          hovertemplate:"Solved: %{y}<br>%{customdata}<extra></extra>"},
-        legendDot("Before trials", GREY), legendDot("After trials", TEAL),
+        ...(hasPre ? [legendDot("Before trials", GREY)] : []), legendDot("After trials", TEAL),
         {x:[dates[0]], y:[0], mode:"markers", showlegend:false, hoverinfo:"skip", marker:{...trialMarker([0], 0, tmax, 6), opacity:0}}],   // invisible point that draws the trial-level colour bar
-        withTrialLine({...lineLayout(dates), margin:{...base.margin, r:90}, yaxis:{...base.yaxis, range:[0, cap + 8], tickvals:[0, 20, 40, 60, 80], fixedrange:true}}, T0), cfg);   // 0 to 80 with headroom; fixed so autoscale cannot change it
+        withTrialLine({...lineLayout(dates), margin:{...base.margin, r:90}, yaxis:{...base.yaxis, range:[0, cap + 8], tickvals:[0, 20, 40, 60, 80], fixedrange:true}}, hasPre ? T0 : null), cfg);   // 0 to 80 with headroom; fixed so autoscale cannot change it
       return;
     }
     const sub = rows.filter(r => r.id == wsel.value);
@@ -366,8 +360,11 @@ function contributions() {
         const k = key(r.msg); p.sums[k] = (p.sums[k] ?? 0) + r.amount; p.total += r.amount; });
       const list = Object.values(by).sort((a, b) => a.name.localeCompare(b.name, undefined, {sensitivity:"base"}));
       const td = v => v === undefined ? `<td class="num"></td>` : v < 0 ? `<td class="num neg">(${fmt.format(-v)})</td>` : `<td class="num">${fmt.format(v)}</td>`;
+      const sum = {};                                                                  // column totals (blank when a column has no entries)
+      list.forEach(p => cols.forEach(c => { if (p.sums[c] !== undefined) sum[c] = (sum[c] ?? 0) + p.sums[c]; }));
+      const grand = list.reduce((a, p) => a + p.total, 0);
       $("ctbl").innerHTML = `<table class="tbl"><thead><tr><th>Player name</th>${cols.map(c => `<th class="num">${escHtml(c)}</th>`).join("")}<th class="num">Grand Total</th></tr></thead><tbody>${
-        list.map(p => `<tr><td>${escHtml(p.name)}</td>${cols.map(c => td(p.sums[c])).join("")}${td(p.total)}</tr>`).join("")}</tbody></table>`;
+        list.map(p => `<tr><td>${escHtml(p.name)}</td>${cols.map(c => td(p.sums[c])).join("")}${td(p.total)}</tr>`).join("")}<tr class="sum"><td>Total</td>${cols.map(c => td(sum[c])).join("")}${td(grand)}</tr></tbody></table>`;
       $("cmsg").textContent = "";
     } catch (err) { $("ctbl").innerHTML = ""; $("cmsg").textContent = err.message; }
   };
@@ -375,42 +372,51 @@ function contributions() {
 
 /* ---------- main menu ---------- */
 const SITE = "RMoose's Forge of Empires Assortment";
-const menu = () => { $("view").innerHTML = `<div class="cards">
-  <a class="tile" href="#/en19/treasury"><div class="kicker">en19 (Uceria)</div><h2>Team Targets Guild Dashboard</h2><p>Guild Treasury, Quantum Incursions, Guild Battlegrounds and Guild Expeditions.</p></a>
-  <div class="tile soon"><div class="kicker">en5 (East-Nagach)</div><h2>Freyja's Warriors Guild Dashboard</h2><p>Coming soon.</p></div>
-  <a class="tile" href="#/report"><div class="kicker">Tool</div><h2>Guild Expeditions Report Generator</h2><p>Upload a Guild Expeditions CSV file and get a report ready to copy.</p></a>
-  <a class="tile" href="#/contributions"><div class="kicker">Tool</div><h2>Guild Contributions Processor</h2><p>Upload a Guild Treasury contributions CSV file and get each player's totals by contribution type.</p></a></div>`; };
-
-/* ---------- routing: #/  #/en19/<section>  #/en5  #/report ---------- */
+const DASH = {
+  en19:{guild:"Team Targets", game:"Forge of Empires · en19 (Uceria)", kicker:"en19 (Uceria)", tile:"Team Targets Guild Dashboard"},
+  en5:{guild:"Freyja's Warriors", game:"Forge of Empires · en5 (East-Nagach)", kicker:"en5 (East-Nagach)", tile:"Freyja's Warriors Guild Dashboard"}
+};
 const SECTIONS = {
   treasury:["Guild Treasury", treasury],
   qi:["Quantum Incursions", d => scoreboard("qi", d)],
   gbg:["Guild Battlegrounds", d => scoreboard("gbg", d)],
   ge:["Guild Expeditions", d => scoreboard("ge", d)]
 };
+const manifest = fetch("data/dashboards.json").then(r => r.json()).catch(() => ({}));    // which sections have data; written by build.py
+const sectionsOf = (man, a) => (man[a] || (a === "en19" ? Object.keys(SECTIONS) : [])).filter(s => SECTIONS[s]);
+const menu = man => {
+  const tiles = Object.entries(DASH).map(([a, D]) => { const secs = sectionsOf(man, a);
+    return secs.length ? `<a class="tile" href="#/${a}"><div class="kicker">${D.kicker}</div><h2>${D.tile}</h2><p>${secs.map(s => SECTIONS[s][0]).join(", ")}.</p></a>`
+      : `<div class="tile soon"><div class="kicker">${D.kicker}</div><h2>${D.tile}</h2><p>Coming soon.</p></div>`; }).join("");
+  $("view").innerHTML = `<div class="cards">${tiles}
+  <a class="tile" href="#/report"><div class="kicker">Tool</div><h2>Guild Expeditions Report Generator</h2><p>Upload a Guild Expeditions CSV file and get a report ready to copy.</p></a>
+  <a class="tile" href="#/contributions"><div class="kicker">Tool</div><h2>Guild Contributions Processor</h2><p>Upload a Guild Treasury contributions CSV file and get each player's totals by contribution type.</p></a></div>`; };
+
+/* ---------- routing: #/  #/<dashboard>/<section>  #/report  #/contributions ---------- */
 const cache = {};
 async function route() {
   const h = location.hash.slice(1);
   if (SECTIONS[h]) { location.replace("#/en19/" + h); return; }                       // old links such as #qi
-  const [a, b] = h.replace(/^\/+|\/+$/g, "").split("/");
-  if (a === "en19" && !SECTIONS[b]) { location.replace("#/en19/treasury"); return; }
-  const dash = a === "en19";
-  $("app").classList.toggle("solo", !dash); $("helperNote").hidden = !dash; $("reportNote").hidden = a !== "report" && a !== "contributions";
+  const man = await manifest, [a, b] = h.replace(/^\/+|\/+$/g, "").split("/");
+  const D = DASH[a], secs = D ? sectionsOf(man, a) : [];
+  if (secs.length && !secs.includes(b)) { location.replace(`#/${a}/${secs[0]}`); return; }
+  const dash = !!D && secs.length > 0;
+  $("app").classList.toggle("solo", !dash); $("helperNote").hidden = !D; $("reportNote").hidden = a !== "report" && a !== "contributions";
   document.querySelectorAll(".tabs a").forEach(t => t.classList.toggle("on", t.dataset.t === a));
-  document.querySelectorAll("nav a").forEach(x => x.classList.toggle("on", x.dataset.k === b));
   $("summary").textContent = ""; $("status").textContent = ""; $("view").innerHTML = "";
   if (dash) {
     const [title, render] = SECTIONS[b];
-    $("title").textContent = title; document.title = `${title} | Team Targets (en19)`;
+    $("side").innerHTML = `<div class="brand"><div class="guild">${D.guild}</div><div class="game">${D.game}</div></div><div class="links">${
+      secs.map(s => `<a href="#/${a}/${s}" data-k="${s}"${s === b ? ' class="on"' : ""}>${SECTIONS[s][0]}</a>`).join("")}</div>`;
+    $("title").textContent = title; document.title = `${title} | ${D.guild} (${a})`;
     if (typeof Plotly === "undefined") { $("status").textContent = "Plotly failed to load. Check that plotly.min.js is next to index.html."; return; }
     $("status").textContent = "Loading…";
-    try { cache[b] ??= await (await fetch(`data/en19/${b}.json`)).json(); $("status").textContent = ""; render(cache[b]); }
+    try { const k = `${a}/${b}`; cache[k] ??= await (await fetch(`data/${k}.json`)).json(); $("status").textContent = ""; render(cache[k]); }
     catch (err) { $("status").textContent = "Something went wrong: " + err.message; }
-  } else if (a === "report") { $("title").textContent = document.title = "Guild Expeditions Report Generator"; report(); }
+  } else if (D) { $("title").textContent = document.title = D.tile; $("summary").textContent = "No data yet."; }
+  else if (a === "report") { $("title").textContent = document.title = "Guild Expeditions Report Generator"; report(); }
   else if (a === "contributions") { $("title").textContent = document.title = "Guild Contributions Processor"; contributions(); }
-  else if (a === "en5") { $("title").textContent = document.title = "en5 (East-Nagach): Freyja's Warriors Guild Dashboard";
-    $("view").innerHTML = "<section><h2>Coming soon</h2><p>This dashboard is not available yet.</p></section>"; }
-  else { $("title").textContent = document.title = SITE; $("summary").textContent = "Choose a dashboard or tool."; menu(); }
+  else { $("title").textContent = document.title = SITE; $("summary").textContent = "Choose a dashboard or tool."; menu(man); }
 }
 window.addEventListener("hashchange", route); route();
 </script>

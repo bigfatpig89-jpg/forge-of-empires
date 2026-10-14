@@ -3,7 +3,7 @@
 Dashboards for Guild Treasury, Quantum Incursions (QI), Guild Battlegrounds (GBG) and Guild Expeditions (GE).
 Live site: https://bigfatpig89-jpg.github.io/forge-of-empires/
 
-The site opens on a main menu (RMoose's Forge of Empires Assortment) with the en19 (Uceria) Team Targets dashboard, a coming-soon card for en5 (East-Nagach), and the Guild Expeditions Report Generator (upload a GE CSV, get a copyable report; it runs in the browser). Dashboard pages are `#/en19/treasury`, `#/en19/qi`, `#/en19/gbg` and `#/en19/ge`; the generator is `#/report`.
+The site opens on a main menu (RMoose's Forge of Empires Assortment) with the en19 (Uceria) Team Targets dashboard, the en5 (East-Nagach) Freyja's Warriors dashboard, and the Guild Expeditions Report Generator (upload a GE CSV, get a copyable report; it runs in the browser). Dashboard pages are `#/en19/treasury`, `#/en19/qi`, `#/en19/gbg` and `#/en19/ge`; the generator is `#/report`.
 
 ## Weekly update
 
@@ -69,3 +69,4 @@ Open http://localhost:8000. Stop the server with Ctrl+C, then `cd ..` to return 
 - GE player history is a line graph that includes weeks with 0 solved. `trial` (the difficulty level a player picks each week) was only added in May 2025, so earlier points are grey, later points are coloured by trial level, and a dashed line marks the first week with trial data (found automatically from the data).
 - QI, GBG and GE each have an "All-Time Best Performances" table (top 20 ranks, tied players share a rank, e.g. 1, 2, 2, 4). It uses each player's best record over all data, with the earliest date if the best was repeated. For GE the ranking is the highest trial completed, counting only weeks with all 80 encounters solved.
 - The Guild Contributions Processor (`#/contributions`) takes a Guild Treasury contributions CSV (Player ID, Player name, Era, Good, Amount, Message, Date/Time) and shows each player's total per message type plus a Grand Total, with negative values in red. Like the report generator, it runs in the browser and nothing is saved.
+- Each dashboard has its own data folder (`data/en19/`, `data/en5/`), each with `treasury`, `qi`, `gbg` and `ge` subfolders. `build.py` writes `docs/data/<dashboard>/*.json` plus `docs/data/dashboards.json`, which lists the sections that have data. A section appears in a dashboard's sidebar once it has files, so the en5 sidebar currently shows only Guild Battlegrounds. To add another dashboard, add its name to `DASHBOARDS` in `build.py` and to `DASH` in `docs/index.html`.

@@ -38,6 +38,8 @@ def week(v):
     m = re.fullmatch(r"(\d{1,2})/(\w{3})/(\d{4})", str(v).strip())
     return f"{m[3]}-{MONTHS[m[2].title()]:02d}-{int(m[1]):02d}" if m else pd.to_datetime(v).strftime("%Y-%m-%d")
 
+TRIALS_START = "2025-05-26"    # when Trials were introduced; the same for every dashboard (first trial week in the en19 data)
+
 def guild_expeditions(folder):
     """The date comes from the gexWeek column, so a file may hold one week or many. All players are kept, including those with 0 solved."""
     frames = []
@@ -48,15 +50,15 @@ def guild_expeditions(folder):
     if not frames: return {"names": {}, "meta": {}, "rows": []}
     df = pd.concat(frames, ignore_index=True).drop_duplicates(["date", "player ID"], keep="last")
     names = df.sort_values("date").drop_duplicates("player ID", keep="last").set_index("player ID")["player"]
-    first_trial = df.loc[df["trial"].notna(), "date"].min()      # trial is blank before Trials existed
+    has_trial = df["trial"].notna().any()                       # trial is blank in weeks before Trials existed
     act = df.rename(columns={"player ID": "id", "solvedEncounters": "s",      # inactive players are kept: the team percentage needs the full roster
                              "expeditionPoints": "p", "rank": "r", "trial": "t"})
     rows = act.sort_values(["date", "s", "p"], ascending=[True, False, False])[["date", "id", "s", "p", "r", "t"]].to_dict("records")
     for r in rows: r["t"] = None if pd.isna(r["t"]) else int(r["t"])
     return {"names": {str(k): v for k, v in names.items()},
-            "meta": {"trialStart": None if pd.isna(first_trial) else first_trial}, "rows": rows}
+            "meta": {"trialStart": TRIALS_START if has_trial else None}, "rows": rows}
 
-DASHBOARDS = ["en19"]    # one folder per dashboard: data/<name>/{treasury,qi,gbg,ge}; add "en5" here when its data exists
+DASHBOARDS = ["en19", "en5"]    # one folder per dashboard: data/<name>/{treasury,qi,gbg,ge}; sections without files are simply left out
 
 def build(dash):
     base, out = f"data/{dash}", {}
@@ -71,6 +73,7 @@ def build(dash):
     for name, d in out.items():
         Path(f"docs/data/{dash}/{name}.json").write_text(json.dumps(d, separators=(",", ":")))
         print(dash, name, len(d["rows"]), "rows")
+    return [name for name, d in out.items() if d["rows"]]       # the sections that have data
 
-for dash in DASHBOARDS:
-    build(dash)
+manifest = {dash: build(dash) for dash in DASHBOARDS}
+Path("docs/data/dashboards.json").write_text(json.dumps(manifest))   # tells the page which sections to show for each dashboard
