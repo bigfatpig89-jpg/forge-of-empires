@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Team Targets | Forge of Empires en19</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=Fraunces:opsz,wght@9..144,600&display=swap">
+<script src="plotly.min.js"></script>
+<style>
+  :root { --bg:#eef1f4; --panel:#fff; --ink:#16202b; --muted:#5d6b7a; --line:#d5dbe2; --accent:#0f766e; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 "IBM Plex Sans", system-ui, sans-serif; }
+  .top { background:#0e1620; display:flex; flex-wrap:wrap; align-items:center; gap:4px 24px; padding:10px 4vw; min-height:52px; }
+  .top .site { font:600 18px/1.2 Fraunces, Georgia, serif; color:#fff; text-decoration:none; }
+  .tabs { display:flex; flex-wrap:wrap; gap:4px; }
+  .tabs a { color:#cbd5df; text-decoration:none; padding:6px 12px; border-radius:6px; font-size:15px; }
+  .tabs a:hover { background:#243244; color:#fff; }
+  .tabs a.on { background:var(--accent); color:#fff; }
+  .tabs a:focus-visible, .top .site:focus-visible { outline:2px solid #fff; outline-offset:2px; }
+  .app.solo { display:block; }
+  .app.solo nav { display:none; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:20px; }
+  .tile { display:block; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:20px; color:inherit; text-decoration:none; }
+  a.tile:hover { border-color:var(--accent); box-shadow:0 2px 10px rgba(15,118,110,.15); }
+  a.tile:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .tile h2 { font:600 22px/1.2 Fraunces, Georgia, serif; margin:4px 0 8px; }
+  .tile .kicker { font-size:13px; color:var(--accent); font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+  .tile p { margin:0; color:var(--muted); font-size:14px; }
+  .tile.soon { opacity:.65; }
+  .scroll { max-height:440px; overflow:auto; }
+  .scroll .tbl thead th { position:sticky; top:0; background:var(--panel); }
+  .tbl tr.sum td { font-weight:600; border-top:2px solid var(--ink); }
+  .tbl td.neg { background:#d93025; color:#fff; font-weight:600; }
+  .fields { display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; margin:8px 0; }
+  .bad { color:#d93025; font-weight:600; }
+  input[type=text], input[type=password], textarea { font:inherit; padding:8px 12px; border:1px solid var(--line); border-radius:6px; background:var(--panel); }
+  textarea { width:100%; max-width:680px; font-family:ui-monospace, Menlo, monospace; font-size:14px; }
+  button { font:inherit; padding:8px 16px; border:0; border-radius:6px; background:var(--accent); color:#fff; cursor:pointer; }
+  button:focus-visible, input:focus-visible, textarea:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .app { display:grid; grid-template-columns:230px 1fr; min-height:100vh; }
+  nav { background:var(--ink); padding:28px 16px; position:sticky; top:0; height:100vh; }
+  .brand { margin:0 8px 24px; }
+  .guild { font:600 24px/1.2 Fraunces, Georgia, serif; color:#fff; }
+  .game { font-size:13px; color:#9fb0c1; margin-top:4px; }
+  nav a { display:block; padding:10px 12px; border-radius:6px; color:#cbd5df; text-decoration:none; margin-bottom:4px; }
+  nav a:hover { background:#243244; color:#fff; }
+  nav a.on { background:var(--accent); color:#fff; }
+  nav a:focus-visible { outline:2px solid #fff; outline-offset:2px; }
+  .content { min-width:0; display:flex; flex-direction:column; }
+  main { flex:1; }
+  footer { padding:0 4vw 24px; font-size:13px; color:var(--muted); }
+  header { padding:32px 4vw 8px; }
+  h1 { margin:0; font:600 clamp(28px,4vw,42px)/1.1 Fraunces, Georgia, serif; }
+  header p { margin:6px 0 0; color:var(--muted); }
+  #status { padding:0 4vw; color:var(--muted); }
+  main { padding:16px 4vw 48px; display:grid; gap:20px; }
+  section { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:16px 16px 8px; min-width:0; }
+  h2 { margin:0 0 4px; font-size:17px; font-weight:600; }
+  section > p { margin:0 0 8px; font-size:14px; color:var(--muted); }
+  label { font-size:14px; color:var(--muted); margin-right:8px; }
+  select { font:inherit; padding:8px 12px; border:1px solid var(--line); border-radius:6px; background:var(--panel); min-width:220px; max-width:100%; }
+  select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  .picker { margin:8px 0 4px; }
+  .tbl-wrap { overflow-x:auto; padding-bottom:8px; }
+  table.tbl { border-collapse:collapse; font-size:14px; min-width:320px; }
+  .tbl th, .tbl td { text-align:left; padding:6px 24px 6px 0; border-bottom:1px solid var(--line); }
+  .tbl th { font-weight:600; color:var(--muted); font-size:13px; }
+  .tbl td.num, .tbl th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .tbl td.num { padding-left:24px; }
+  .chart { width:100%; height:420px; }
+  .tall { height:680px; }
+  @media (max-width:800px) {
+    .app { display:block; }
+    nav { position:static; height:auto; padding:14px 12px 12px; }
+    .brand { margin:0 4px 10px; }
+    .links { display:flex; gap:6px; overflow-x:auto; }
+    nav a { white-space:nowrap; margin:0; }
+    .tall { height:560px; }
+  }
+</style>
+</head>
+<body>
+<div class="top"><a class="site" href="#/">RMoose's Forge of Empires Assortment</a>
+  <div class="tabs"><a href="#/en19" data-t="en19">en19 (Uceria)</a><a href="#/en5" data-t="en5">en5 (East-Nagach)</a><a href="#/report" data-t="report">Report Generator</a><a href="#/contributions" data-t="contributions">Contributions Processor</a></div></div>
+<div class="app" id="app">
+  <nav aria-label="Sections" id="side"></nav>
+  <div class="content">
+    <header><h1 id="title"></h1><p id="summary"></p></header>
+    <div id="status"></div>
+    <main id="view"></main>
+    <footer><div id="helperNote">All data is pulled using FoE Helper as soon after Monday 8am server time as possible.</div><div id="reportNote" hidden>Your data is not saved on this site and will be cleared once you leave the page.</div><div>This website is not affiliated with InnoGames.</div></footer>
+  </div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const fmt = new Intl.NumberFormat("en");
+const days = (a, b) => (new Date(b) - new Date(a)) / 864e5;
+const shift = (d, n) => new Date(new Date(d).getTime() + n * 864e5).toISOString().slice(0, 10);
+const BREAK_DAYS = 45;    // lines break where snapshots are further apart than this
+const cfg = {responsive:true, displaylogo:false};
+const base = { margin:{t:10,r:24,b:40,l:72}, paper_bgcolor:"rgba(0,0,0,0)", plot_bgcolor:"rgba(0,0,0,0)",
+  font:{family:"IBM Plex Sans, system-ui, sans-serif", color:"#16202b"}, hovermode:"x unified",
+  xaxis:{gridcolor:"#e6eaee"}, yaxis:{gridcolor:"#e6eaee", tickformat:",", rangemode:"tozero"}, legend:{orientation:"h", y:-0.12},
+  hoverlabel:{bgcolor:"#ffffff", bordercolor:"#9aa5b1", font:{color:"#16202b"}} };
+
+const card = (title, desc, id, picker = "", cls = "") =>
+  `<section><h2>${title}</h2><p>${desc}</p>${picker}<div id="${id}" class="chart ${cls}"></div></section>`;
+const picker = (id, label) => `<div class="picker"><label for="${id}">${label}</label><select id="${id}"></select></div>`;
+const fill = (id, opts) => { const s = $(id); opts.forEach(([v, t]) => s.add(new Option(t, v))); return s; };
+
+function series(dates, map) {   // x/y for a {date: value} map, with a null wherever there is a long gap
+  const x = [], y = [];
+  dates.filter(d => d in map).forEach((d, i, a) => {
+    if (i > 0 && days(a[i - 1], d) > BREAK_DAYS) { x.push(d); y.push(null); }
+    x.push(d); y.push(map[d]);
+  });
+  return { x, y };
+}
+const lineLayout = dates => ({...base, xaxis:{...base.xaxis, range:[shift(dates[0], -10), shift(dates.at(-1), 20)]}});
+
+/* ---------- Guild Treasury ---------- */
+const LOW_STOCK = 100000;    // goods below this quantity are listed in the Guild Treasury low-stock table
+function treasury({rows}) {
+  const dates = [...new Set(rows.map(r => r.date))].sort();
+  const eras = [...new Map(rows.map(r => [r.eraID, r.era])).entries()].sort((a, b) => a[0] - b[0]);
+  $("summary").textContent = `${dates.length} weekly snapshots, ${dates[0]} to ${dates.at(-1)}.`;
+  $("view").innerHTML =
+    card("Total Stock by Era", "Total goods in stock for each era at every weekly snapshot. Lines break where snapshots are missing.", "stock", "", "tall") +
+    card("Goods in stock", "Stock of each of the era's goods at every weekly snapshot.", "goods", picker("era", "Era")) +
+    `<section><h2 id="lowTitle"></h2><p id="lowNote"></p><div id="low" class="tbl-wrap"></div></section>`;
+  const last = dates.at(-1), low = rows.filter(r => r.date === last && r.instock < LOW_STOCK); // keeps the order of the GuildGoods file
+  $("lowTitle").textContent = `Low stock as of ${last}`;
+  $("lowNote").textContent = low.length ? `Goods in the latest snapshot with fewer than ${fmt.format(LOW_STOCK)} in stock.`
+    : `Well done! There are no goods below ${fmt.format(LOW_STOCK)} in stock.`;
+  $("low").innerHTML = low.length
+    ? `<table class="tbl"><thead><tr><th>Good</th><th>Age</th><th class="num">Quantity</th></tr></thead><tbody>${
+        low.map(r => `<tr><td>${r.good}</td><td>${r.era}</td><td class="num">${fmt.format(r.instock)}</td></tr>`).join("")}</tbody></table>` : "";
+  const totals = {};
+  rows.forEach(r => { ((totals[r.eraID] ??= {})[r.date] ??= 0); totals[r.eraID][r.date] += r.instock; });
+  const L = lineLayout(dates);
+  Plotly.newPlot("stock", eras.filter(([id]) => totals[id]).map(([id, name]) =>
+    ({name, mode:"lines+markers", marker:{size:7}, ...series(dates, totals[id]), connectgaps:false})), L, cfg);
+  const sel = fill("era", eras.map(([id, name]) => [id, name]));
+  const draw = () => {
+    const sub = rows.filter(r => r.eraID == sel.value);
+    Plotly.react("goods", [...new Set(sub.map(r => r.good))].map(g => {
+      const m = {}; sub.filter(r => r.good === g).forEach(r => m[r.date] = r.instock);
+      return {name:g, mode:"lines+markers", marker:{size:7}, ...series(dates, m), connectgaps:false};
+    }), L, cfg);
+  };
+  sel.onchange = draw; draw();
+}
+
+/* ---------- Quantum Incursions and Guild Battlegrounds (active players only) ---------- */
+const SCORE = {
+  qi:  { unit:"Progress", round:"season", parts:r => [["Progress", r.s]], extra:r => `Actions: ${fmt.format(r.a)}`,
+         best:{head:"Progress", desc:"Ranking of the best record of each player over all seasons.", val:r => r.s, ok:r => r.s > 0} },
+  gbg: { unit:"Total points", round:"season", parts:r => [["Negotiations (×2)", 2 * r.n], ["Battles", r.b]],
+         best:{head:"Score", desc:"Ranking of the best record of each player over all seasons.", val:r => r.s, ok:r => r.s > 0},    // score = battles + negotiations x 2
+         extra:r => `Negotiations ${r.n}, battles ${r.b}` },
+  ge:  { unit:"Solved encounters", round:"week", trial:true, max:80, parts:r => [["Solved encounters", r.s]],
+         best:{head:"Highest trial", desc:"Ranking of the highest trial completed of each player over all expeditions.",
+               val:r => r.t, ok:(r, cap) => r.s >= cap && (r.t ?? 0) > 0},         // a trial counts as completed when all 80 encounters are solved
+         titles:{team:"Team Percentage per Week", board:"Weekly Leaderboard", player:"Player History"},
+         extra:r => `Expedition points: ${fmt.format(r.p)}<br>Trial level: ${r.t ?? "n/a"}` }
+};
+/* Guild Expeditions: grey = before Trials existed, colour ramp = trial level, dashed line = first week with trial data */
+const GREY = "#9aa5b1", RAMP = [[0, "#c6e6e1"], [1, "#0b4f49"]];
+const trialMarker = (t, lo, hi, size, title = "Trial level") => ({color:t, colorscale:RAMP, cmin:lo, cmax:hi, showscale:true,
+  colorbar:{title:{text:title}, thickness:12, len:0.7}, ...(size ? {size, line:{width:1, color:"#fff"}} : {})});
+const lerp = (v, lo, hi) => { const f = hi > lo ? Math.min(1, Math.max(0, (v - lo) / (hi - lo))) : 1, a = [198, 230, 225], b = [11, 79, 73];
+  return `rgb(${a.map((x, i) => Math.round(x + (b[i] - x) * f)).join(",")})`; };   // same ramp as RAMP, for per-point colours
+const TEAL = "#0f766e";
+const legendDot = (name, color) => ({x:[null], y:[null], mode:"markers", name, marker:{color, size:9}, hoverinfo:"skip"});   // legend-only entry
+const withTrialLine = (L, T0) => !T0 ? L : {...L, margin:{...L.margin, t:34},
+  shapes:[{type:"line", xref:"x", yref:"paper", x0:T0, x1:T0, y0:0, y1:1, line:{color:"#5d6b7a", width:1, dash:"dash"}}],
+  annotations:[{x:T0, xref:"x", y:1, yref:"paper", text:"Trials introduced", showarrow:false, xanchor:"left", yanchor:"bottom", xshift:4, yshift:4, font:{size:12, color:"#5d6b7a"}}]};
+function scoreboard(key, {names, rows: allRows, meta}) {
+  const S = SCORE[key], T0 = S.trial ? meta?.trialStart : null;
+  const rows = allRows.filter(r => r.s > 0);                    // active players only (GE data also carries inactive players)
+  if (!rows.length) { $("summary").textContent = "No data yet."; $("view").innerHTML = ""; return; }
+  const dates = [...new Set(allRows.map(r => r.date))].sort(), last = dates.at(-1);
+  const hasPre = !!T0 && dates[0] < T0;                          // any data from before Trials? (en5 has none)
+  const nm = id => names[id] || id;
+  const cap = S.max ? S.max : 0;
+  const tmax = Math.max(1, ...rows.map(r => r.t ?? 0)), tnote = T0 && dates[0] < T0 ? ` Grey is from before Trials were introduced (${T0}); afterwards the colour shows the trial level.` : "";
+  const TT = S.titles || {team:`Team ${S.unit.toLowerCase()} per ${S.round}`, board:"Seasonal Leaderboard", player:"Player history"};
+  $("summary").textContent = `${dates.length} ${S.round}s, ${dates[0]} to ${last}. ` + (cap
+    ? "The team percentage includes inactive players; the leaderboard and player list show active players only."
+    : "Only active players (score above zero) are shown.");
+  $("view").innerHTML =
+    card(TT.team, cap ? `Total encounters solved divided by the maximum possible (${cap} per player), counting every player in the guild that week, including inactive ones. Hover over a point for details.${T0 ? ` Grey points are from before Trials were introduced (${T0}).` : ""} Lines break where weeks are missing.`
+                      : `Team total for each ${S.round}. Hover over a point to see the number of active players. Lines break where ${S.round}s are missing.`, "team") +
+    `<section><h2>All-Time Best Performances</h2><p>${S.best.desc}</p><div id="best" class="tbl-wrap"></div></section>` +
+    card(TT.board, cap ? `Active players in the selected week, ranked by encounters solved, then trial level, then expedition points.${tnote}` : "Active players in the selected season.",
+         "board", picker("date", `${S.round[0].toUpperCase() + S.round.slice(1)} ended`)) +
+    card(TT.player, cap ? `The selected player's solved encounters in every week they were in the guild, including weeks with none.${tnote}`
+                        : `The selected player's score in every ${S.round} they were active.`, "player", picker("who", "Player"));
+
+  // team chart
+  const tot = {}, cnt = {}, ros = {};
+  allRows.forEach(r => ros[r.date] = (ros[r.date] || 0) + 1);
+  rows.forEach(r => { tot[r.date] = (tot[r.date] || 0) + r.s; cnt[r.date] = (cnt[r.date] || 0) + 1; });
+  if (cap) {
+    const pct = {}; dates.forEach(d => pct[d] = 100 * (tot[d] || 0) / (cap * ros[d]));
+    const ds = dates.filter(d => d in pct);
+    Plotly.newPlot("team", [
+      {...series(dates, pct), mode:"lines", line:{color:"#b8c4cf", width:2}, hoverinfo:"skip", showlegend:false, connectgaps:false},
+      {x:ds, y:ds.map(d => pct[d]), mode:"markers", showlegend:false, marker:{color:ds.map(d => d < T0 ? GREY : TEAL), size:9},
+       customdata:ds.map(d => [tot[d] || 0, cap * ros[d], cnt[d] || 0, ros[d]]),
+       hovertemplate:"%{y:.1f}%<br>Solved: %{customdata[0]:,} of %{customdata[1]:,}<br>Active players: %{customdata[2]} of %{customdata[3]}<extra></extra>"},
+      ...(hasPre ? [legendDot("Before trials", GREY)] : []), legendDot("After trials", TEAL)],
+      withTrialLine({...lineLayout(dates), yaxis:{...base.yaxis, tickformat:",.0f", ticksuffix:"%"}}, hasPre ? T0 : null), cfg);
+  } else {
+    const tr = series(dates, tot);
+    Plotly.newPlot("team", [{name:`Team ${S.unit.toLowerCase()}`, mode:"lines+markers", marker:{size:7}, ...tr,
+      customdata:tr.x.map(d => cnt[d]), hovertemplate:"%{y:,}<br>Active players: %{customdata}<extra></extra>", connectgaps:false}],
+      {...lineLayout(dates), showlegend:false}, cfg);
+  }
+
+  // all-time best performances: each player's best record (earliest date if repeated); tied players share a rank (1, 2, 2, 4); ranks up to 20
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;"}[c]));
+  const bestOf = {};
+  allRows.forEach(r => { if (!S.best.ok(r, cap)) return; const v = S.best.val(r), c = bestOf[r.id];
+    if (!c || v > c.v || (v === c.v && r.date < c.date)) bestOf[r.id] = {id:r.id, v, date:r.date}; });
+  const list = Object.values(bestOf).sort((a, b) => b.v - a.v || a.date.localeCompare(b.date) || nm(a.id).localeCompare(nm(b.id)));
+  list.forEach((x, i) => x.rank = i && x.v === list[i - 1].v ? list[i - 1].rank : i + 1);
+  const top = list.filter(x => x.rank <= 20);
+  $("best").innerHTML = top.length
+    ? `<table class="tbl"><thead><tr><th>Rank</th><th>Player</th><th class="num">${S.best.head}</th><th>Date</th></tr></thead><tbody>${
+        top.map(x => `<tr><td>${x.rank}</td><td>${esc(nm(x.id))}</td><td class="num">${fmt.format(x.v)}</td><td>${x.date}</td></tr>`).join("")}</tbody></table>`
+    : "<p>No records yet.</p>";
+
+  // leaderboard: GE ranks by solved encounters, then trial level (the game's own rank is ignored)
+  const order = S.trial ? (a, b) => b.s - a.s || (b.t ?? 0) - (a.t ?? 0) || (b.p || 0) - (a.p || 0)
+                        : (a, b) => b.s - a.s || (b.p || 0) - (a.p || 0);
+  const dsel = fill("date", [...dates].reverse().map(d => [d, d]));
+  const board = () => {
+    const sub = rows.filter(r => r.date === dsel.value).sort(order);
+    const H = Math.max(240, 90 + 24 * sub.length);
+    $("board").style.height = H + "px";
+    Plotly.react("board", S.parts(sub[0] || {s:0, n:0, b:0}).map(([label], i) => ({
+      type:"bar", orientation:"h", name:label, x:sub.map(r => S.parts(r)[i][1]), y:sub.map(r => nm(r.id)),
+      customdata:sub.map(S.extra), hovertemplate:`%{y}<br>${label}: %{x:,}<br>%{customdata}<extra></extra>`,
+      marker:!T0 ? {color:["#0f766e", "#b7791f"][i]} : dsel.value >= T0 ? trialMarker(sub.map(r => r.t ?? 0), 0, tmax) : {color:GREY}})),
+      {...base, height:H, barmode:"stack", hovermode:"closest", margin:{t:10,r:T0 ? 90 : 24,b:40,l:170},
+       yaxis:{autorange:"reversed", automargin:true}, xaxis:{gridcolor:"#e6eaee", tickformat:","}, showlegend:S.parts({}).length > 1}, cfg);
+  };
+  dsel.onchange = board; board();
+
+  // player history
+  const ids = [...new Set(rows.map(r => r.id))].sort((a, b) => nm(a).localeCompare(nm(b)));
+  const wsel = fill("who", ids.map(id => [id, nm(id)]));
+  wsel.value = rows.filter(r => r.date === last).sort(order)[0]?.id ?? ids[0];
+  const hist = () => {
+    if (cap) {                                                  // GE: line graph, zeros included
+      const sub = allRows.filter(r => r.id == wsel.value), m = {};
+      sub.forEach(r => m[r.date] = r.s);
+      Plotly.react("player", [
+        {...series(dates, m), mode:"lines", line:{color:"#b8c4cf", width:2}, hoverinfo:"skip", showlegend:false, connectgaps:false},
+        {x:sub.map(r => r.date), y:sub.map(r => r.s), customdata:sub.map(S.extra), mode:"markers", showlegend:false,
+         cliponaxis:false, marker:{size:9, color:sub.map(r => r.date < T0 ? GREY : lerp(r.t ?? 0, 0, tmax))},
+         hovertemplate:"Solved: %{y}<br>%{customdata}<extra></extra>"},
+        ...(hasPre ? [legendDot("Before trials", GREY)] : []), legendDot("After trials", TEAL),
+        {x:[dates[0]], y:[0], mode:"markers", showlegend:false, hoverinfo:"skip", marker:{...trialMarker([0], 0, tmax, 6), opacity:0}}],   // invisible point that draws the trial-level colour bar
+        withTrialLine({...lineLayout(dates), margin:{...base.margin, r:90}, yaxis:{...base.yaxis, range:[0, cap + 8], tickvals:[0, 20, 40, 60, 80], fixedrange:true}}, hasPre ? T0 : null), cfg);   // 0 to 80 with headroom; fixed so autoscale cannot change it
+      return;
+    }
+    const sub = rows.filter(r => r.id == wsel.value);
+    const bar = (list, name, marker, show, i = 0) => ({type:"bar", name, x:list.map(r => r.date), y:list.map(r => S.parts(r)[i][1]),
+      customdata:list.map(S.extra), hovertemplate:`${name}: %{y:,}<br>%{customdata}<extra></extra>`, marker, showlegend:show});
+    Plotly.react("player", S.parts(sub[0]).map(([label], i) => bar(sub, label, {color:["#0f766e", "#b7791f"][i]}, S.parts({}).length > 1, i)),
+      {...lineLayout(dates), barmode:"stack", showlegend:S.parts({}).length > 1}, cfg);
+  };
+  wsel.onchange = hist; hist();
+}
+
+/* ---------- Guild Expeditions Report Generator ---------- */
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const FULL = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const ord = n => n + (n % 100 >= 11 && n % 100 <= 13 ? "th" : ({1:"st", 2:"nd", 3:"rd"})[n % 10] || "th");
+const weekISO = v => { const m = String(v).trim().match(/^(\d{1,2})\/(\w{3})\/(\d{4})$/);       // 05/Oct/2026 -> 2026-10-05
+  return m ? `${m[3]}-${String(MON.indexOf(m[2][0].toUpperCase() + m[2].slice(1).toLowerCase()) + 1).padStart(2, "0")}-${m[1].padStart(2, "0")}` : String(v).trim().slice(0, 10); };
+function parseCsv(text) {
+  const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter(l => l.trim());
+  const sep = (lines[0] || "").includes(";") ? ";" : ",", head = (lines[0] || "").split(sep).map(s => s.trim().toLowerCase());
+  const [w, s, p] = ["gexweek", "solvedencounters", "expeditionpoints"].map(n => head.indexOf(n));
+  if (w < 0 || s < 0 || p < 0) throw new Error("This does not look like a Guild Expeditions file (expected the columns gexWeek, solvedEncounters and expeditionPoints).");
+  const out = lines.slice(1).map(l => { const c = l.split(sep); return {week:weekISO(c[w]), solved:+c[s] || 0, points:+c[p] || 0, cells:c}; });
+  out.head = lines[0].split(sep).map(x => x.trim());      // the file's own column names
+  return out;
+}
+const escHtml = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;"}[c]));
+function report() {
+  $("view").innerHTML = `<section><h2>Guild Expeditions report</h2>
+    <p>Upload a Guild Expeditions CSV file (by default called Participation.csv). It is read in your browser and is not uploaded anywhere.</p>
+    <div class="fields"><input type="file" id="rfile" accept=".csv,text/csv" aria-label="Guild Expeditions CSV file"></div>
+    <div class="fields" id="rweekbox" hidden><label for="rweek">Week</label><select id="rweek"></select></div>
+    <div class="fields"><label for="rrank">Ranking</label><input type="text" id="rrank" size="10"><label for="rpower">Guild Power</label><input type="text" id="rpower" size="16"></div>
+    <textarea id="rout" rows="12" aria-label="Report text" placeholder="The report appears here after you choose a file."></textarea>
+    <div class="fields"><button type="button" id="rcopy">Copy report</button><span id="rmsg" role="status"></span></div></section>
+    <section id="rdata" hidden><h2>Uploaded data</h2><p id="rdatanote"></p><div id="rtbl" class="tbl-wrap scroll"></div></section>`;
+  let rows = [];
+  const draw = () => {
+    const wk = $("rweek").value; if (!rows.length || !wk) return;
+    const r = rows.filter(x => x.week === wk), n = (lo, hi) => r.filter(x => x.solved >= lo && x.solved <= hi).length;
+    const m = k => `${k} ${k === 1 ? "member" : "members"}`, [y, mo, d] = wk.split("-").map(Number);
+    $("rout").value = [`Date: ${ord(d)} ${FULL[mo - 1]} ${y}`, `Ranking: ${$("rrank").value}`,
+      `Expedition Points: ${fmt.format(r.reduce((a, x) => a + x.points, 0))}`, `Guild Power: ${$("rpower").value}`,
+      `${m(n(80, 1e9))} completed level 5 (80 encounters)`, `${m(n(64, 79))} completed level 4 (64-79 encounters)`,
+      `${m(n(48, 63))} completed level 3 (48-63 encounters)`, `${m(n(32, 47))} completed level 2 (32-47 encounters)`,
+      `${m(n(16, 31))} completed level 1 (16-31 encounters)`, `${m(n(1, 15))} did not complete level 1 (1-15 encounters)`,
+      `${m(n(0, 0))} did not start (0 encounters)`].join("\n");
+    const head = rows.head, num = head.map((_, i) => r.every(x => /^-?[\d,.]+$/.test(x.cells[i] ?? "")));
+    $("rtbl").innerHTML = `<table class="tbl"><thead><tr>${head.map((t, i) => `<th${num[i] ? ' class="num"' : ""}>${escHtml(t)}</th>`).join("")}</tr></thead><tbody>${
+      r.map(x => `<tr>${head.map((_, i) => `<td${num[i] ? ' class="num"' : ""}>${escHtml(x.cells[i] ?? "")}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+    $("rdatanote").textContent = `${r.length} rows for the selected week, as they appear in the file.`; $("rdata").hidden = false;
+  };
+  $("rfile").onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    try {
+      rows = parseCsv(await f.text());
+      const weeks = [...new Set(rows.map(x => x.week))].sort().reverse();
+      $("rweek").innerHTML = ""; weeks.forEach(w => $("rweek").add(new Option(w, w)));
+      $("rweekbox").hidden = weeks.length < 2; $("rmsg").textContent = ""; draw();
+    } catch (err) { rows = []; $("rout").value = ""; $("rdata").hidden = true; $("rmsg").textContent = err.message; }
+  };
+  $("rweek").onchange = $("rrank").oninput = $("rpower").oninput = draw;
+  $("rcopy").onclick = async () => { const t = $("rout").value; if (!t) return;
+    try { await navigator.clipboard.writeText(t); } catch { $("rout").select(); document.execCommand("copy"); }
+    $("rmsg").textContent = "Copied"; };
+}
+
+/* ---------- Guild Contributions Processor ---------- */
+const KNOWN_MSG = ["Battlegrounds: Place Building", "Building production", "Guild expedition: Difficulty unlocked", "Guild treasury donation"];
+const fmtDay = iso => { const [y, mo, d] = iso.split("-").map(Number); return `${ord(d)} ${FULL[mo - 1]} ${y}`; };
+function parseContrib(text) {
+  const lines = text.replace(/^\uFEFF/, "").split(/\r?\n/).filter(l => l.trim());
+  const sep = (lines[0] || "").includes(";") ? ";" : ",", head = (lines[0] || "").split(sep).map(s => s.trim().toLowerCase());
+  const [i, n, a, m, t] = ["player id", "player name", "amount", "message", "date/time"].map(k => head.indexOf(k));
+  if ([i, n, a, m, t].some(x => x < 0)) throw new Error("This does not look like a Guild Treasury contributions file (expected the columns Player ID, Player name, Amount, Message and Date/Time).");
+  return lines.slice(1).map(l => { const c = l.split(sep), d = (c[t] || "").trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s*(\d{1,2}:\d{2}(?::\d{2})?)?/);
+    return {id:c[i].trim(), name:c[n].trim(), amount:+c[a] || 0, msg:c[m].trim(),
+            at:d ? `${d[3]}-${d[2].padStart(2, "0")}-${d[1].padStart(2, "0")} ${(d[4] || "").replace(/^(\d):/, "0$1:")}` : ""}; });
+}
+function contributions() {
+  $("view").innerHTML = `<section><h2>Guild Contributions Processor</h2>
+    <p id="cdesc">Upload a Guild Treasury contributions CSV file. It is read in your browser and is not uploaded anywhere.</p>
+    <div class="fields"><input type="file" id="cfile" accept=".csv,text/csv" aria-label="Guild Treasury contributions CSV file"><span id="cmsg" role="status"></span></div>
+    <div id="ctbl" class="tbl-wrap scroll" style="max-height:70vh"></div></section>`;
+  $("cfile").onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    try {
+      const rows = parseContrib(await f.text()), days = rows.map(r => r.at.slice(0, 10)).filter(Boolean).sort();
+      if (!rows.length || !days.length) throw new Error("The file has no usable data rows.");
+      $("cdesc").textContent = `Cumulative Treasury Contribution data from ${fmtDay(days[0])} to ${fmtDay(days.at(-1))}`;
+      const cols = [...KNOWN_MSG], key = s => cols.find(c => c.toLowerCase() === s.toLowerCase());
+      rows.forEach(r => { if (!key(r.msg)) cols.push(r.msg); });                      // any other message type gets its own column
+      const by = {};
+      rows.forEach(r => { const p = by[r.id] ??= {name:r.name, at:r.at, sums:{}, total:0}; if (r.at >= p.at) { p.at = r.at; p.name = r.name; }   // latest name per player ID
+        const k = key(r.msg); p.sums[k] = (p.sums[k] ?? 0) + r.amount; p.total += r.amount; });
+      const list = Object.values(by).sort((a, b) => a.name.localeCompare(b.name, undefined, {sensitivity:"base"}));
+      const td = v => v === undefined ? `<td class="num"></td>` : v < 0 ? `<td class="num neg">(${fmt.format(-v)})</td>` : `<td class="num">${fmt.format(v)}</td>`;
+      const sum = {};                                                                  // column totals (blank when a column has no entries)
+      list.forEach(p => cols.forEach(c => { if (p.sums[c] !== undefined) sum[c] = (sum[c] ?? 0) + p.sums[c]; }));
+      const grand = list.reduce((a, p) => a + p.total, 0);
+      $("ctbl").innerHTML = `<table class="tbl"><thead><tr><th>Player name</th>${cols.map(c => `<th class="num">${escHtml(c)}</th>`).join("")}<th class="num">Grand Total</th></tr></thead><tbody>${
+        list.map(p => `<tr><td>${escHtml(p.name)}</td>${cols.map(c => td(p.sums[c])).join("")}${td(p.total)}</tr>`).join("")}<tr class="sum"><td>Total</td>${cols.map(c => td(sum[c])).join("")}${td(grand)}</tr></tbody></table>`;
+      $("cmsg").textContent = "";
+    } catch (err) { $("ctbl").innerHTML = ""; $("cmsg").textContent = err.message; }
+  };
+}
+
+/* ---------- Members (password protected: the data file is encrypted, the browser decrypts it) ---------- */
+const MIN = {ge:48, gbg:500, qi:500};            // members below these values are shown in red
+const unlocked = new WeakMap();                  // decrypted data, kept in memory only until the page is reloaded
+const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+async function decryptJson(p, password) {
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveKey"]);
+  const key = await crypto.subtle.deriveKey({name:"PBKDF2", salt:b64(p.salt), iterations:p.iter, hash:"SHA-256"}, base, {name:"AES-GCM", length:256}, false, ["decrypt"]);
+  return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:"AES-GCM", iv:b64(p.iv)}, key, b64(p.data))));
+}
+function membersPage(p) {
+  if (unlocked.has(p)) return showMembers(unlocked.get(p));
+  $("view").innerHTML = `<section><h2>Members</h2><p>This section is password protected.</p>
+    <div class="fields"><label for="mpw">Password</label><input type="password" id="mpw" autocomplete="off"><button type="button" id="mgo">Unlock</button><span id="mmsg" role="status"></span></div></section>`;
+  const go = async () => {
+    if (!window.crypto?.subtle) { $("mmsg").textContent = "This needs a secure connection (https or localhost)."; return; }
+    $("mmsg").textContent = "Unlocking…";
+    try { const d = await decryptJson(p, $("mpw").value); unlocked.set(p, d); showMembers(d); }
+    catch { $("mmsg").textContent = "Incorrect password."; }
+  };
+  $("mgo").onclick = go; $("mpw").onkeydown = e => { if (e.key === "Enter") go(); };
+  $("mpw").focus();
+}
+function showMembers(d) {
+  const dates = [...new Set(d.rows.map(r => r.date))].sort(), ld = dates.at(-1), pd = dates.at(-2);
+  const cur = d.rows.filter(r => r.date === ld).sort((a, b) => a.rank - b.rank), prev = Object.fromEntries(d.rows.filter(r => r.date === pd).map(r => [r.id, r]));
+  const T = (head, rows, num) => `<div class="tbl-wrap"><table class="tbl"><thead><tr>${head.map((t, i) => `<th${num[i] ? ' class="num"' : ""}>${escHtml(t)}</th>`).join("")}</tr></thead><tbody>${
+    rows.map(r => `<tr>${r.map((c, i) => `<td${num[i] ? ' class="num"' : ""}>${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+  const bad = (v, m) => v != null && v < m, cell = (v, red) => v == null ? "" : red ? `<span class="bad">${v}</span>` : String(v);
+  const info = cur.map(r => { const g = bad(r.ge, MIN.ge), b = bad(r.gbg, MIN.gbg), q = bad(r.qi, MIN.qi);
+    return [r.rank, r.id, g || b || q ? `<span class="bad">${escHtml(r.name)}</span>` : escHtml(r.name), fmt.format(r.points), escHtml(r.era ?? ""),
+            cell(r.ge, g), cell(r.gbg, b), cell(r.qi, q), fmt.format(r.wb ?? 0)]; });
+  $("summary").textContent = `Member data from ${ld}` + (pd ? `, compared with ${pd}.` : ".");
+  let html = `<section><h2>Members</h2><p>Members with a red name are below the minimum for Last GE (${MIN.ge}), Last GBG (${MIN.gbg}) or Last QI (${MIN.qi}).</p>${
+    T(["Rank", "ID", "Name", "Points", "Era", "Last GE", "Last GBG", "Last QI", "Battles Won"], info, [1, 1, 0, 1, 0, 1, 1, 1, 1])}</section>`;
+  let text = "";
+  if (pd) {
+    const both = cur.filter(r => prev[r.id]).map(r => ({name:r.name, p1:r.points, p0:prev[r.id].points, b1:r.wb ?? 0, b0:prev[r.id].wb ?? 0}));
+    const top = (list, f) => [...list].sort((a, b) => f(b) - f(a)).slice(0, 10);
+    const gain = r => r.p1 - r.p0, pct = r => (100 * (r.p1 - r.p0) / r.p0).toFixed(2) + "%", bat = r => r.b1 - r.b0;
+    const byPts = top(both, gain), byPct = top(both.filter(r => r.p0 > 0), r => (r.p1 - r.p0) / r.p0), byBat = top(both, bat);
+    const sec = (title, head, list, c1, c0, g) => `<section><h2>${title}</h2><p>Compared with the previous file (${pd}). Members who were not in both files are left out.</p>${
+      T(["Name", `${head} ${ld}`.replace(/^/, "Current "), `Previous ${head} ${pd}`, g[0]], list.map(r => [escHtml(r.name), fmt.format(r[c1]), fmt.format(r[c0]), g[1](r)]), [0, 1, 1, 1])}</section>`;
+    html += `<section><h2>Copy top 10 gainers</h2><p>Copies the three top 10 lists below as text, with each member's name and gain only.</p><div class="fields"><button type="button" id="mcopy">Copy top 10 gainers</button><span id="mcmsg" role="status"></span></div></section>`
+      + sec("Top 10 gainers: points", "Points", byPts, "p1", "p0", ["Gain", r => fmt.format(gain(r))])
+      + sec("Top 10 gainers: percentage", "Points", byPct, "p1", "p0", ["% Gain", pct])
+      + sec("Top 10 gainers: battles won", "Battles Won", byBat, "b1", "b0", ["Gain", r => fmt.format(bat(r))]);
+    const block = (t, list, f) => `${t} (${pd} to ${ld})\n` + list.map(r => `${r.name}: ${f(r)}`).join("\n");
+    text = [block("Top 10 gainers: points", byPts, r => fmt.format(gain(r))), block("Top 10 gainers: percentage", byPct, pct), block("Top 10 gainers: battles won", byBat, r => fmt.format(bat(r)))].join("\n\n");
+  } else html += "<section><h2>Top 10 gainers</h2><p>Two member files are needed to compare weeks.</p></section>";
+  $("view").innerHTML = html;
+  if (pd) $("mcopy").onclick = async () => {
+    try { await navigator.clipboard.writeText(text); }
+    catch { const t = document.createElement("textarea"); t.value = text; document.body.append(t); t.select(); document.execCommand("copy"); t.remove(); }
+    $("mcmsg").textContent = "Copied";
+  };
+}
+
+/* ---------- main menu ---------- */
+const SITE = "RMoose's Forge of Empires Assortment";
+const DASH = {
+  en19:{guild:"Team Targets", game:"Forge of Empires · en19 (Uceria)", kicker:"en19 (Uceria)", tile:"Team Targets Guild Dashboard"},
+  en5:{guild:"Freyja's Warriors", game:"Forge of Empires · en5 (East-Nagach)", kicker:"en5 (East-Nagach)", tile:"Freyja's Warriors Guild Dashboard"}
+};
+const SECTIONS = {
+  treasury:["Guild Treasury", treasury],
+  qi:["Quantum Incursions", d => scoreboard("qi", d)],
+  gbg:["Guild Battlegrounds", d => scoreboard("gbg", d)],
+  ge:["Guild Expeditions", d => scoreboard("ge", d)],
+  members:["Members", membersPage]
+};
+const manifest = fetch("data/dashboards.json").then(r => r.json()).catch(() => ({}));    // which sections have data; written by build.py
+const sectionsOf = (man, a) => (man[a] || (a === "en19" ? Object.keys(SECTIONS).filter(s => s !== "members") : [])).filter(s => SECTIONS[s]);
+const menu = man => {
+  const tiles = Object.entries(DASH).map(([a, D]) => { const secs = sectionsOf(man, a);
+    return secs.length ? `<a class="tile" href="#/${a}"><div class="kicker">${D.kicker}</div><h2>${D.tile}</h2><p>${secs.map(s => SECTIONS[s][0]).join(", ")}.</p></a>`
+      : `<div class="tile soon"><div class="kicker">${D.kicker}</div><h2>${D.tile}</h2><p>Coming soon.</p></div>`; }).join("");
+  $("view").innerHTML = `<div class="cards">${tiles}
+  <a class="tile" href="#/report"><div class="kicker">Tool</div><h2>Guild Expeditions Report Generator</h2><p>Upload a Guild Expeditions CSV file and get a report ready to copy.</p></a>
+  <a class="tile" href="#/contributions"><div class="kicker">Tool</div><h2>Guild Contributions Processor</h2><p>Upload a Guild Treasury contributions CSV file and get each player's totals by contribution type.</p></a></div>`; };
+
+/* ---------- routing: #/  #/<dashboard>/<section>  #/report  #/contributions ---------- */
+const cache = {};
+async function route() {
+  const h = location.hash.slice(1);
+  if (SECTIONS[h]) { location.replace("#/en19/" + h); return; }                       // old links such as #qi
+  const man = await manifest, [a, b] = h.replace(/^\/+|\/+$/g, "").split("/");
+  const D = DASH[a], secs = D ? sectionsOf(man, a) : [];
+  if (secs.length && !secs.includes(b)) { location.replace(`#/${a}/${secs[0]}`); return; }
+  const dash = !!D && secs.length > 0;
+  $("app").classList.toggle("solo", !dash); $("helperNote").hidden = !D; $("reportNote").hidden = a !== "report" && a !== "contributions";
+  document.querySelectorAll(".tabs a").forEach(t => t.classList.toggle("on", t.dataset.t === a));
+  $("summary").textContent = ""; $("status").textContent = ""; $("view").innerHTML = "";
+  if (dash) {
+    const [title, render] = SECTIONS[b];
+    $("side").innerHTML = `<div class="brand"><div class="guild">${D.guild}</div><div class="game">${D.game}</div></div><div class="links">${
+      secs.map(s => `<a href="#/${a}/${s}" data-k="${s}"${s === b ? ' class="on"' : ""}>${SECTIONS[s][0]}</a>`).join("")}</div>`;
+    $("title").textContent = title; document.title = `${title} | ${D.guild} (${a})`;
+    if (typeof Plotly === "undefined") { $("status").textContent = "Plotly failed to load. Check that plotly.min.js is next to index.html."; return; }
+    $("status").textContent = "Loading…";
+    try { const k = `${a}/${b}`; cache[k] ??= await (await fetch(`data/${k}.json`)).json(); $("status").textContent = ""; render(cache[k]); }
+    catch (err) { $("status").textContent = "Something went wrong: " + err.message; }
+  } else if (D) { $("title").textContent = document.title = D.tile; $("summary").textContent = "No data yet."; }
+  else if (a === "report") { $("title").textContent = document.title = "Guild Expeditions Report Generator"; report(); }
+  else if (a === "contributions") { $("title").textContent = document.title = "Guild Contributions Processor"; contributions(); }
+  else { $("title").textContent = document.title = SITE; $("summary").textContent = "Choose a dashboard or tool."; menu(man); }
+}
+window.addEventListener("hashchange", route); route();
+</script>
+</body>
+</html>

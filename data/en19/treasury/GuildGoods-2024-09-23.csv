@@ -1,0 +1,86 @@
+eraID;era;good;produceable;instock
+3;Iron Age;Cloth;587;55968
+3;Iron Age;Ebony;587;82041
+3;Iron Age;Jewelry;587;49908
+3;Iron Age;Iron;587;44141
+3;Iron Age;Limestone;587;62290
+4;Early Middle Age;Copper;151;39091
+4;Early Middle Age;Gold;151;29023
+4;Early Middle Age;Granite;151;27877
+4;Early Middle Age;Honey;151;37181
+4;Early Middle Age;Alabaster;151;30008
+5;High Middle Age;Brick;185;43000
+5;High Middle Age;Glass;185;65930
+5;High Middle Age;Dried Herbs;185;39836
+5;High Middle Age;Ropes;185;30329
+5;High Middle Age;Salt;185;40157
+6;Late Middle Age;Basalt;205;46386
+6;Late Middle Age;Brass;205;30323
+6;Late Middle Age;Gunpowder;205;53368
+6;Late Middle Age;Silk;205;52783
+6;Late Middle Age;Talc Powder;205;59476
+7;Colonial Age;Coffee;271;32158
+7;Colonial Age;Paper;271;41267
+7;Colonial Age;Porcelain;271;22397
+7;Colonial Age;Tar;271;37903
+7;Colonial Age;Wire;271;25807
+8;Industrial Age;Coke;816;78271
+8;Industrial Age;Fertilizer;816;80385
+8;Industrial Age;Rubber;816;80376
+8;Industrial Age;Textiles;816;54058
+8;Industrial Age;Whale Oil;816;61108
+9;Progressive Era;Asbestos;722;82844
+9;Progressive Era;Explosives;722;9678
+9;Progressive Era;Machine Parts;722;63026
+9;Progressive Era;Gasoline;722;62984
+9;Progressive Era;Tinplate;722;65872
+10;Modern Era;Convenience Food;146;14610
+10;Modern Era;Ferroconcrete;146;18788
+10;Modern Era;Flavorants;146;18818
+10;Modern Era;Luxury Materials;146;15130
+10;Modern Era;Packaging;146;22044
+11;Postmodern Era;Genome Data;26;11861
+11;Postmodern Era;Industrial Filters;26;10781
+11;Postmodern Era;Renewable Resources;26;10628
+11;Postmodern Era;Semiconductors;26;11226
+11;Postmodern Era;Steel;26;9631
+12;Contemporary Era;Bionics Data;24;17723
+12;Contemporary Era;Electromagnets;24;10866
+12;Contemporary Era;Gas;24;26122
+12;Contemporary Era;Plastics;24;25159
+12;Contemporary Era;Robots;24;18020
+13;Tomorrow Era;Nutrition Research;253;38873
+13;Tomorrow Era;Papercrete;253;35401
+13;Tomorrow Era;Preservatives;253;28567
+13;Tomorrow Era;Smart Materials;253;31780
+13;Tomorrow Era;Translucent Concrete;253;31974
+14;Future Era;Algae;214;86367
+14;Future Era;Biogeochemical Data;214;78072
+14;Future Era;Nanoparticles;214;86505
+14;Future Era;Purified Water;214;92082
+14;Future Era;Superconductors;214;120831
+15;Arctic Future;AI data;918;28890
+15;Arctic Future;Bioplastics;918;46385
+15;Arctic Future;Nanowire;918;73189
+15;Arctic Future;Paper Batteries;918;67096
+15;Arctic Future;Transester gas;918;64792
+16;Oceanic Future;Artificial Scales;114;43521
+16;Oceanic Future;Biolight;114;54127
+16;Oceanic Future;Corals;114;95738
+16;Oceanic Future;Pearls;114;76145
+16;Oceanic Future;Plankton;114;53313
+17;Virtual Future;Cryptocash;107;74534
+17;Virtual Future;Data Crystals;107;72742
+17;Virtual Future;Golden Rice;107;66271
+17;Virtual Future;Nanites;107;81105
+17;Virtual Future;Tea Silk;107;73504
+18;Space Age Mars;BioTech Crops;702;159474
+18;Space Age Mars;Fusion Reactors;702;171655
+18;Space Age Mars;Lubricants;702;167424
+18;Space Age Mars;Mars Microbes;702;163562
+18;Space Age Mars;Superalloys;702;172065
+19;Space Age Asteroid Belt;Bromine;819;13772
+19;Space Age Asteroid Belt;Compound Fluid;819;14022
+19;Space Age Asteroid Belt;Nickel;819;14399
+19;Space Age Asteroid Belt;Platinum Crystal;819;14149
+19;Space Age Asteroid Belt;Processed Material;819;14272

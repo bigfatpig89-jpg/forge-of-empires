@@ -1,0 +1,101 @@
+eraID;era;good;produceable;instock
+3;Iron Age;Cloth;764;71189
+3;Iron Age;Ebony;764;87582
+3;Iron Age;Jewelry;764;81216
+3;Iron Age;Iron;764;51735
+3;Iron Age;Limestone;764;72488
+4;Early Middle Age;Copper;243;32258
+4;Early Middle Age;Gold;243;38034
+4;Early Middle Age;Granite;243;25394
+4;Early Middle Age;Honey;243;46855
+4;Early Middle Age;Alabaster;243;33531
+5;High Middle Age;Brick;567;39098
+5;High Middle Age;Glass;567;72949
+5;High Middle Age;Dried Herbs;567;41292
+5;High Middle Age;Ropes;567;41063
+5;High Middle Age;Salt;567;43613
+6;Late Middle Age;Basalt;111;47678
+6;Late Middle Age;Brass;111;51090
+6;Late Middle Age;Gunpowder;111;39104
+6;Late Middle Age;Silk;111;50019
+6;Late Middle Age;Talc Powder;111;47638
+7;Colonial Age;Coffee;1189;13393
+7;Colonial Age;Paper;1189;73241
+7;Colonial Age;Porcelain;1189;43454
+7;Colonial Age;Tar;1189;50264
+7;Colonial Age;Wire;1189;26723
+8;Industrial Age;Coke;1546;114051
+8;Industrial Age;Fertilizer;1546;24528
+8;Industrial Age;Rubber;1546;84621
+8;Industrial Age;Textiles;1546;95716
+8;Industrial Age;Whale Oil;1546;107122
+9;Progressive Era;Asbestos;851;120509
+9;Progressive Era;Explosives;851;63530
+9;Progressive Era;Machine Parts;851;94295
+9;Progressive Era;Gasoline;851;68463
+9;Progressive Era;Tinplate;851;85756
+10;Modern Era;Convenience Food;184;17854
+10;Modern Era;Ferroconcrete;184;17412
+10;Modern Era;Flavorants;184;14680
+10;Modern Era;Luxury Materials;184;19857
+10;Modern Era;Packaging;184;891
+11;Postmodern Era;Genome Data;69;11960
+11;Postmodern Era;Industrial Filters;69;8704
+11;Postmodern Era;Renewable Resources;69;10987
+11;Postmodern Era;Semiconductors;69;19869
+11;Postmodern Era;Steel;69;10251
+12;Contemporary Era;Bionics Data;120;18209
+12;Contemporary Era;Electromagnets;120;9917
+12;Contemporary Era;Gas;120;21989
+12;Contemporary Era;Plastics;120;23142
+12;Contemporary Era;Robots;120;16268
+13;Tomorrow Era;Nutrition Research;458;49430
+13;Tomorrow Era;Papercrete;458;43232
+13;Tomorrow Era;Preservatives;458;38574
+13;Tomorrow Era;Smart Materials;458;36873
+13;Tomorrow Era;Translucent Concrete;458;50805
+14;Future Era;Algae;31;94184
+14;Future Era;Biogeochemical Data;31;90691
+14;Future Era;Nanoparticles;31;99071
+14;Future Era;Purified Water;31;106666
+14;Future Era;Superconductors;31;128706
+15;Arctic Future;AI data;265;50744
+15;Arctic Future;Bioplastics;265;72143
+15;Arctic Future;Nanowire;265;97868
+15;Arctic Future;Paper Batteries;265;75236
+15;Arctic Future;Transester gas;265;85662
+16;Oceanic Future;Artificial Scales;1117;110311
+16;Oceanic Future;Biolight;1117;109219
+16;Oceanic Future;Corals;1117;164744
+16;Oceanic Future;Pearls;1117;146354
+16;Oceanic Future;Plankton;1117;86673
+17;Virtual Future;Cryptocash;5;79699
+17;Virtual Future;Data Crystals;5;79032
+17;Virtual Future;Golden Rice;5;72516
+17;Virtual Future;Nanites;5;87195
+17;Virtual Future;Tea Silk;5;79134
+18;Space Age Mars;BioTech Crops;53;216013
+18;Space Age Mars;Fusion Reactors;53;197411
+18;Space Age Mars;Lubricants;53;223578
+18;Space Age Mars;Mars Microbes;53;224486
+18;Space Age Mars;Superalloys;53;227789
+19;Space Age Asteroid Belt;Bromine;333;107886
+19;Space Age Asteroid Belt;Compound Fluid;333;107132
+19;Space Age Asteroid Belt;Nickel;333;113159
+19;Space Age Asteroid Belt;Platinum Crystal;333;73321
+19;Space Age Asteroid Belt;Processed Material;333;88718
+20;Space Age Venus;Glowing Seaweed;167;69150
+20;Space Age Venus;Herbal Snack;167;65711
+20;Space Age Venus;Microgreen Supplements;167;62436
+20;Space Age Venus;Soy Proteins;167;64085
+20;Space Age Venus;Sugar Crystals;167;67321
+21;Space Age Jupiter Moon;Advanced DNA Data;1119;21458
+21;Space Age Jupiter Moon;Bio Creatures;1119;23677
+21;Space Age Jupiter Moon;Enhanced Porifera;1119;22317
+21;Space Age Jupiter Moon;Red Algae;1119;24517
+21;Space Age Jupiter Moon;Topological Records;1119;21017
+22;Space Age Titan;Compressed Matter Capsule;0;629
+22;Space Age Titan;Experimental Data;0;629
+22;Space Age Titan;Isolated Molecules;0;629
+22;Space Age Titan;Liquid Binder;0;629
+22;Space Age Titan;Upcycled Hydrocarbons;0;629

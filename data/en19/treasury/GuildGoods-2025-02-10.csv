@@ -1,0 +1,101 @@
+eraID;era;good;produceable;instock
+3;Iron Age;Cloth;1046;117162
+3;Iron Age;Ebony;1046;110225
+3;Iron Age;Jewelry;1046;106521
+3;Iron Age;Iron;1046;118333
+3;Iron Age;Limestone;1046;115440
+4;Early Middle Age;Copper;454;40106
+4;Early Middle Age;Gold;454;46403
+4;Early Middle Age;Granite;454;39730
+4;Early Middle Age;Honey;454;56343
+4;Early Middle Age;Alabaster;454;39418
+5;High Middle Age;Brick;438;50968
+5;High Middle Age;Glass;438;60214
+5;High Middle Age;Dried Herbs;438;48499
+5;High Middle Age;Ropes;438;47090
+5;High Middle Age;Salt;438;38225
+6;Late Middle Age;Basalt;338;41748
+6;Late Middle Age;Brass;338;38826
+6;Late Middle Age;Gunpowder;338;48759
+6;Late Middle Age;Silk;338;40262
+6;Late Middle Age;Talc Powder;338;48094
+7;Colonial Age;Coffee;938;55611
+7;Colonial Age;Paper;938;113502
+7;Colonial Age;Porcelain;938;82543
+7;Colonial Age;Tar;938;72304
+7;Colonial Age;Wire;938;64896
+8;Industrial Age;Coke;2300;86543
+8;Industrial Age;Fertilizer;2300;49445
+8;Industrial Age;Rubber;2300;135097
+8;Industrial Age;Textiles;2300;132670
+8;Industrial Age;Whale Oil;2300;145766
+9;Progressive Era;Asbestos;1172;114835
+9;Progressive Era;Explosives;1172;92127
+9;Progressive Era;Machine Parts;1172;105781
+9;Progressive Era;Gasoline;1172;66605
+9;Progressive Era;Tinplate;1172;101147
+10;Modern Era;Convenience Food;161;13822
+10;Modern Era;Ferroconcrete;161;18250
+10;Modern Era;Flavorants;161;15618
+10;Modern Era;Luxury Materials;161;21769
+10;Modern Era;Packaging;161;2765
+11;Postmodern Era;Genome Data;44;13532
+11;Postmodern Era;Industrial Filters;44;10276
+11;Postmodern Era;Renewable Resources;44;12559
+11;Postmodern Era;Semiconductors;44;22541
+11;Postmodern Era;Steel;44;11823
+12;Contemporary Era;Bionics Data;295;22450
+12;Contemporary Era;Electromagnets;295;16278
+12;Contemporary Era;Gas;295;25776
+12;Contemporary Era;Plastics;295;27233
+12;Contemporary Era;Robots;295;20035
+13;Tomorrow Era;Nutrition Research;464;52506
+13;Tomorrow Era;Papercrete;464;53358
+13;Tomorrow Era;Preservatives;464;34964
+13;Tomorrow Era;Smart Materials;464;43346
+13;Tomorrow Era;Translucent Concrete;464;55290
+14;Future Era;Algae;105;97722
+14;Future Era;Biogeochemical Data;105;93827
+14;Future Era;Nanoparticles;105;88997
+14;Future Era;Purified Water;105;101927
+14;Future Era;Superconductors;105;127203
+15;Arctic Future;AI data;1028;61870
+15;Arctic Future;Bioplastics;1028;81319
+15;Arctic Future;Nanowire;1028;78543
+15;Arctic Future;Paper Batteries;1028;81719
+15;Arctic Future;Transester gas;1028;92622
+16;Oceanic Future;Artificial Scales;547;67838
+16;Oceanic Future;Biolight;547;125319
+16;Oceanic Future;Corals;547;171619
+16;Oceanic Future;Pearls;547;162706
+16;Oceanic Future;Plankton;547;87148
+17;Virtual Future;Cryptocash;712;98356
+17;Virtual Future;Data Crystals;712;99689
+17;Virtual Future;Golden Rice;712;92173
+17;Virtual Future;Nanites;712;105852
+17;Virtual Future;Tea Silk;712;97791
+18;Space Age Mars;BioTech Crops;1187;224000
+18;Space Age Mars;Fusion Reactors;1187;204398
+18;Space Age Mars;Lubricants;1187;231565
+18;Space Age Mars;Mars Microbes;1187;232473
+18;Space Age Mars;Superalloys;1187;234776
+19;Space Age Asteroid Belt;Bromine;24;121603
+19;Space Age Asteroid Belt;Compound Fluid;24;116321
+19;Space Age Asteroid Belt;Nickel;24;113847
+19;Space Age Asteroid Belt;Platinum Crystal;24;54524
+19;Space Age Asteroid Belt;Processed Material;24;103135
+20;Space Age Venus;Glowing Seaweed;5;96284
+20;Space Age Venus;Herbal Snack;5;93845
+20;Space Age Venus;Microgreen Supplements;5;86570
+20;Space Age Venus;Soy Proteins;5;93219
+20;Space Age Venus;Sugar Crystals;5;92455
+21;Space Age Jupiter Moon;Advanced DNA Data;352;98816
+21;Space Age Jupiter Moon;Bio Creatures;352;84664
+21;Space Age Jupiter Moon;Enhanced Porifera;352;94707
+21;Space Age Jupiter Moon;Red Algae;352;101879
+21;Space Age Jupiter Moon;Topological Records;352;102175
+22;Space Age Titan;Compressed Matter Capsule;1160;9308
+22;Space Age Titan;Experimental Data;1160;10308
+22;Space Age Titan;Isolated Molecules;1160;12308
+22;Space Age Titan;Liquid Binder;1160;12308
+22;Space Age Titan;Upcycled Hydrocarbons;1160;9308

@@ -1,0 +1,101 @@
+eraID;era;good;produceable;instock
+3;Iron Age;Cloth;739;35053
+3;Iron Age;Ebony;739;52333
+3;Iron Age;Jewelry;739;43209
+3;Iron Age;Iron;739;16601
+3;Iron Age;Limestone;739;42369
+4;Early Middle Age;Copper;153;25419
+4;Early Middle Age;Gold;153;27622
+4;Early Middle Age;Granite;153;9459
+4;Early Middle Age;Honey;153;33740
+4;Early Middle Age;Alabaster;153;18706
+5;High Middle Age;Brick;422;36919
+5;High Middle Age;Glass;422;67794
+5;High Middle Age;Dried Herbs;422;43505
+5;High Middle Age;Ropes;422;34831
+5;High Middle Age;Salt;422;41301
+6;Late Middle Age;Basalt;638;40028
+6;Late Middle Age;Brass;638;43550
+6;Late Middle Age;Gunpowder;638;43571
+6;Late Middle Age;Silk;638;51396
+6;Late Middle Age;Talc Powder;638;33478
+7;Colonial Age;Coffee;360;38352
+7;Colonial Age;Paper;360;45904
+7;Colonial Age;Porcelain;360;26538
+7;Colonial Age;Tar;360;30836
+7;Colonial Age;Wire;360;3260
+8;Industrial Age;Coke;1424;105065
+8;Industrial Age;Fertilizer;1424;46877
+8;Industrial Age;Rubber;1424;108117
+8;Industrial Age;Textiles;1424;74844
+8;Industrial Age;Whale Oil;1424;90325
+9;Progressive Era;Asbestos;894;105344
+9;Progressive Era;Explosives;894;43587
+9;Progressive Era;Machine Parts;894;80280
+9;Progressive Era;Gasoline;894;58792
+9;Progressive Era;Tinplate;894;71214
+10;Modern Era;Convenience Food;143;14998
+10;Modern Era;Ferroconcrete;143;15461
+10;Modern Era;Flavorants;143;10083
+10;Modern Era;Luxury Materials;143;17771
+10;Modern Era;Packaging;143;16983
+11;Postmodern Era;Genome Data;54;10658
+11;Postmodern Era;Industrial Filters;54;7794
+11;Postmodern Era;Renewable Resources;54;10410
+11;Postmodern Era;Semiconductors;54;11008
+11;Postmodern Era;Steel;54;8417
+12;Contemporary Era;Bionics Data;28;16947
+12;Contemporary Era;Electromagnets;28;8638
+12;Contemporary Era;Gas;28;21714
+12;Contemporary Era;Plastics;28;22482
+12;Contemporary Era;Robots;28;17420
+13;Tomorrow Era;Nutrition Research;302;45466
+13;Tomorrow Era;Papercrete;302;39291
+13;Tomorrow Era;Preservatives;302;31379
+13;Tomorrow Era;Smart Materials;302;37317
+13;Tomorrow Era;Translucent Concrete;302;41842
+14;Future Era;Algae;152;94995
+14;Future Era;Biogeochemical Data;152;86700
+14;Future Era;Nanoparticles;152;96633
+14;Future Era;Purified Water;152;100710
+14;Future Era;Superconductors;152;123115
+15;Arctic Future;AI data;174;46022
+15;Arctic Future;Bioplastics;174;64910
+15;Arctic Future;Nanowire;174;99053
+15;Arctic Future;Paper Batteries;174;66307
+15;Arctic Future;Transester gas;174;84342
+16;Oceanic Future;Artificial Scales;876;74233
+16;Oceanic Future;Biolight;876;81378
+16;Oceanic Future;Corals;876;132880
+16;Oceanic Future;Pearls;876;108840
+16;Oceanic Future;Plankton;876;51565
+17;Virtual Future;Cryptocash;5;78549
+17;Virtual Future;Data Crystals;5;75882
+17;Virtual Future;Golden Rice;5;71291
+17;Virtual Future;Nanites;5;85045
+17;Virtual Future;Tea Silk;5;76984
+18;Space Age Mars;BioTech Crops;360;207232
+18;Space Age Mars;Fusion Reactors;360;187470
+18;Space Age Mars;Lubricants;360;214797
+18;Space Age Mars;Mars Microbes;360;211131
+18;Space Age Mars;Superalloys;360;218838
+19;Space Age Asteroid Belt;Bromine;92;87689
+19;Space Age Asteroid Belt;Compound Fluid;92;92158
+19;Space Age Asteroid Belt;Nickel;92;94592
+19;Space Age Asteroid Belt;Platinum Crystal;92;54124
+19;Space Age Asteroid Belt;Processed Material;92;76279
+20;Space Age Venus;Glowing Seaweed;1146;18853
+20;Space Age Venus;Herbal Snack;1146;18349
+20;Space Age Venus;Microgreen Supplements;1146;17139
+20;Space Age Venus;Soy Proteins;1146;16049
+20;Space Age Venus;Sugar Crystals;1146;18524
+21;Space Age Jupiter Moon;Advanced DNA Data;385;1591
+21;Space Age Jupiter Moon;Bio Creatures;385;1291
+21;Space Age Jupiter Moon;Enhanced Porifera;385;1291
+21;Space Age Jupiter Moon;Red Algae;385;1391
+21;Space Age Jupiter Moon;Topological Records;385;1291
+22;Space Age Titan;Compressed Matter Capsule;631;629
+22;Space Age Titan;Experimental Data;631;629
+22;Space Age Titan;Isolated Molecules;631;629
+22;Space Age Titan;Liquid Binder;631;629
+22;Space Age Titan;Upcycled Hydrocarbons;631;629
