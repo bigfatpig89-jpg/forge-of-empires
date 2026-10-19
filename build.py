@@ -32,8 +32,6 @@ def scores(df, id_col, name_col, cols):
     return {"names": {str(k): v for k, v in names.items()},
             "rows": df[["date", "id"] + list(cols)].sort_values(["date", "s"], ascending=[True, False]).to_dict("records")}
 
-FORGEHAMMER_FROM = "2026-08-31"    # member files from this date come from ForgeHammer; earlier ones come from FoE Helper
-
 def season_lookup(rows):
     by = {}
     for r in rows: by.setdefault(r["date"], {})[r["id"]] = r["s"]
@@ -47,7 +45,7 @@ def season_value(by, date, pid, exact):
 
 def members(folder, out):
     """Member exports (Member-YYYY-MM-DD.csv); the date comes from the file name.
-    FoE Helper files (before FORGEHAMMER_FROM) hold counters instead of season points and have no QI column, so their
+    FoE Helper files (no qi_participation column) hold counters instead of season points, so their
     Last GE / GBG / QI values are filled in from the GE, GBG and QI files of the same week."""
     ge, gbg, qi = (season_lookup(out[k]["rows"]) for k in ("ge", "gbg", "qi"))
     opt = lambda v: None if v is None or pd.isna(v) else int(v)
@@ -55,16 +53,17 @@ def members(folder, out):
     for f in sorted(Path(folder).glob("Member-*.csv")):
         df = pd.read_csv(f, sep=";", encoding="utf-8-sig")
         if "guildmember" in df: df = df[df["guildmember"] != 0]            # keep current members only
+        helper = "qi_participation" not in df                               # ForgeHammer files have this column, FoE Helper files do not
         date = re.search(r"(\d{4}-\d{2}-\d{2})", f.name).group(1)
         for r in df.to_dict("records"):
             row = {"date": date, "id": int(r["member_id"]), "rank": int(r["rank"]), "name": r["member"], "points": int(r["points"]),
                    "era": r.get("eraName"), "ge": opt(r.get("gex_participation")), "gbg": opt(r.get("gbg_participation")),
                    "qi": opt(r.get("qi_participation")), "wb": opt(r.get("won_battles"))}
-            if date < FORGEHAMMER_FROM:
+            if helper:
                 pid = row["id"]; row.update(ge=season_value(ge, date, pid, True), gbg=season_value(gbg, date, pid, False),
                                             qi=season_value(qi, date, pid, False), filled=True)
             rows.append(row)
-    return {"meta": {"forgeHammerFrom": FORGEHAMMER_FROM}, "rows": rows}
+    return {"rows": rows}
 
 ITER = 600_000
 _password = None

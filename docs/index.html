@@ -404,8 +404,8 @@ function showMembers(d) {
     return [r.rank, r.id, g || b || q ? `<span class="bad">${escHtml(r.name)}</span>` : escHtml(r.name), fmt.format(r.points), escHtml(r.era ?? ""),
             cell(r.ge, g), cell(r.gbg, b), cell(r.qi, q), fmt.format(r.wb ?? 0)]; });
   $("summary").textContent = `Member data from ${ld}` + (pd ? `, compared with ${pd}.` : ".");
-  const from = d.meta?.forgeHammerFrom, filled = cur.some(r => r.filled);
-  const note = from ? `<p style="margin-top:12px">About the files: member files before ${from} came from FoE Helper. Their GE and GBG participation values were counters rather than season points, and they had no QI value, so for those files Last GE, Last GBG and Last QI are taken from the GE, GBG and QI files of the same week (blank where there is no such file). Files from ${from} come from ForgeHammer and already contain all three season values. The file shown here (${ld}) ${filled ? "was filled in from the season files." : "is a ForgeHammer file."}</p>` : "";
+  const fh = d.rows.filter(r => !r.filled).map(r => r.date).sort()[0], filled = cur.some(r => r.filled);
+  const note = `<p style="margin-top:12px">About the files: member files exported by FoE Helper have no QI column, and their GE and GBG participation values were counters rather than season points. For those files, Last GE, Last GBG and Last QI are taken from the GE, GBG and QI files of the same week (blank where there is no such file). Member files from ForgeHammer${fh ? ` (from ${fh})` : ""} already contain all three season values. The file shown here (${ld}) ${filled ? "was filled in from the season files." : "is a ForgeHammer file."}</p>`;
   let html = `<section><h2>Members</h2><p>Members with a red name are below the minimum for Last GE (${MIN.ge}), Last GBG (${MIN.gbg}) or Last QI (${MIN.qi}).</p>${
     T(["Rank", "ID", "Name", "Points", "Era", "Last GE", "Last GBG", "Last QI", "Battles Won"], info, [1, 1, 0, 1, 0, 1, 1, 1, 1])}${note}</section>`;
   let text = "";

@@ -1,0 +1,106 @@
+﻿eraID;era;good;produceable;instock
+3;Iron Age;Cloth;627;106168
+3;Iron Age;Ebony;627;127929
+3;Iron Age;Jewelry;627;115304
+3;Iron Age;Iron;627;202569
+3;Iron Age;Limestone;627;175295
+4;Early Middle Age;Copper;24;132840
+4;Early Middle Age;Gold;24;138592
+4;Early Middle Age;Granite;24;134194
+4;Early Middle Age;Honey;24;144212
+4;Early Middle Age;Alabaster;24;139929
+5;High Middle Age;Brick;52;176125
+5;High Middle Age;Glass;52;153098
+5;High Middle Age;Dried Herbs;52;150331
+5;High Middle Age;Ropes;52;148896
+5;High Middle Age;Salt;52;148271
+6;Late Middle Age;Basalt;61;226882
+6;Late Middle Age;Brass;61;217869
+6;Late Middle Age;Gunpowder;61;214270
+6;Late Middle Age;Silk;61;210195
+6;Late Middle Age;Talc Powder;61;235689
+7;Colonial Age;Coffee;726;90576
+7;Colonial Age;Paper;726;178931
+7;Colonial Age;Porcelain;726;242110
+7;Colonial Age;Tar;726;170787
+7;Colonial Age;Wire;726;114205
+8;Industrial Age;Coke;359;661837
+8;Industrial Age;Fertilizer;359;545251
+8;Industrial Age;Rubber;359;491955
+8;Industrial Age;Textiles;359;258486
+8;Industrial Age;Whale Oil;359;675065
+9;Progressive Era;Asbestos;1606;595705
+9;Progressive Era;Explosives;1606;240538
+9;Progressive Era;Machine Parts;1606;422882
+9;Progressive Era;Gasoline;1606;344259
+9;Progressive Era;Tinplate;1606;295666
+10;Modern Era;Convenience Food;1947;275916
+10;Modern Era;Ferroconcrete;1947;424357
+10;Modern Era;Flavorants;1947;284752
+10;Modern Era;Luxury Materials;1947;282420
+10;Modern Era;Packaging;1947;270340
+11;Postmodern Era;Genome Data;54;630420
+11;Postmodern Era;Industrial Filters;54;886550
+11;Postmodern Era;Renewable Resources;54;870798
+11;Postmodern Era;Semiconductors;54;698540
+11;Postmodern Era;Steel;54;457851
+12;Contemporary Era;Bionics Data;2486;290120
+12;Contemporary Era;Electromagnets;2486;236942
+12;Contemporary Era;Gas;2486;200787
+12;Contemporary Era;Plastics;2486;309545
+12;Contemporary Era;Robots;2486;207437
+13;Tomorrow Era;Nutrition Research;53;392445
+13;Tomorrow Era;Papercrete;53;312867
+13;Tomorrow Era;Preservatives;53;373619
+13;Tomorrow Era;Smart Materials;53;633872
+13;Tomorrow Era;Translucent Concrete;53;512375
+14;Future Era;Algae;4922;1738787
+14;Future Era;Biogeochemical Data;4922;2135981
+14;Future Era;Nanoparticles;4922;2238942
+14;Future Era;Purified Water;4922;2567981
+14;Future Era;Superconductors;4922;2007445
+15;Arctic Future;AI data;627;1129803
+15;Arctic Future;Bioplastics;627;1224472
+15;Arctic Future;Nanowire;627;1046001
+15;Arctic Future;Paper Batteries;627;1246574
+15;Arctic Future;Transester gas;627;1140309
+16;Oceanic Future;Artificial Scales;2479;1685382
+16;Oceanic Future;Biolight;2479;1670037
+16;Oceanic Future;Corals;2479;817977
+16;Oceanic Future;Pearls;2479;1128622
+16;Oceanic Future;Plankton;2479;1721489
+17;Virtual Future;Cryptocash;3072;1180486
+17;Virtual Future;Data Crystals;3072;1305147
+17;Virtual Future;Golden Rice;3072;1542414
+17;Virtual Future;Nanites;3072;1423178
+17;Virtual Future;Tea Silk;3072;1246850
+18;Space Age Mars;BioTech Crops;4635;1557579
+18;Space Age Mars;Fusion Reactors;4635;1259191
+18;Space Age Mars;Lubricants;4635;880775
+18;Space Age Mars;Mars Microbes;4635;1382378
+18;Space Age Mars;Superalloys;4635;984210
+19;Space Age Asteroid Belt;Bromine;0;1687011
+19;Space Age Asteroid Belt;Compound Fluid;0;1631666
+19;Space Age Asteroid Belt;Nickel;0;1425308
+19;Space Age Asteroid Belt;Platinum Crystal;0;1661954
+19;Space Age Asteroid Belt;Processed Material;0;1779017
+20;Space Age Venus;Glowing Seaweed;379;2283089
+20;Space Age Venus;Herbal Snack;379;2615970
+20;Space Age Venus;Microgreen Supplements;379;2480771
+20;Space Age Venus;Soy Proteins;379;2028188
+20;Space Age Venus;Sugar Crystals;379;2530399
+21;Space Age Jupiter Moon;Advanced DNA Data;65;3318358
+21;Space Age Jupiter Moon;Bio Creatures;65;3192642
+21;Space Age Jupiter Moon;Enhanced Porifera;65;3170802
+21;Space Age Jupiter Moon;Red Algae;65;3268847
+21;Space Age Jupiter Moon;Topological Records;65;3592911
+22;Space Age Titan;Compressed Matter Capsule;6614;1572173
+22;Space Age Titan;Experimental Data;6614;2439208
+22;Space Age Titan;Isolated Molecules;6614;2367292
+22;Space Age Titan;Liquid Binder;6614;2709458
+22;Space Age Titan;Upcycled Hydrocarbons;6614;1736328
+23;Space Age Space Hub;Dark Energy Batteries;43783;16645050
+23;Space Age Space Hub;Deep Space Data;43783;16189123
+23;Space Age Space Hub;Hypersleep Modules;43783;17096636
+23;Space Age Space Hub;Oxygen Pills;43783;15725361
+23;Space Age Space Hub;Silver Crystals;43783;16393155
