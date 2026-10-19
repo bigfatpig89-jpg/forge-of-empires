@@ -1,5 +1,5 @@
 """Build docs/data/*.json for the dashboard from the CSVs in data/treasury, data/qi, data/gbg and data/ge."""
-import base64, getpass, json, os, re, pandas as pd
+import base64, datetime as dt, getpass, json, os, re, pandas as pd
 from pathlib import Path
 from eras import ERA_ID
 
@@ -32,8 +32,24 @@ def scores(df, id_col, name_col, cols):
     return {"names": {str(k): v for k, v in names.items()},
             "rows": df[["date", "id"] + list(cols)].sort_values(["date", "s"], ascending=[True, False]).to_dict("records")}
 
-def members(folder):
-    """FoE Helper member exports (Member-YYYY-MM-DD.csv); the date comes from the file name."""
+FORGEHAMMER_FROM = "2026-08-31"    # member files from this date come from ForgeHammer; earlier ones come from FoE Helper
+
+def season_lookup(rows):
+    by = {}
+    for r in rows: by.setdefault(r["date"], {})[r["id"]] = r["s"]
+    return by
+
+def season_value(by, date, pid, exact):
+    """What a member scored in the GE week / QI or GBG season that matches a member file's date (None if there is no such season)."""
+    mon = dt.date.fromisoformat(date); mon -= dt.timedelta(days=mon.weekday())        # files dated Tuesday belong to that Monday
+    ok = [d for d in by if (d == mon.isoformat() if exact else 0 <= (mon - dt.date.fromisoformat(d)).days <= 14)]
+    return by[max(ok)].get(pid, 0) if ok else None                                  # QI/GBG: the latest season that ended on or before the file
+
+def members(folder, out):
+    """Member exports (Member-YYYY-MM-DD.csv); the date comes from the file name.
+    FoE Helper files (before FORGEHAMMER_FROM) hold counters instead of season points and have no QI column, so their
+    Last GE / GBG / QI values are filled in from the GE, GBG and QI files of the same week."""
+    ge, gbg, qi = (season_lookup(out[k]["rows"]) for k in ("ge", "gbg", "qi"))
     opt = lambda v: None if v is None or pd.isna(v) else int(v)
     rows = []
     for f in sorted(Path(folder).glob("Member-*.csv")):
@@ -41,10 +57,14 @@ def members(folder):
         if "guildmember" in df: df = df[df["guildmember"] != 0]            # keep current members only
         date = re.search(r"(\d{4}-\d{2}-\d{2})", f.name).group(1)
         for r in df.to_dict("records"):
-            rows.append({"date": date, "id": int(r["member_id"]), "rank": int(r["rank"]), "name": r["member"], "points": int(r["points"]),
-                         "era": r.get("eraName"), "ge": opt(r.get("gex_participation")), "gbg": opt(r.get("gbg_participation")),
-                         "qi": opt(r.get("qi_participation")), "wb": opt(r.get("won_battles"))})
-    return {"rows": rows}
+            row = {"date": date, "id": int(r["member_id"]), "rank": int(r["rank"]), "name": r["member"], "points": int(r["points"]),
+                   "era": r.get("eraName"), "ge": opt(r.get("gex_participation")), "gbg": opt(r.get("gbg_participation")),
+                   "qi": opt(r.get("qi_participation")), "wb": opt(r.get("won_battles"))}
+            if date < FORGEHAMMER_FROM:
+                pid = row["id"]; row.update(ge=season_value(ge, date, pid, True), gbg=season_value(gbg, date, pid, False),
+                                            qi=season_value(qi, date, pid, False), filled=True)
+            rows.append(row)
+    return {"meta": {"forgeHammerFrom": FORGEHAMMER_FROM}, "rows": rows}
 
 ITER = 600_000
 _password = None
@@ -109,7 +129,7 @@ def build(dash):
         Path(f"docs/data/{dash}/{name}.json").write_text(json.dumps(d, separators=(",", ":")))
         print(dash, name, len(d["rows"]), "rows")
     sections = [name for name, d in out.items() if d["rows"]]       # the sections that have data
-    m = members(f"{base}/members")
+    m = members(f"{base}/members", out)
     if m["rows"]:                                                    # members are only ever written encrypted
         pw = password()
         if not pw: print(dash, "members: no password given, section skipped")

@@ -250,7 +250,8 @@ function scoreboard(key, {names, rows: allRows, meta}) {
 
   // player history
   const ids = [...new Set(rows.map(r => r.id))].sort((a, b) => nm(a).localeCompare(nm(b)));
-  const wsel = fill("who", ids.map(id => [id, nm(id)]));
+  const nameCount = {}; ids.forEach(id => { const k = nm(id).toLowerCase(); nameCount[k] = (nameCount[k] || 0) + 1; });
+  const wsel = fill("who", ids.map(id => [id, nameCount[nm(id).toLowerCase()] > 1 ? `${nm(id)} (ID ${id})` : nm(id)]));   // two IDs with one name: show the ID
   wsel.value = rows.filter(r => r.date === last).sort(order)[0]?.id ?? ids[0];
   const hist = () => {
     if (cap) {                                                  // GE: line graph, zeros included
@@ -403,8 +404,10 @@ function showMembers(d) {
     return [r.rank, r.id, g || b || q ? `<span class="bad">${escHtml(r.name)}</span>` : escHtml(r.name), fmt.format(r.points), escHtml(r.era ?? ""),
             cell(r.ge, g), cell(r.gbg, b), cell(r.qi, q), fmt.format(r.wb ?? 0)]; });
   $("summary").textContent = `Member data from ${ld}` + (pd ? `, compared with ${pd}.` : ".");
+  const from = d.meta?.forgeHammerFrom, filled = cur.some(r => r.filled);
+  const note = from ? `<p style="margin-top:12px">About the files: member files before ${from} came from FoE Helper. Their GE and GBG participation values were counters rather than season points, and they had no QI value, so for those files Last GE, Last GBG and Last QI are taken from the GE, GBG and QI files of the same week (blank where there is no such file). Files from ${from} come from ForgeHammer and already contain all three season values. The file shown here (${ld}) ${filled ? "was filled in from the season files." : "is a ForgeHammer file."}</p>` : "";
   let html = `<section><h2>Members</h2><p>Members with a red name are below the minimum for Last GE (${MIN.ge}), Last GBG (${MIN.gbg}) or Last QI (${MIN.qi}).</p>${
-    T(["Rank", "ID", "Name", "Points", "Era", "Last GE", "Last GBG", "Last QI", "Battles Won"], info, [1, 1, 0, 1, 0, 1, 1, 1, 1])}</section>`;
+    T(["Rank", "ID", "Name", "Points", "Era", "Last GE", "Last GBG", "Last QI", "Battles Won"], info, [1, 1, 0, 1, 0, 1, 1, 1, 1])}${note}</section>`;
   let text = "";
   if (pd) {
     const both = cur.filter(r => prev[r.id]).map(r => ({name:r.name, p1:r.points, p0:prev[r.id].points, b1:r.wb ?? 0, b0:prev[r.id].wb ?? 0}));
@@ -417,7 +420,8 @@ function showMembers(d) {
       + sec("Top 10 gainers: points", "Points", byPts, "p1", "p0", ["Gain", r => fmt.format(gain(r))])
       + sec("Top 10 gainers: percentage", "Points", byPct, "p1", "p0", ["% Gain", pct])
       + sec("Top 10 gainers: battles won", "Battles Won", byBat, "b1", "b0", ["Gain", r => fmt.format(bat(r))]);
-    const block = (t, list, f) => `${t} (${pd} to ${ld})\n` + list.map(r => `${r.name}: ${f(r)}`).join("\n");
+    const block = (t, list, f) => { const w = Math.max(0, ...list.map(r => [...r.name].length));     // names padded to one width so the values start in the same column
+      return `${t} (${pd} to ${ld})\n` + list.map(r => `${r.name}${" ".repeat(w - [...r.name].length)}  ${f(r)}`).join("\n"); };
     text = [block("Top 10 gainers: points", byPts, r => fmt.format(gain(r))), block("Top 10 gainers: percentage", byPct, pct), block("Top 10 gainers: battles won", byBat, r => fmt.format(bat(r)))].join("\n\n");
   } else html += "<section><h2>Top 10 gainers</h2><p>Two member files are needed to compare weeks.</p></section>";
   $("view").innerHTML = html;
