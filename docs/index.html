@@ -34,6 +34,8 @@
   .tbl.sticky1 thead th:first-child { z-index:3; }
   .tbl td.up, .upkey { background:#dbeafe; color:#1e40af; font-weight:600; }
   .upkey { padding:0 6px; border-radius:4px; }
+  .tbl td.gold, .topkey { background:#f4c430; }
+  .topkey { padding:0 6px; border-radius:4px; font-weight:600; color:#111; }
   .legend { margin-top:16px; border-top:1px solid var(--line); padding-top:8px; }
   .legend h3 { margin:4px 0 8px; font-size:15px; }
   .legend-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:4px 16px; font-size:14px; padding-bottom:8px; }
@@ -448,11 +450,26 @@ function greatBuildings({gbs, rows}) {
   const players = Object.keys(now).sort((a, b) => a.localeCompare(b, undefined, {sensitivity:"base"})), have = new Set(Object.values(now).flatMap(Object.keys)), cols = gbs.filter(g => have.has(g.id));
   // blue = the level went up since the previous file, or the Great Building is newly built; players who are not in the previous file have no baseline, so nothing is marked for them
   const up = (p, g) => before[p] && (before[p][g] === undefined || now[p][g] > before[p][g]);
+  const topLevel = {}; cols.forEach(g => topLevel[g.id] = Math.max(...players.map(p => now[p][g.id] ?? 0)));      // highest level of each Great Building
   $("view").innerHTML = `<section><h2>Great Building levels</h2><p>Level of each Great Building for each player on ${last} (${players.length} players, ${cols.length} Great Buildings). A blank cell means the player does not have that Great Building.${
-    prev ? ` <b class="upkey">Blue</b> means the level increased, or the Great Building was newly built, since ${prev}; players who were not in that file are not marked.` : ""} Hover over a heading for the full name.</p>
+    prev ? ` <b class="upkey">Blue</b> means the level increased, or the Great Building was newly built, since ${prev}; players who were not in that file are not marked.` : ""} <b class="topkey">Gold</b> marks the highest level of each Great Building (every owner, if tied). Hover over a heading for the full name.</p>
     <div class="tbl-wrap scroll" style="max-height:70vh"><table class="tbl gb sticky1"><thead><tr><th>Player</th>${cols.map(g => `<th class="num" title="${escHtml(g.name)}">${escHtml(g.short)}</th>`).join("")}</tr></thead><tbody>${
-      players.map(p => `<tr><td>${escHtml(p)}</td>${cols.map(g => { const v = now[p][g.id]; return `<td class="num${v !== undefined && up(p, g.id) ? " up" : ""}">${v ?? ""}</td>`; }).join("")}</tr>`).join("")}</tbody></table></div>
-    <div class="legend"><h3>Legend</h3><div class="legend-grid">${cols.map(g => `<div><b>${escHtml(g.short)}</b> ${escHtml(g.name)}</div>`).join("")}</div></div></section>`;
+      players.map(p => `<tr><td>${escHtml(p)}</td>${cols.map(g => { const v = now[p][g.id]; return `<td class="num${v !== undefined && up(p, g.id) ? " up" : ""}${v !== undefined && v === topLevel[g.id] ? " gold" : ""}">${v ?? ""}</td>`; }).join("")}</tr>`).join("")}</tbody></table></div>
+    <div class="legend"><h3>Legend</h3><div class="legend-grid">${cols.map(g => `<div><b>${escHtml(g.short)}</b> ${escHtml(g.name)}</div>`).join("")}</div></div></section>
+    <section><h2>Great Building rankings</h2><p>Choose a Great Building to rank every member who has it by level. Players on the same level share a rank. Blue and gold work as in the table above.</p>
+    ${picker("gbpick", "Great Building")}<div id="gbrank" class="tbl-wrap"></div></section>`;
+  if (!cols.length) return;
+  const gsel = $("gbpick"), owners = g => players.filter(p => now[p][g.id] !== undefined).length;
+  cols.forEach(g => gsel.add(new Option(`${g.short} – ${g.name}`, g.id)));
+  gsel.value = cols.reduce((a, g) => owners(g) > owners(a) ? g : a, cols[0]).id;                    // start on the Great Building with the most owners
+  const rank = () => {
+    const g = gsel.value, list = players.filter(p => now[p][g] !== undefined).sort((a, b) => now[b][g] - now[a][g] || a.localeCompare(b, undefined, {sensitivity:"base"}));
+    let r = 0;
+    $("gbrank").innerHTML = `<table class="tbl"><thead><tr><th>Rank</th><th>Player</th><th class="num">Level</th></tr></thead><tbody>${list.map((p, i) => {
+      if (i === 0 || now[p][g] !== now[list[i - 1]][g]) r = i + 1;                                  // ties share a rank: 1, 2, 2, 4
+      return `<tr><td>${r}</td><td>${escHtml(p)}</td><td class="num${up(p, g) ? " up" : ""}${r === 1 ? " gold" : ""}">${now[p][g]}</td></tr>`; }).join("")}</tbody></table>`;
+  };
+  gsel.onchange = rank; rank();
 }
 
 /* ---------- main menu ---------- */
