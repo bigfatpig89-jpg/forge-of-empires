@@ -1,5 +1,5 @@
 """Build docs/data/*.json for the dashboard from the CSVs in data/treasury, data/qi, data/gbg and data/ge."""
-import base64, datetime as dt, getpass, json, os, re, pandas as pd
+import base64, csv, datetime as dt, getpass, json, os, re, unicodedata, pandas as pd
 from pathlib import Path
 from eras import ERA_ID
 
@@ -42,6 +42,35 @@ def season_value(by, date, pid, exact):
     mon = dt.date.fromisoformat(date); mon -= dt.timedelta(days=mon.weekday())        # files dated Tuesday belong to that Monday
     ok = [d for d in by if (d == mon.isoformat() if exact else 0 <= (mon - dt.date.fromisoformat(d)).days <= 14)]
     return by[max(ok)].get(pid, 0) if ok else None                                  # QI/GBG: the latest season that ended on or before the file
+
+GB_ERAS = ["BronzeAge", "IronAge", "EarlyMiddleAge", "HighMiddleAge", "LateMiddleAge", "ColonialAge", "IndustrialAge", "ProgressiveEra", "ModernEra",
+           "PostModernEra", "ContemporaryEra", "TomorrowEra", "FutureEra", "ArcticFuture", "OceanicFuture", "VirtualFuture", "SpaceAgeMars",
+           "SpaceAgeAsteroidBelt", "SpaceAgeVenus", "SpaceAgeJupiterMoon", "SpaceAgeTitan", "SpaceAgeSpaceHub", "StellarAgeDiscovery", "AllAge"]
+
+def gb_key(s):
+    """Match names ignoring accents, case and punctuation (Chateau = Château)."""
+    return re.sub(r"[^a-z0-9]", "", unicodedata.normalize("NFKD", s).encode("ascii", "ignore").decode().lower())
+
+def gb_order(entity_id):
+    m = re.match(r"X_([A-Za-z]+)_", entity_id); n = re.search(r"(\d+)$", entity_id)
+    return (GB_ERAS.index(m[1]) if m and m[1] in GB_ERAS else len(GB_ERAS), int(n[1]) if n else 0)
+
+def great_buildings(folder):
+    """Great Building levels per player (GreatBuildings-YYYY-MM-DD.csv). Short forms come from gb_short_forms.csv."""
+    df = load(folder, "GreatBuildings")
+    if df.empty: return {"gbs": [], "rows": []}
+    short = {}
+    if Path("gb_short_forms.csv").exists():
+        with open("gb_short_forms.csv", encoding="utf-8-sig", newline="") as f:
+            short = {gb_key(r["Great Building"]): r["Short form"].strip() for r in csv.DictReader(f, delimiter=";")}
+    df = df.dropna(subset=["level"]).drop_duplicates(["date", "member", "city_entity_id"], keep="last")
+    gbs = df.drop_duplicates("city_entity_id")[["city_entity_id", "gbname"]].to_dict("records")
+    gbs.sort(key=lambda g: (gb_order(g["city_entity_id"]), g["gbname"]))
+    for g in gbs:
+        if gb_key(g["gbname"]) not in short: print("  no short form for", g["gbname"], "- using the full name (add it to gb_short_forms.csv)")
+    return {"gbs": [{"id": g["city_entity_id"], "name": g["gbname"], "short": short.get(gb_key(g["gbname"])) or g["gbname"]} for g in gbs],
+            "rows": [{"date": r["date"], "p": r["member"], "g": r["city_entity_id"], "l": int(r["level"])}
+                     for r in df.sort_values(["date", "member"]).to_dict("records")]}
 
 def members(folder, out):
     """Member exports (Member-YYYY-MM-DD.csv); the date comes from the file name.
@@ -123,6 +152,7 @@ def build(dash):
     out["qi"] = scores(load(f"{base}/qi", "QI"), "Player_ID", "Player", {"a": "Actions", "s": "Progress"})
     out["gbg"] = scores(load(f"{base}/gbg", "GBG", gbg_columns), "player_id", "player", {"n": "negotiations", "b": "battles", "s": "total"})
     out["ge"] = guild_expeditions(f"{base}/ge")
+    out["greatbuildings"] = great_buildings(f"{base}/greatbuildings")
     Path(f"docs/data/{dash}").mkdir(parents=True, exist_ok=True)
     for name, d in out.items():
         Path(f"docs/data/{dash}/{name}.json").write_text(json.dumps(d, separators=(",", ":")))
