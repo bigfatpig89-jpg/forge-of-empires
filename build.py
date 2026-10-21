@@ -72,6 +72,16 @@ def great_buildings(folder):
             "rows": [{"date": r["date"], "p": r["member"], "g": r["city_entity_id"], "l": int(r["level"])}
                      for r in df.sort_values(["date", "member"]).to_dict("records")]}
 
+def guild_buildings(folder):
+    """Guild Buildings per player and era (GuildBuildings-YYYY-MM-DD.csv): number of buildings, guild goods and building levels."""
+    df = load(folder, "GuildBuildings")
+    if df.empty: return {"eras": [], "rows": []}
+    for c in ("level", "eraId", "guildGoods"): df[c] = pd.to_numeric(df[c], errors="coerce").fillna(0).astype(int)
+    eras = df.drop_duplicates("eraId").sort_values("eraId")[["eraId", "era"]]            # eraId order = the order of the eras in GuildGoods
+    g = df.groupby(["date", "member", "eraId"]).agg(n=("building", "count"), g=("guildGoods", "sum"), l=("level", "sum")).reset_index()
+    return {"eras": [{"id": int(r.eraId), "name": r.era} for r in eras.itertuples()],
+            "rows": [{"date": r.date, "p": r.member, "e": int(r.eraId), "n": int(r.n), "g": int(r.g), "l": int(r.l)} for r in g.itertuples()]}
+
 def members(folder, out):
     """Member exports (Member-YYYY-MM-DD.csv); the date comes from the file name.
     FoE Helper files (no qi_participation column) hold counters instead of season points, so their
@@ -153,6 +163,7 @@ def build(dash):
     out["gbg"] = scores(load(f"{base}/gbg", "GBG", gbg_columns), "player_id", "player", {"n": "negotiations", "b": "battles", "s": "total"})
     out["ge"] = guild_expeditions(f"{base}/ge")
     out["greatbuildings"] = great_buildings(f"{base}/greatbuildings")
+    out["guildbuildings"] = guild_buildings(f"{base}/guildbuildings")
     Path(f"docs/data/{dash}").mkdir(parents=True, exist_ok=True)
     for name, d in out.items():
         Path(f"docs/data/{dash}/{name}.json").write_text(json.dumps(d, separators=(",", ":")))

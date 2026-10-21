@@ -36,6 +36,8 @@
   .upkey { padding:0 6px; border-radius:4px; }
   .tbl td.gold, .topkey { background:#f4c430; }
   .topkey { padding:0 6px; border-radius:4px; font-weight:600; color:#111; }
+  .tbl.gbld th.num { white-space:normal; min-width:72px; font-size:12px; line-height:1.25; vertical-align:bottom; padding:6px 8px; }
+  .tbl.gbld td.num { padding:6px 8px; }
   .legend { margin-top:16px; border-top:1px solid var(--line); padding-top:8px; }
   .legend h3 { margin:4px 0 8px; font-size:15px; }
   .legend-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:4px 16px; font-size:14px; padding-bottom:8px; }
@@ -472,6 +474,18 @@ function greatBuildings({gbs, rows}) {
   gsel.onchange = rank; rank();
 }
 
+/* ---------- Guild Buildings: guild goods produced, players as rows, ages as columns (in GuildGoods order), total row at the bottom ---------- */
+function guildBuildings({eras, rows}) {
+  const last = rows.reduce((m, r) => r.date > m ? r.date : m, ""), sub = rows.filter(r => r.date === last), by = {};
+  sub.forEach(r => (by[r.p] ??= {})[r.e] = r.g);
+  const players = Object.keys(by).sort((a, b) => a.localeCompare(b, undefined, {sensitivity:"base"})), cols = eras.filter(e => sub.some(r => r.e === e.id));
+  const tot = cols.map(e => players.reduce((a, p) => a + (by[p][e.id] ?? 0), 0));
+  $("view").innerHTML = `<section><h2>Guild Buildings</h2><p>Total guild goods produced by each player's Guild Buildings on ${last}: ${players.length} players across ${cols.length} ages, in the order of the eras in the treasury goods. The last row is the total of each age.</p>
+    <div class="tbl-wrap scroll" style="max-height:70vh"><table class="tbl gbld sticky1"><thead><tr><th>Player</th>${cols.map(e => `<th class="num">${escHtml(e.name)}</th>`).join("")}</tr></thead><tbody>${
+      players.map(p => `<tr><td>${escHtml(p)}</td>${cols.map(e => `<td class="num">${by[p][e.id] === undefined ? "" : fmt.format(by[p][e.id])}</td>`).join("")}</tr>`).join("")
+    }<tr class="sum"><td>Total</td>${tot.map(t => `<td class="num">${fmt.format(t)}</td>`).join("")}</tr></tbody></table></div></section>`;
+}
+
 /* ---------- main menu ---------- */
 const SITE = "RMoose's Forge of Empires Assortment";
 const DASH = {
@@ -484,10 +498,11 @@ const SECTIONS = {
   gbg:["Guild Battlegrounds", d => scoreboard("gbg", d)],
   ge:["Guild Expeditions", d => scoreboard("ge", d)],
   greatbuildings:["Great Buildings", greatBuildings],
+  guildbuildings:["Guild Buildings", guildBuildings],
   members:["Members", membersPage]
 };
 const manifest = fetch("data/dashboards.json").then(r => r.json()).catch(() => ({}));    // which sections have data; written by build.py
-const sectionsOf = (man, a) => (man[a] || (a === "en19" ? Object.keys(SECTIONS).filter(s => s !== "members" && s !== "greatbuildings") : [])).filter(s => SECTIONS[s]);
+const sectionsOf = (man, a) => (man[a] || (a === "en19" ? Object.keys(SECTIONS).filter(s => s !== "members" && s !== "greatbuildings" && s !== "guildbuildings") : [])).filter(s => SECTIONS[s]);
 const menu = man => {
   const tiles = Object.entries(DASH).map(([a, D]) => { const secs = sectionsOf(man, a);
     return secs.length ? `<a class="tile" href="#/${a}"><div class="kicker">${D.kicker}</div><h2>${D.tile}</h2><p>${secs.map(s => SECTIONS[s][0]).join(", ")}.</p></a>`
