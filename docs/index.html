@@ -36,7 +36,8 @@
   .upkey { padding:0 6px; border-radius:4px; }
   .tbl td.gold, .topkey { background:#f4c430; }
   .topkey { padding:0 6px; border-radius:4px; font-weight:600; color:#111; }
-  .tbl.gbld th.num { white-space:normal; min-width:72px; font-size:12px; line-height:1.25; vertical-align:bottom; padding:6px 8px; }
+  .tbl tr.mem td { font-weight:600; }
+  .tbl.gbld th.num { white-space:normal; min-width:48px; font-size:12px; line-height:1.25; vertical-align:bottom; padding:6px 8px; }
   .tbl.gbld td.num { padding:6px 8px; }
   .legend { margin-top:16px; border-top:1px solid var(--line); padding-top:8px; }
   .legend h3 { margin:4px 0 8px; font-size:15px; }
@@ -474,16 +475,21 @@ function greatBuildings({gbs, rows}) {
   gsel.onchange = rank; rank();
 }
 
-/* ---------- Guild Buildings: guild goods produced, players as rows, ages as columns (in GuildGoods order), total row at the bottom ---------- */
-function guildBuildings({eras, rows}) {
+/* ---------- Guild Buildings: guild goods produced, players as rows, ages (short forms) as columns in GuildGoods order, total row, members row, legend ---------- */
+function guildBuildings({eras, members, rows}) {
   const last = rows.reduce((m, r) => r.date > m ? r.date : m, ""), sub = rows.filter(r => r.date === last), by = {};
   sub.forEach(r => (by[r.p] ??= {})[r.e] = r.g);
   const players = Object.keys(by).sort((a, b) => a.localeCompare(b, undefined, {sensitivity:"base"})), cols = eras.filter(e => sub.some(r => r.e === e.id));
   const tot = cols.map(e => players.reduce((a, p) => a + (by[p][e.id] ?? 0), 0));
-  $("view").innerHTML = `<section><h2>Guild Buildings</h2><p>Total guild goods produced by each player's Guild Buildings on ${last}: ${players.length} players across ${cols.length} ages, in the order of the eras in the treasury goods. The last row is the total of each age.</p>
-    <div class="tbl-wrap scroll" style="max-height:70vh"><table class="tbl gbld sticky1"><thead><tr><th>Player</th>${cols.map(e => `<th class="num">${escHtml(e.name)}</th>`).join("")}</tr></thead><tbody>${
+  const md = (members || []).map(r => r.date).filter(d => d <= last).sort().at(-1), mem = {};          // the Eras file of the same date (or the latest one before it)
+  if (md) members.filter(r => r.date === md).forEach(r => mem[r.e] = r.m);
+  $("view").innerHTML = `<section><h2>Guild Buildings</h2><p>Total guild goods produced by each player's Guild Buildings on ${last}: ${players.length} players across ${cols.length} ages, in the order of the eras in the treasury goods. The Total row adds up each age.${
+    md ? ` Num Members is the number of members currently in each age, from the Eras file of ${md}.` : ""} Hover over a heading for the full age name.</p>
+    <div class="tbl-wrap scroll" style="max-height:70vh"><table class="tbl gbld sticky1"><thead><tr><th>Player</th>${cols.map(e => `<th class="num" title="${escHtml(e.name)}">${escHtml(e.short || e.name)}</th>`).join("")}</tr></thead><tbody>${
       players.map(p => `<tr><td>${escHtml(p)}</td>${cols.map(e => `<td class="num">${by[p][e.id] === undefined ? "" : fmt.format(by[p][e.id])}</td>`).join("")}</tr>`).join("")
-    }<tr class="sum"><td>Total</td>${tot.map(t => `<td class="num">${fmt.format(t)}</td>`).join("")}</tr></tbody></table></div></section>`;
+    }<tr class="sum"><td>Total</td>${tot.map(t => `<td class="num">${fmt.format(t)}</td>`).join("")}</tr>${
+      md ? `<tr class="mem"><td>Num Members</td>${cols.map(e => `<td class="num">${fmt.format(mem[e.id] ?? 0)}</td>`).join("")}</tr>` : ""}</tbody></table></div>
+    <div class="legend"><h3>Legend</h3><div class="legend-grid">${cols.map(e => `<div><b>${escHtml(e.short || e.name)}</b> ${escHtml(e.name)}</div>`).join("")}</div></div></section>`;
 }
 
 /* ---------- main menu ---------- */
@@ -501,7 +507,7 @@ const SECTIONS = {
   guildbuildings:["Guild Buildings", guildBuildings],
   members:["Members", membersPage]
 };
-const manifest = fetch("data/dashboards.json").then(r => r.json()).catch(() => ({}));    // which sections have data; written by build.py
+const manifest = fetch("data/dashboards.json", {cache:"no-cache"}).then(r => r.json()).catch(() => ({}));    // which sections have data; written by build.py
 const sectionsOf = (man, a) => (man[a] || (a === "en19" ? Object.keys(SECTIONS).filter(s => s !== "members" && s !== "greatbuildings" && s !== "guildbuildings") : [])).filter(s => SECTIONS[s]);
 const menu = man => {
   const tiles = Object.entries(DASH).map(([a, D]) => { const secs = sectionsOf(man, a);
@@ -530,7 +536,7 @@ async function route() {
     $("title").textContent = title; document.title = `${title} | ${D.guild} (${a})`;
     if (typeof Plotly === "undefined") { $("status").textContent = "Plotly failed to load. Check that plotly.min.js is next to index.html."; return; }
     $("status").textContent = "Loading…";
-    try { const k = `${a}/${b}`; cache[k] ??= await (await fetch(`data/${k}.json`)).json(); $("status").textContent = ""; render(cache[k]); }
+    try { const k = `${a}/${b}`; cache[k] ??= await (await fetch(`data/${k}.json`, {cache:"no-cache"})).json(); $("status").textContent = ""; render(cache[k]); }
     catch (err) { $("status").textContent = "Something went wrong: " + err.message; }
   } else if (D) { $("title").textContent = document.title = D.tile; $("summary").textContent = "No data yet."; }
   else if (a === "report") { $("title").textContent = document.title = "Guild Expeditions Report Generator"; report(); }

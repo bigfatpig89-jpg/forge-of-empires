@@ -72,14 +72,20 @@ def great_buildings(folder):
             "rows": [{"date": r["date"], "p": r["member"], "g": r["city_entity_id"], "l": int(r["level"])}
                      for r in df.sort_values(["date", "member"]).to_dict("records")]}
 
-def guild_buildings(folder):
-    """Guild Buildings per player and era (GuildBuildings-YYYY-MM-DD.csv): number of buildings, guild goods and building levels."""
+ERA_SHORT = {3: "IA", 4: "EMA", 5: "HMA", 6: "LMA", 7: "CA", 8: "InA", 9: "PE", 10: "ME", 11: "PME", 12: "CE", 13: "TE", 14: "FE", 15: "AF", 16: "OF",
+             17: "VF", 18: "SAM", 19: "SAAB", 20: "SAV", 21: "SAJM", 22: "SAT", 23: "SASH", 24: "SAD"}      # by eraId; a new era shows its full name until added here
+
+def guild_buildings(folder, eras_folder):
+    """Guild Buildings per player and era (GuildBuildings-YYYY-MM-DD.csv): number of buildings, guild goods and building levels.
+    Members per era come from the Eras files (Eras-YYYY-MM-DD.csv) in eras_folder."""
     df = load(folder, "GuildBuildings")
-    if df.empty: return {"eras": [], "rows": []}
+    if df.empty: return {"eras": [], "members": [], "rows": []}
+    ef = load(eras_folder, "Eras")
+    members = [] if ef.empty else [{"date": r["date"], "e": int(r["eraId"]), "m": int(r["numberOfMembers"])} for r in ef.to_dict("records")]
     for c in ("level", "eraId", "guildGoods"): df[c] = pd.to_numeric(df[c], errors="coerce").fillna(0).astype(int)
     eras = df.drop_duplicates("eraId").sort_values("eraId")[["eraId", "era"]]            # eraId order = the order of the eras in GuildGoods
     g = df.groupby(["date", "member", "eraId"]).agg(n=("building", "count"), g=("guildGoods", "sum"), l=("level", "sum")).reset_index()
-    return {"eras": [{"id": int(r.eraId), "name": r.era} for r in eras.itertuples()],
+    return {"eras": [{"id": int(r.eraId), "name": r.era, "short": ERA_SHORT.get(int(r.eraId), r.era)} for r in eras.itertuples()], "members": members,
             "rows": [{"date": r.date, "p": r.member, "e": int(r.eraId), "n": int(r.n), "g": int(r.g), "l": int(r.l)} for r in g.itertuples()]}
 
 def members(folder, out):
@@ -163,7 +169,7 @@ def build(dash):
     out["gbg"] = scores(load(f"{base}/gbg", "GBG", gbg_columns), "player_id", "player", {"n": "negotiations", "b": "battles", "s": "total"})
     out["ge"] = guild_expeditions(f"{base}/ge")
     out["greatbuildings"] = great_buildings(f"{base}/greatbuildings")
-    out["guildbuildings"] = guild_buildings(f"{base}/guildbuildings")
+    out["guildbuildings"] = guild_buildings(f"{base}/guildbuildings", f"{base}/eras")
     Path(f"docs/data/{dash}").mkdir(parents=True, exist_ok=True)
     for name, d in out.items():
         Path(f"docs/data/{dash}/{name}.json").write_text(json.dumps(d, separators=(",", ":")))
