@@ -25,6 +25,7 @@
   a.tile:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
   .tile h2 { font:600 22px/1.2 Fraunces, Georgia, serif; margin:4px 0 8px; }
   .tile .kicker { font-size:13px; color:var(--accent); font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+  .tile .sub { font-size:13px; color:var(--muted); margin:-2px 0 8px; }
   .tile p { margin:0; color:var(--muted); font-size:14px; }
   .tile.soon { opacity:.65; }
   .scroll { max-height:440px; overflow:auto; }
@@ -94,7 +95,7 @@
 </head>
 <body>
 <div class="top"><a class="site" href="#/">RMoose's Forge of Empires Assortment</a>
-  <div class="tabs"><a href="#/en19" data-t="en19">en19 (Uceria)</a><a href="#/en5" data-t="en5">en5 (East-Nagach)</a><a href="#/report" data-t="report">Report Generator</a><a href="#/contributions" data-t="contributions">Contributions Processor</a></div></div>
+  <div class="tabs"><a href="#/en19" data-t="en19">en19 (Uceria)</a><a href="#/en5" data-t="en5">en5 (East-Nagach)</a><a href="#/report" data-t="report">Report Generator</a><a href="#/contributions" data-t="contributions">Contributions Processor</a><a href="#/events" data-t="events">Event League Reports</a></div></div>
 <div class="app" id="app">
   <nav aria-label="Sections" id="side"></nav>
   <div class="content">
@@ -492,6 +493,14 @@ function guildBuildings({eras, members, rows}) {
     <div class="legend"><h3>Legend</h3><div class="legend-grid">${cols.map(e => `<div><b>${escHtml(e.short || e.name)}</b> ${escHtml(e.name)}</div>`).join("")}</div></div></section>`;
 }
 
+/* ---------- Event League Reports: one section per event (Year + Event); servers as rows, league levels as columns ---------- */
+function eventLeagues({events}) {
+  if (!events.length) { $("view").innerHTML = "<section><h2>Event League Reports</h2><p>No event data yet.</p></section>"; return; }
+  $("view").innerHTML = events.map(e => `<section><h2>Event: ${escHtml(e.year)} ${escHtml(e.event)}</h2><p>Minigame Type: ${escHtml(e.type)}</p>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Server</th>${e.leagues.map(l => `<th class="num">${escHtml(l)}</th>`).join("")}</tr></thead><tbody>${
+      e.servers.map(s => `<tr><td>${escHtml(s.server)}:${escHtml(s.name)}</td>${s.values.map(v => `<td class="num">${typeof v === "number" ? fmt.format(v) : escHtml(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></section>`).join("");
+}
+
 /* ---------- main menu ---------- */
 const SITE = "RMoose's Forge of Empires Assortment";
 const DASH = {
@@ -511,11 +520,12 @@ const manifest = fetch("data/dashboards.json", {cache:"no-cache"}).then(r => r.j
 const sectionsOf = (man, a) => (man[a] || (a === "en19" ? Object.keys(SECTIONS).filter(s => s !== "members" && s !== "greatbuildings" && s !== "guildbuildings") : [])).filter(s => SECTIONS[s]);
 const menu = man => {
   const tiles = Object.entries(DASH).map(([a, D]) => { const secs = sectionsOf(man, a);
-    return secs.length ? `<a class="tile" href="#/${a}"><div class="kicker">${D.kicker}</div><h2>${D.tile}</h2><p>${secs.map(s => SECTIONS[s][0]).join(", ")}.</p></a>`
-      : `<div class="tile soon"><div class="kicker">${D.kicker}</div><h2>${D.tile}</h2><p>Coming soon.</p></div>`; }).join("");
+    return secs.length ? `<a class="tile" href="#/${a}"><div class="kicker">Dashboard</div><h2>${D.tile}</h2><div class="sub">${D.kicker}</div><p>${secs.map(s => SECTIONS[s][0]).join(", ")}.</p></a>`
+      : `<div class="tile soon"><div class="kicker">Dashboard</div><h2>${D.tile}</h2><div class="sub">${D.kicker}</div><p>Coming soon.</p></div>`; }).join("");
   $("view").innerHTML = `<div class="cards">${tiles}
   <a class="tile" href="#/report"><div class="kicker">Tool</div><h2>Guild Expeditions Report Generator</h2><p>Upload a Guild Expeditions CSV file and get a report ready to copy.</p></a>
-  <a class="tile" href="#/contributions"><div class="kicker">Tool</div><h2>Guild Contributions Processor</h2><p>Upload a Guild Treasury contributions CSV file and get each player's totals by contribution type.</p></a></div>`; };
+  <a class="tile" href="#/contributions"><div class="kicker">Tool</div><h2>Guild Contributions Processor</h2><p>Upload a Guild Treasury contributions CSV file and get each player's totals by contribution type.</p></a>
+  <a class="tile" href="#/events"><div class="kicker">Data</div><h2>Event League Reports</h2><p>Point thresholds for each league level, by server.</p></a></div>`; };
 
 /* ---------- routing: #/  #/<dashboard>/<section>  #/report  #/contributions ---------- */
 const cache = {};
@@ -540,6 +550,11 @@ async function route() {
     catch (err) { $("status").textContent = "Something went wrong: " + err.message; }
   } else if (D) { $("title").textContent = document.title = D.tile; $("summary").textContent = "No data yet."; }
   else if (a === "report") { $("title").textContent = document.title = "Guild Expeditions Report Generator"; report(); }
+  else if (a === "events") {
+    $("title").textContent = document.title = "Event League Reports"; $("summary").textContent = "Point thresholds needed to reach each league level.";
+    $("status").textContent = "Loading…";
+    try { const d = await (await fetch("data/events.json", {cache:"no-cache"})).json(); $("status").textContent = ""; eventLeagues(d); }
+    catch (err) { $("status").textContent = "Something went wrong: " + err.message; } }
   else if (a === "contributions") { $("title").textContent = document.title = "Guild Contributions Processor"; contributions(); }
   else { $("title").textContent = document.title = SITE; $("summary").textContent = "Choose a dashboard or tool."; menu(man); }
 }

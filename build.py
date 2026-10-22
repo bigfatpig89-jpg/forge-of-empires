@@ -157,6 +157,25 @@ def guild_expeditions(folder):
     return {"names": {str(k): v for k, v in names.items()},
             "meta": {"trialStart": TRIALS_START if has_trial else None}, "rows": rows}
 
+def event_leagues(folder):
+    """Event league thresholds from the CSV files in data/events (any file name; comma or semicolon separated).
+    Columns: Year, Event, Type, Server, ServerName, then one column per league level. An event is one Year + Event."""
+    frames = []
+    for f in sorted(Path(folder).glob("*.csv")):
+        text = f.read_text(encoding="utf-8-sig")
+        frames.append(pd.read_csv(f, sep=";" if text.split("\n")[0].count(";") > text.split("\n")[0].count(",") else ",", encoding="utf-8-sig", dtype=str, keep_default_na=False))
+    events = []
+    if frames:
+        df = pd.concat(frames, ignore_index=True).drop_duplicates(["Year", "Event", "Server"], keep="last")
+        fixed = ["Year", "Event", "Type", "Server", "ServerName"]
+        server_key = lambda s: (re.sub(r"\d+", "", s), int(re.search(r"\d+", s)[0]) if re.search(r"\d+", s) else 0)
+        for (year, event), g in sorted(df.groupby(["Year", "Event"], sort=False), key=lambda kv: (kv[0][0], kv[0][1]), reverse=True):
+            leagues = [c for c in df.columns if c not in fixed and (g[c].str.strip() != "").any()]          # league levels this event has
+            servers = [{"server": r["Server"], "name": r["ServerName"], "values": [int(r[c]) if str(r[c]).strip().isdigit() else r[c] for c in leagues]}
+                       for r in sorted(g.to_dict("records"), key=lambda r: server_key(r["Server"]))]
+            events.append({"year": year, "event": event, "type": ", ".join(dict.fromkeys(g["Type"])), "leagues": leagues, "servers": servers})
+    return {"events": events}
+
 DASHBOARDS = ["en19", "en5"]    # one folder per dashboard: data/<name>/{treasury,qi,gbg,ge}; sections without files are simply left out
 
 def build(dash):
@@ -187,4 +206,6 @@ def build(dash):
     return sections
 
 manifest = {dash: build(dash) for dash in DASHBOARDS}
-Path("docs/data/dashboards.json").write_text(json.dumps(manifest))   # tells the page which sections to show for each dashboard
+Path("docs/data/dashboards.json").write_text(json.dumps(manifest))
+ev = event_leagues("data/events"); Path("docs/data/events.json").write_text(json.dumps(ev))
+print("events", len(ev["events"]), "events")   # tells the page which sections to show for each dashboard
