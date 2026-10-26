@@ -1,4 +1,4 @@
-Great Building;Short form
+﻿Great Building;Short form
 Tower of Babel;ToB
 Statue of Zeus;SoZ
 Lighthouse of Alexandria;LoA
@@ -6,6 +6,7 @@ Cathedral of Aachen;CoA
 Hagia Sophia;HS
 Galata Tower;GT
 St. Mark's Basilica;SMB
+Notre Dame;ND
 Saint Basil's Cathedral;SBC
 Castel del Monte;CdM
 Frauenkirche of Dresden;FoD
@@ -14,14 +15,17 @@ Royal Albert Hall;RAH
 Capitol;Cap
 Alcatraz;Traz
 Château Frontenac;CF
+Space Needle;SN
 Atomium;Atom
 Cape Canaveral;CC
+The Habitat;Hab
 Innovation Tower;IT
 Lotus Temple;LT
 Truce Tower;TT
 Voyager V1;V1
 The Arc;Arc
 Rain Forest Project;RFP
+Gaea Statue;Gaea
 Arctic Orangery;AO
 Seed Vault;SV
 The Kraken;Kraken
@@ -40,5 +44,6 @@ Saturn VI Gate HYDRA;Hydra
 Stellar Warship;SW
 Cosmic Catalyst;CosCat
 Shattered Horizon Siphon;SHS
+Oracle of Delphi;OOD
 Observatory;Obs
 Temple of Relics;ToR
