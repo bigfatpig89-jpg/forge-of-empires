@@ -38,6 +38,7 @@
   .tbl td.gold, .topkey { background:#f4c430; }
   .topkey { padding:0 6px; border-radius:4px; font-weight:600; color:#111; }
   .tbl tr.mem td { font-weight:600; }
+  .tbl td.tc { font-weight:700; }
   .tbl.gbld th.num { white-space:normal; min-width:48px; font-size:12px; line-height:1.25; vertical-align:bottom; padding:6px 8px; }
   .tbl.gbld td.num { padding:6px 8px; }
   .legend { margin-top:16px; border-top:1px solid var(--line); padding-top:8px; }
@@ -477,29 +478,28 @@ function greatBuildings({gbs, rows}) {
   gsel.onchange = rank; rank();
 }
 
-/* ---------- Guild Buildings: guild goods produced, players as rows, ages (short forms) as columns in GuildGoods order, total row, members row, legend ---------- */
+/* ---------- Guild Buildings: guild goods produced, players as rows, ages (short forms) as columns in GuildGoods order, Total column and row, members row, legend; then a ranking and a watchlist ---------- */
 function guildBuildings({eras, members, rows}) {
   const last = rows.reduce((m, r) => r.date > m ? r.date : m, ""), sub = rows.filter(r => r.date === last), by = {};
   sub.forEach(r => (by[r.p] ??= {})[r.e] = r.g);
   const players = Object.keys(by).sort((a, b) => a.localeCompare(b, undefined, {sensitivity:"base"})), cols = eras.filter(e => sub.some(r => r.e === e.id));
-  const tot = cols.map(e => players.reduce((a, p) => a + (by[p][e.id] ?? 0), 0));
+  const ptot = p => cols.reduce((a, e) => a + (by[p][e.id] ?? 0), 0), tot = cols.map(e => players.reduce((a, p) => a + (by[p][e.id] ?? 0), 0)), grand = tot.reduce((a, t) => a + t, 0);
   const md = (members || []).map(r => r.date).filter(d => d <= last).sort().at(-1), mem = {};          // the Eras file of the same date (or the latest one before it)
   if (md) members.filter(r => r.date === md).forEach(r => mem[r.e] = r.m);
-  $("view").innerHTML = `<section><h2>Guild Buildings</h2><p>Total guild goods produced by each player's Guild Buildings on ${last}: ${players.length} players across ${cols.length} ages, in the order of the eras in the treasury goods. The Total row adds up each age.${
+  const fmt1 = new Intl.NumberFormat("en", {maximumFractionDigits:1}), byName = (a, b) => a.localeCompare(b, undefined, {sensitivity:"base"});
+  const ranked = players.map(p => [p, ptot(p)]).sort((a, b) => b[1] - a[1] || byName(a[0], b[0]));
+  const watch = cols.map((e, i) => ({name:e.name, goods:tot[i], m:mem[e.id] ?? 0})).filter(r => r.m >= 1).map(r => ({...r, ratio:r.goods / r.m})).sort((a, b) => a.ratio - b.ratio || byName(a.name, b.name));
+  $("view").innerHTML = `<section><h2>Guild Buildings</h2><p>Total guild goods produced by each player's Guild Buildings on ${last}: ${players.length} players across ${cols.length} ages, in the order of the eras in the treasury goods. The Total row and column add up each age and each player.${
     md ? ` Num Members is the number of members currently in each age, from the Eras file of ${md}.` : ""} Hover over a heading for the full age name.</p>
-    <div class="tbl-wrap scroll" style="max-height:70vh"><table class="tbl gbld sticky1"><thead><tr><th>Player</th>${cols.map(e => `<th class="num" title="${escHtml(e.name)}">${escHtml(e.short || e.name)}</th>`).join("")}</tr></thead><tbody>${
-      players.map(p => `<tr><td>${escHtml(p)}</td>${cols.map(e => `<td class="num">${by[p][e.id] === undefined ? "" : fmt.format(by[p][e.id])}</td>`).join("")}</tr>`).join("")
-    }<tr class="sum"><td>Total</td>${tot.map(t => `<td class="num">${fmt.format(t)}</td>`).join("")}</tr>${
-      md ? `<tr class="mem"><td>Num Members</td>${cols.map(e => `<td class="num">${fmt.format(mem[e.id] ?? 0)}</td>`).join("")}</tr>` : ""}</tbody></table></div>
-    <div class="legend"><h3>Legend</h3><div class="legend-grid">${cols.map(e => `<div><b>${escHtml(e.short || e.name)}</b> ${escHtml(e.name)}</div>`).join("")}</div></div></section>`;
-}
-
-/* ---------- Event League Reports: one section per event (Year + Event); servers as rows, league levels as columns ---------- */
-function eventLeagues({events}) {
-  if (!events.length) { $("view").innerHTML = "<section><h2>Event League Reports</h2><p>No event data yet.</p></section>"; return; }
-  $("view").innerHTML = events.map(e => `<section><h2>Event: ${escHtml(e.year)} ${escHtml(e.event)}</h2><p>Minigame Type: ${escHtml(e.type)}</p>
-    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Server</th>${e.leagues.map(l => `<th class="num">${escHtml(l)}</th>`).join("")}</tr></thead><tbody>${
-      e.servers.map(s => `<tr><td>${escHtml(s.server)}:${escHtml(s.name)}</td>${s.values.map(v => `<td class="num">${typeof v === "number" ? fmt.format(v) : escHtml(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></section>`).join("");
+    <div class="tbl-wrap scroll" style="max-height:70vh"><table class="tbl gbld sticky1"><thead><tr><th>Player</th>${cols.map(e => `<th class="num" title="${escHtml(e.name)}">${escHtml(e.short || e.name)}</th>`).join("")}<th class="num">Total</th></tr></thead><tbody>${
+      players.map(p => `<tr><td>${escHtml(p)}</td>${cols.map(e => `<td class="num">${by[p][e.id] === undefined ? "" : fmt.format(by[p][e.id])}</td>`).join("")}<td class="num tc">${fmt.format(ptot(p))}</td></tr>`).join("")
+    }<tr class="sum"><td>Total</td>${tot.map(t => `<td class="num">${fmt.format(t)}</td>`).join("")}<td class="num tc">${fmt.format(grand)}</td></tr>${
+      md ? `<tr class="mem"><td>Num Members</td>${cols.map(e => `<td class="num">${fmt.format(mem[e.id] ?? 0)}</td>`).join("")}<td class="num tc">${fmt.format(Object.values(mem).reduce((a, m) => a + m, 0))}</td></tr>` : ""}</tbody></table></div>
+    <div class="legend"><h3>Legend</h3><div class="legend-grid">${cols.map(e => `<div><b>${escHtml(e.short || e.name)}</b> ${escHtml(e.name)}</div>`).join("")}</div></div></section>
+    <section><h2>Guild Goods Ranking</h2><p>Guild members ranked by total guild goods produced, highest first.</p><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Player</th><th class="num">Total Guild Goods</th></tr></thead><tbody>${
+      ranked.map(([p, t]) => `<tr><td>${escHtml(p)}</td><td class="num">${fmt.format(t)}</td></tr>`).join("")}</tbody></table></div></section>
+    <section><h2>Goods Watchlist by Age</h2>${md ? `<p>Total guild goods per member in each age that has at least one member, lowest Goods/Members first (members from the Eras file of ${md}).</p><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Age</th><th class="num">Goods</th><th class="num">Num Members</th><th class="num">Goods/Members</th></tr></thead><tbody>${
+      watch.map(r => `<tr><td>${escHtml(r.name)}</td><td class="num">${fmt.format(r.goods)}</td><td class="num">${fmt.format(r.m)}</td><td class="num">${fmt1.format(r.ratio)}</td></tr>`).join("")}</tbody></table></div>` : `<p>This table needs an Eras file for the number of members in each age.</p>`}</section>`;
 }
 
 /* ---------- main menu ---------- */
