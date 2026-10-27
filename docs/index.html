@@ -142,13 +142,14 @@ function treasury({rows}) {
     card("Total Stock by Era", "Total goods in stock for each era at every weekly snapshot. Lines break where snapshots are missing.", "stock", "", "tall") +
     card("Goods in stock", "Stock of each of the era's goods at every weekly snapshot.", "goods", picker("era", "Era")) +
     `<section><h2 id="lowTitle"></h2><p id="lowNote"></p><div id="low" class="tbl-wrap"></div></section>`;
-  const last = dates.at(-1), low = rows.filter(r => r.date === last && r.instock < LOW_STOCK); // keeps the order of the GuildGoods file
+  const last = dates.at(-1), latest = rows.filter(r => r.date === last), low = latest.filter(r => r.instock < LOW_STOCK);   // keeps the order of the GuildGoods file
+  const lowest = [...latest].sort((x, y) => x.instock - y.instock).slice(0, 5);                                        // the 5 lowest goods, lowest first
+  const goodsTable = list => `<table class="tbl"><thead><tr><th>Good</th><th>Age</th><th class="num">Quantity</th></tr></thead><tbody>${
+    list.map(r => `<tr><td>${escHtml(r.good)}</td><td>${escHtml(r.era)}</td><td class="num">${fmt.format(r.instock)}</td></tr>`).join("")}</tbody></table>`;
   $("lowTitle").textContent = `Low stock as of ${last}`;
   $("lowNote").textContent = low.length ? `Goods in the latest snapshot with fewer than ${fmt.format(LOW_STOCK)} in stock.`
-    : `Well done! There are no goods below ${fmt.format(LOW_STOCK)} in stock.`;
-  $("low").innerHTML = low.length
-    ? `<table class="tbl"><thead><tr><th>Good</th><th>Age</th><th class="num">Quantity</th></tr></thead><tbody>${
-        low.map(r => `<tr><td>${r.good}</td><td>${r.era}</td><td class="num">${fmt.format(r.instock)}</td></tr>`).join("")}</tbody></table>` : "";
+    : `Well done! There are no goods below ${fmt.format(LOW_STOCK)} in stock. The 5 lowest goods are shown below, lowest first.`;
+  $("low").innerHTML = goodsTable(low.length ? low : lowest);
   const totals = {};
   rows.forEach(r => { ((totals[r.eraID] ??= {})[r.date] ??= 0); totals[r.eraID][r.date] += r.instock; });
   const L = lineLayout(dates);
