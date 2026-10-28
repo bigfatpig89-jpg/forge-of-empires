@@ -84,7 +84,36 @@ Dashboard CSVs are `;`-separated. They are read with a BOM-safe encoding, so the
 - `eras.py`: maps era names to eraIDs (used only when a treasury file has no `eraID` column).
 - `gb_short_forms.csv`: Great Building short forms (`Great Building;Short form`). A new Great Building prints a warning and shows its full name until a row is added.
 - `docs/index.html`: the whole site (menu, sidebar, all sections and tools).
+- `make_zip.sh`: builds `~/Desktop/RMoose_FoE.zip` for uploading to Claude, without `.git`, the raw member CSVs and other unneeded files (see "Sharing the project with Claude" below).
 - `docs/fonts/`: the site fonts as `.woff2` files (IBM Plex Sans 400 and 600, Fraunces 600) with their licence files (SIL Open Font License). `index.html` loads them through `@font-face`; the file names there must match the files in this folder.
+
+## Sharing the project with Claude (`make_zip.sh`)
+
+`make_zip.sh` (in the project folder, committed to the repo like the other files) creates `~/Desktop/RMoose_FoE.zip` for uploading to a Claude chat. It leaves out what Claude does not need or must not receive: the `.git` folder (its config can hold a GitHub token), the raw member CSVs in `data/*/members/`, `.DS_Store` files, `__pycache__` and `docs/plotly.min.js` (4.5 MB; include it only if page tests in a browser are wanted). It deletes any old zip first, so the new one holds only what is in the folder now.
+
+If the file is ever missing (for example after a fresh clone, which may also lose the executable permission), create `make_zip.sh` in the project folder with this content and make it runnable with `chmod +x make_zip.sh`.
+
+```
+#!/bin/bash
+cd "$(dirname "$0")" || exit 1
+rm -f ~/Desktop/RMoose_FoE.zip
+zip -r ~/Desktop/RMoose_FoE.zip . -x ".git/*" "data/*/members/*" "*.DS_Store" "__pycache__/*" "docs/plotly.min.js"
+echo "Created ~/Desktop/RMoose_FoE.zip"
+```
+
+To use it, run from the project folder:
+
+```
+./make_zip.sh
+```
+
+Check that nothing sensitive is inside (this should print nothing):
+
+```
+unzip -l ~/Desktop/RMoose_FoE.zip | grep -E " data/[^/]+/members/| \.git/"
+```
+
+`docs/data/en5/members.json` and `docs/data/en19/members.json` do appear in the zip. They are the encrypted files that are already public on the site, so that is expected. For small tasks, upload only the files involved instead of the whole zip.
 
 ## Where to change things
 
