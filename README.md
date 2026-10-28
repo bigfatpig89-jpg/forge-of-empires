@@ -13,7 +13,7 @@ This is an unofficial fan site and is not affiliated with InnoGames. A fuller de
 
 ## How it works
 
-CSV exports go into `data/`. `python3 build.py` turns them into JSON files in `docs/data/`. `docs/index.html` (one file, no server) reads the JSON and draws the pages with Plotly (`docs/plotly.min.js`, hosted locally). GitHub Pages serves the `docs/` folder.
+CSV exports go into `data/`. `python3 build.py` turns them into JSON files in `docs/data/`. `docs/index.html` (one file, no server) reads the JSON and draws the pages with Plotly (`docs/plotly.min.js`, hosted locally). The fonts are hosted locally too (`docs/fonts/`), so the site loads nothing from other websites. GitHub Pages serves the `docs/` folder.
 
 Note the two different `data` folders: `data/` holds the CSV inputs, `docs/data/` holds the generated JSON.
 
@@ -84,7 +84,7 @@ Dashboard CSVs are `;`-separated. They are read with a BOM-safe encoding, so the
 - `eras.py`: maps era names to eraIDs (used only when a treasury file has no `eraID` column).
 - `gb_short_forms.csv`: Great Building short forms (`Great Building;Short form`). A new Great Building prints a warning and shows its full name until a row is added.
 - `docs/index.html`: the whole site (menu, sidebar, all sections and tools).
-- `convert_legacy*.py`: one-off scripts used to split old spreadsheets into weekly files.
+- `docs/fonts/`: the site fonts as `.woff2` files (IBM Plex Sans 400 and 600, Fraunces 600) with their licence files (SIL Open Font License). `index.html` loads them through `@font-face`; the file names there must match the files in this folder.
 
 ## Where to change things
 
@@ -119,4 +119,5 @@ Dashboard CSVs are `;`-separated. They are read with a BOM-safe encoding, so the
 - **A section is missing from the sidebar:** the sidebar comes from `docs/data/dashboards.json`, which `build.py` writes. Check the folder and file names, re-run `python3 build.py`, and make sure `build.py` is the current version (replacing only `index.html` is not enough).
 - **The page shows old data:** hard-refresh (Cmd+Shift+R). The page re-checks its data files on every load, so also confirm the preview server runs from this project's `docs` folder.
 - **`git push` says the branch has no upstream:** run `git push --set-upstream origin main` once.
+- **The fonts look wrong (default fonts shown):** check that `docs/fonts/` holds `ibm-plex-sans-400.woff2`, `ibm-plex-sans-600.woff2` and `fraunces-600.woff2`, and that they were committed. If a font file is missing the browser falls back to system fonts; nothing else breaks.
 - **The site doesn't update:** check the repository's Actions tab for the Pages deploy status.
