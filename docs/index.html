@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
 <title>Team Targets | Forge of Empires en19</title>
 <script src="plotly.min.js"></script>
 <style>
@@ -532,6 +533,13 @@ const menu = man => {
 
 /* ---------- routing: #/  #/<dashboard>/<section>  #/report  #/contributions ---------- */
 const cache = {};
+function eventLeagues({events}) {     // one section per Year + Event: servers as rows, league thresholds as columns
+  $("view").innerHTML = !events.length ? "<section><p>No event data yet.</p></section>" : events.map(e => `<section><h2>Event: ${escHtml(e.year)} ${escHtml(e.event)}</h2>
+    <p>Minigame Type: ${escHtml(e.type)}</p>
+    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Server</th>${e.leagues.map(l => `<th class="num">${escHtml(l)}</th>`).join("")}</tr></thead><tbody>${
+      e.servers.map(sv => `<tr><td>${escHtml(sv.server)}:${escHtml(sv.name)}</td>${sv.values.map(v => `<td class="num">${typeof v === "number" ? fmt.format(v) : escHtml(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></section>`).join("");
+}
+
 async function route() {
   const h = location.hash.slice(1);
   if (SECTIONS[h]) { location.replace("#/en19/" + h); return; }                       // old links such as #qi

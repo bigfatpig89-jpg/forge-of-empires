@@ -3,12 +3,28 @@ import base64, csv, datetime as dt, getpass, json, os, re, unicodedata, pandas a
 from pathlib import Path
 from eras import ERA_ID
 
+def warn_unmatched(folder, pattern):
+    """Print a warning for every file in a folder that the glob pattern will not pick up (wrong prefix, .CSV, .xlsx, a typo...)."""
+    folder = Path(folder)
+    if not folder.is_dir(): return
+    matched = set(folder.glob(pattern))
+    for f in sorted(folder.iterdir()):
+        if f.is_file() and not f.name.startswith(".") and f not in matched:
+            print(f"  WARNING: {f} is ignored (the name must match {pattern})")
+
+def file_date(f):
+    """The snapshot date in a file name (YYYY-MM-DD); stops with a clear message if there is none."""
+    m = re.search(r"(\d{4}-\d{2}-\d{2})", f.name)
+    if not m: raise SystemExit(f"{f}: the file name needs a date such as 2026-10-26 (YYYY-MM-DD)")
+    return m.group(1)
+
 def load(folder, prefix, fix=None):
     frames = []
+    warn_unmatched(folder, f"{prefix}-*.csv")
     for f in sorted(Path(folder).glob(f"{prefix}-*.csv")):
         df = pd.read_csv(f, sep=";", encoding="utf-8-sig")       # utf-8-sig strips the BOM the game export adds
         if fix: df = fix(df)
-        df["date"] = re.search(r"(\d{4}-\d{2}-\d{2})", f.name).group(1)
+        df["date"] = file_date(f)
         frames.append(df)
     return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
 
@@ -95,11 +111,12 @@ def members(folder, out):
     ge, gbg, qi = (season_lookup(out[k]["rows"]) for k in ("ge", "gbg", "qi"))
     opt = lambda v: None if v is None or pd.isna(v) else int(v)
     rows = []
+    warn_unmatched(folder, "Member-*.csv")
     for f in sorted(Path(folder).glob("Member-*.csv")):
         df = pd.read_csv(f, sep=";", encoding="utf-8-sig")
         if "guildmember" in df: df = df[df["guildmember"] != 0]            # keep current members only
         helper = "qi_participation" not in df                               # ForgeHammer files have this column, FoE Helper files do not
-        date = re.search(r"(\d{4}-\d{2}-\d{2})", f.name).group(1)
+        date = file_date(f)
         for r in df.to_dict("records"):
             row = {"date": date, "id": int(r["member_id"]), "rank": int(r["rank"]), "name": r["member"], "points": int(r["points"]),
                    "era": r.get("eraName"), "ge": opt(r.get("gex_participation")), "gbg": opt(r.get("gbg_participation")),
@@ -135,6 +152,7 @@ MONTHS = {m: i for i, m in enumerate("Jan Feb Mar Apr May Jun Jul Aug Sep Oct No
 def week(v):
     """GE dates come as 15/Dec/2025 (game export); ISO dates are accepted too."""
     m = re.fullmatch(r"(\d{1,2})/(\w{3})/(\d{4})", str(v).strip())
+    if m and m[2].title() not in MONTHS: raise SystemExit(f"GE file: cannot read the week '{v}' (expected a date like 15/Dec/2025)")
     return f"{m[3]}-{MONTHS[m[2].title()]:02d}-{int(m[1]):02d}" if m else pd.to_datetime(v).strftime("%Y-%m-%d")
 
 TRIALS_START = "2025-05-26"    # when Trials were introduced; the same for every dashboard (first trial week in the en19 data)
@@ -142,9 +160,10 @@ TRIALS_START = "2025-05-26"    # when Trials were introduced; the same for every
 def guild_expeditions(folder):
     """The date comes from the gexWeek column, so a file may hold one week or many. All players are kept, including those with 0 solved."""
     frames = []
+    warn_unmatched(folder, "GE-*.csv")
     for f in sorted(Path(folder).glob("GE-*.csv")):
         df = pd.read_csv(f, sep=";", encoding="utf-8-sig")
-        df["date"] = df["gexWeek"].map(week) if "gexWeek" in df else re.search(r"(\d{4}-\d{2}-\d{2})", f.name).group(1)
+        df["date"] = df["gexWeek"].map(week) if "gexWeek" in df else file_date(f)
         frames.append(df)
     if not frames: return {"names": {}, "meta": {}, "rows": []}
     df = pd.concat(frames, ignore_index=True).drop_duplicates(["date", "player ID"], keep="last")
@@ -161,6 +180,7 @@ def event_leagues(folder):
     """Event league thresholds from the CSV files in data/events (any file name; comma or semicolon separated).
     Columns: Year, Event, Type, Server, ServerName, then one column per league level. An event is one Year + Event."""
     frames = []
+    warn_unmatched(folder, "*.csv")
     for f in sorted(Path(folder).glob("*.csv")):
         text = f.read_text(encoding="utf-8-sig")
         frames.append(pd.read_csv(f, sep=";" if text.split("\n")[0].count(";") > text.split("\n")[0].count(",") else ",", encoding="utf-8-sig", dtype=str, keep_default_na=False))

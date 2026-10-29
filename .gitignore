@@ -3,3 +3,5 @@ __pycache__/
 *.zip
 FoE_U_TeamTargets_-_TreasuryData.csv
 data/*/members/
+**/[Mm]ember*.csv
+.env

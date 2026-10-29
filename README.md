@@ -13,7 +13,7 @@ This is an unofficial fan site and is not affiliated with InnoGames. A fuller de
 
 ## How it works
 
-CSV exports go into `data/`. `python3 build.py` turns them into JSON files in `docs/data/`. `docs/index.html` (one file, no server) reads the JSON and draws the pages with Plotly (`docs/plotly.min.js`, hosted locally). The fonts are hosted locally too (`docs/fonts/`), so the site loads nothing from other websites. GitHub Pages serves the `docs/` folder.
+CSV exports go into `data/`. `python3 build.py` turns them into JSON files in `docs/data/`. `docs/index.html` (one file, no server) reads the JSON and draws the pages with Plotly (`docs/plotly.min.js`, version 2.35.2, hosted locally). The fonts are hosted locally too (`docs/fonts/`), so the site loads nothing from other websites. GitHub Pages serves the `docs/` folder.
 
 Note the two different `data` folders: `data/` holds the CSV inputs, `docs/data/` holds the generated JSON.
 
@@ -41,7 +41,7 @@ Note the two different `data` folders: `data/` holds the CSV inputs, `docs/data/
    python3 build.py
    ```
 
-   It prints the number of rows per section (and asks for the Members password, see below). If a section prints 0 rows, check the folder and file name: a file with the wrong prefix is silently ignored.
+   It prints the number of rows per section (and asks for the Members password, see below). If a section prints 0 rows, check the folder and file name. Any file the build does not read (wrong prefix, `.CSV`, `.xlsx`, a typo) is reported as `WARNING: <file> is ignored`, so read the output before you publish. A file name without a date, or a GE week it cannot read, stops the build with a plain message.
 
 3. Publish:
 
@@ -83,34 +83,21 @@ Dashboard CSVs are `;`-separated. They are read with a BOM-safe encoding, so the
 - `build.py`: reads every CSV and writes `docs/data/<dashboard>/*.json`, `docs/data/dashboards.json` (the sections that have data for each dashboard) and `docs/data/events.json`.
 - `eras.py`: maps era names to eraIDs (used only when a treasury file has no `eraID` column).
 - `gb_short_forms.csv`: Great Building short forms (`Great Building;Short form`). A new Great Building prints a warning and shows its full name until a row is added.
-- `docs/index.html`: the whole site (menu, sidebar, all sections and tools).
-- `make_zip.sh`: builds `~/Desktop/RMoose_FoE.zip` for uploading to Claude, without `.git`, the raw member CSVs and other unneeded files (see "Sharing the project with Claude" below).
+- `docs/index.html`: the whole site (menu, sidebar, all sections and tools). A Content-Security-Policy `<meta>` tag near the top limits what the page may load or send (see "Security notes").
+- `make_zip.sh`: builds `~/Downloads/RMoose_FoE.zip` for uploading to Claude, without `.git`, the raw member CSVs and other unneeded files (see "Sharing the project with Claude" below).
+- `RMoose_FoE_Assortment_Project_Overview.md`: the longer project description (how everything fits together, conventions, data cleaning history, gotchas). Useful for anyone, or any Claude chat, picking the project up.
 - `docs/fonts/`: the site fonts as `.woff2` files (IBM Plex Sans 400 and 600, Fraunces 600) with their licence files (SIL Open Font License). `index.html` loads them through `@font-face`; the file names there must match the files in this folder.
 
 ## Sharing the project with Claude (`make_zip.sh`)
 
-`make_zip.sh` (in the project folder, committed to the repo like the other files) creates `~/Desktop/RMoose_FoE.zip` for uploading to a Claude chat. It leaves out what Claude does not need or must not receive: the `.git` folder (its config can hold a GitHub token), the raw member CSVs in `data/*/members/`, `.DS_Store` files, `__pycache__` and `docs/plotly.min.js` (4.5 MB; include it only if page tests in a browser are wanted). It deletes any old zip first, so the new one holds only what is in the folder now.
+`make_zip.sh` (in the project folder, committed to the repo like the other files) creates `~/Downloads/RMoose_FoE.zip` for uploading to a Claude chat. It zips only the files git tracks plus new files that `.gitignore` does not exclude, so anything ignored (raw member CSVs, `.DS_Store`, `__pycache__`, other zips) and the whole `.git` folder (its config can hold a GitHub token) are left out automatically. It also skips `docs/plotly.min.js` (4.5 MB; copy it into the zip by hand only if page tests in a browser are wanted) and any `member*.csv`, and prints a safety check at the end that should show nothing. It deletes any old zip first.
 
-If the file is ever missing (for example after a fresh clone, which may also lose the executable permission), create `make_zip.sh` in the project folder with this content and make it runnable with `chmod +x make_zip.sh`.
-
-```
-#!/bin/bash
-cd "$(dirname "$0")" || exit 1
-rm -f ~/Desktop/RMoose_FoE.zip
-zip -r ~/Desktop/RMoose_FoE.zip . -x ".git/*" "data/*/members/*" "*.DS_Store" "__pycache__/*" "docs/plotly.min.js"
-echo "Created ~/Desktop/RMoose_FoE.zip"
-```
+If the file is ever missing (for example after a fresh clone, which may also lose the executable permission), restore it from the repo with `git checkout make_zip.sh`, then run `chmod +x make_zip.sh` if needed.
 
 To use it, run from the project folder:
 
 ```
 ./make_zip.sh
-```
-
-Check that nothing sensitive is inside (this should print nothing):
-
-```
-unzip -l ~/Desktop/RMoose_FoE.zip | grep -E " data/[^/]+/members/| \.git/"
 ```
 
 `docs/data/en5/members.json` and `docs/data/en19/members.json` do appear in the zip. They are the encrypted files that are already public on the site, so that is expected. For small tasks, upload only the files involved instead of the whole zip.
@@ -128,7 +115,7 @@ unzip -l ~/Desktop/RMoose_FoE.zip | grep -E " data/[^/]+/members/| \.git/"
 ## Members section (password protected)
 
 - Put the member exports in `data/<dashboard>/members/`. `build.py` asks for the password when it runs (typing is hidden), or reads the `MEMBERS_PASSWORD` environment variable. It writes only an encrypted `members.json`; the browser decrypts it after the password is entered. The password is never stored in the repo. Use a long password (12+ characters). Needs `pip install cryptography`.
-- **Never commit the raw member CSVs.** `data/*/members/` is in `.gitignore`.
+- **Never commit the raw member CSVs.** `data/*/members/` and any `member*.csv` (anywhere in the project) are in `.gitignore`. Before pushing, `git status` should not list any member CSV. The data is not highly sensitive and the password is deliberately simple, so it keeps the section away from other guild members rather than from a determined attacker: the encrypted file is public and its password can be guessed offline.
 - Members table: red name and red cell when Last GE, Last GBG or Last QI is under its minimum. Top 10 gainers (points, percentage, battles won) compare the latest file with the previous one, and a button copies them as text.
 - Two kinds of member file exist. FoE Helper files have no `qi_participation` column and their GE and GBG participation values are counters, not season points. For those files `build.py` fills Last GE, Last GBG and Last QI from the GE, GBG and QI files of the same week (QI and GBG: the latest season that ended on or before the file's date, within 14 days; blank if there is none). Forge Hammer files have `qi_participation` and are used as they are. The page explains this under the table.
 
@@ -142,6 +129,12 @@ unzip -l ~/Desktop/RMoose_FoE.zip | grep -E " data/[^/]+/members/| \.git/"
 - Guild Buildings: total guild goods per player and age (columns in the order of the eras in GuildGoods, short forms from `ERA_SHORT`), a Total row and column, a Num Members row from the Eras file, a ranking of members by total goods, and a Goods Watchlist by Age (ages with at least one member, lowest goods per member first).
 - Event League Reports: one section per event (Year + Event), with servers as rows (`en5:East-Nagach`) and the point thresholds for each league level as columns.
 - Guild Expeditions Report Generator: upload a GE CSV (the file name does not matter) to get a text report to copy. Guild Contributions Processor: upload a treasury contributions log to get each player's totals by contribution type.
+
+## Security notes
+
+- **Content-Security-Policy.** `docs/index.html` starts with a `<meta http-equiv="Content-Security-Policy">` tag. It tells the browser that the page may only load scripts, fonts and data from this site and may not send data anywhere else. It is a safety net against cross-site scripting: if a player name ever reached the page unescaped, an injected script could not send the Members password or the decrypted data to another site. The page already escapes all names, so nothing is known to be wrong. Because the whole app is one inline script, the policy has to allow `'unsafe-inline'` for scripts; moving the script into its own file (`docs/app.js`) would let that be removed. If charts or fonts ever disappear after a change, open the browser console (Cmd+Option+J in Chrome): a CSP problem is reported there as "Refused to ... because it violates the following Content Security Policy directive". Fix the directive, or remove the tag temporarily to confirm it is the cause. GitHub Pages cannot send real HTTP headers, so a meta tag is the only option.
+- **Plotly.** Version 2.35.2 (the first line of `docs/plotly.min.js` shows the version). To update, replace the file with a newer plotly.js release, check the charts in the local preview and commit.
+- **GitHub access.** Use a fine-grained personal access token limited to this one repository (Contents: read and write) with an expiry date, keep it in the macOS Keychain (`git config --global credential.helper osxkeychain`) rather than in a file, and keep two-factor authentication on for the account.
 
 ## Troubleshooting
 
