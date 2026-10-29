@@ -1,5 +1,7 @@
 # RMoose's Forge of Empires Assortment: Project Overview
 
+*Last updated: 2026-10-29. Added a Content-Security-Policy, build warnings for ignored files, a tracked-files-only `make_zip.sh`, and the en19 Treasury From / Before 2026 toggles; fixed the Event League Reports page.*
+
 A reference for anyone (including Claude) picking this project up. It describes what the site is, how it is built, where everything lives, the conventions agreed so far, and the gotchas found along the way.
 
 ## 1. What this is
