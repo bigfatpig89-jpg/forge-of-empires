@@ -64,7 +64,7 @@ Footer: the "All data is pulled using FoE Helper/Forge Hammer as soon after Mond
 
 | Section | What it shows |
 |---|---|
-| **Guild Treasury** | Total Stock by Era (line per era, markers); Goods in stock (era dropdown, one line per good); Low stock table: goods under 100,000 in the order of the GuildGoods file, or, if none, "Well done!" plus the 5 lowest goods (Good, Age, Quantity). |
+| **Guild Treasury** | Total Stock by Era (line per era, markers); Goods in stock (era dropdown, one line per good); **en19 only:** both charts have their own "From 2026" / "Before 2026" toggle, default From 2026 (see section 8); Low stock table: goods under 100,000 in the order of the GuildGoods file, or, if none, "Well done!" plus the 5 lowest goods (Good, Age, Quantity). |
 | **Quantum Incursions (QI)** | Team progress per season, with active players in the hover; All-Time Best Performances (top 20 ranks); Seasonal Leaderboard (season dropdown); Player history (bars, player dropdown). |
 | **Guild Battlegrounds (GBG)** | Same layout as QI. Bars split into negotiations (x2) and battles. Score = battles + negotiations x 2. |
 | **Guild Expeditions (GE)** | Team Percentage per Week = total solved / (80 x all players that week, including inactive); grey markers before Trials, teal after, dashed "Trials introduced" line; All-Time Best Performances = highest trial completed (80 encounters solved); Weekly Leaderboard (solved, then trial level, then expedition points; the game's own rank is ignored); Player History line graph (y axis 0 to 80), markers coloured by trial level. |
@@ -120,6 +120,7 @@ Then wait a minute or two and hard-refresh (Cmd+Shift+R). QI comes every two wee
 | Low stock limit | `LOW_STOCK = 100000` in `index.html` |
 | Members red thresholds | `MIN = {ge:48, gbg:500, qi:500}` in `index.html` |
 | Trials introduced date | `TRIALS_START = "2025-05-26"` in `build.py` (same for every dashboard) |
+| Treasury Before / From toggle | `TREASURY_SPLIT = {"en19": "2026-01-01"}` in `build.py` (only dashboards listed get the toggle) |
 | Line break gap in charts | `BREAK_DAYS = 45` in `index.html` |
 | What the page may load or send | the `Content-Security-Policy` meta tag in the `<head>` of `index.html` (see section 8) |
 
@@ -133,6 +134,7 @@ Then wait a minute or two and hard-refresh (Cmd+Shift+R). QI comes every two wee
 - Era order in tables follows the eraID order of the GuildGoods file.
 - Styling: IBM Plex Sans for text, Fraunces for headings (self-hosted in `docs/fonts/`, no Google Fonts link; fallbacks are `system-ui` and Georgia), dark sidebar, teal accent `#0f766e`, gold `#f4c430`, blue `#dbeafe` / `#1e40af`. Avoid CSS class names that clash with existing ones (`.top` is the top bar; a clash once stretched table rows). Use new unique class names.
 - The page fetches its JSON with `cache: "no-cache"` to avoid stale data after weekly updates.
+- **Treasury toggle (en19 only):** en19 has no snapshots between 2025-09-22 and 2026-09-28 (371 days) and its total stock roughly doubled over that gap (about 18.5M to 37M), so one chart flattens the early years. `build.py` writes `meta.split` (the date, or null) into each `treasury.json`; `index.html` shows the buttons only when `meta.split` is set and there are snapshots on both sides. "From" means date >= split, "Before" means date < split; the default is From (the current state). Both Total Stock by Era and Goods in stock have a toggle; they work independently. Each era (and, within an era, each good) keeps one colour in both views (Plotly's default colour order, set explicitly as `COLORWAY`). In Goods in stock the Era dropdown lists only eras with snapshots in the chosen period (for example Stellar Age Discovery appears only in From 2026) and keeps the selected era when it is still listed. The gap is a data-collection accident specific to en19, so en5 and other dashboards are deliberately not listed.
 - **Escaping:** every player, good, building and file-derived name goes through `escHtml` (or `esc`) before it enters `innerHTML`. Keep doing this for every new table. Names come from strangers in a game and from uploaded files.
 - **Content-Security-Policy:** a `<meta http-equiv="Content-Security-Policy">` tag at the top of `index.html` allows scripts, styles, fonts, images and `fetch` from this site only (`'unsafe-inline'` for script and style, because the app is one inline script), and sets `base-uri`, `form-action` and `object-src` to none. It is a safety net against cross-site scripting: even an injected script cannot send data to another site. Do not add anything that loads from another website (CDN scripts, Google Fonts, remote images): the CSP blocks it and the site promises not to make such requests. If something stops working after an edit, check the browser console for "violates the following Content Security Policy directive". GitHub Pages cannot send real HTTP headers, so a meta tag is the only option.
 
@@ -176,7 +178,6 @@ Then wait a minute or two and hard-refresh (Cmd+Shift+R). QI comes every two wee
 
 - **Goods icons** for the Great Buildings and Guild Goods views: only 20x20 images were found. InnoGames' Fan Content Guideline allows game graphics on a non-commercial fan site if they are unaltered, credited to InnoGames, and the site states the owner is solely responsible; it is not a licence. Icons would have to be saved locally (no hotlinking), and Plotly legends cannot show images (a custom HTML legend would be needed).
 - **Automating the weekly update**: the export step stays manual. After it, a script (or a GitHub Action triggered by uploading CSVs) could run `build.py` and push. Raw member CSVs must not go through GitHub if the repo is public.
-- A **before 2026 / from 2026 toggle** for long time series, since guild output grew a lot during the untracked 2025-2026 gap.
 - A history view for the Members section (the data for it is already in the encrypted file).
 - **Stronger CSP:** move the inline script from `index.html` into `docs/app.js`, then drop `'unsafe-inline'` from `script-src` so injected inline scripts cannot run at all.
 - **Quieter history:** `members.json` is re-encrypted with a fresh salt and IV on every build, so it changes (about 0.7 MB for en5) in every commit even with identical data. Skipping the Members step when the raw member files are unchanged would stop that. Never reuse an IV with the same key to get identical output (it breaks AES-GCM).

@@ -111,6 +111,7 @@ To use it, run from the project folder:
 | Low stock limit (100,000) | `LOW_STOCK` in `docs/index.html` |
 | Members red-name minimums (GE 48, GBG 500, QI 500) | `MIN` in `docs/index.html` |
 | Date Trials were introduced | `TRIALS_START` in `build.py` |
+| Treasury Before / From toggle (en19 only) | `TREASURY_SPLIT` in `build.py` (re-run `python3 build.py`; add a dashboard to the dictionary to give it the toggle too) |
 
 ## Members section (password protected)
 
@@ -124,7 +125,7 @@ To use it, run from the project folder:
 - Players are matched by ID and shown with their latest name. If two IDs share a name, the player dropdown adds `(ID ...)`.
 - QI and GBG show active players only (score above zero). Ranking ties share a rank (1, 2, 2, 4). The All-Time Best Performances tables show the top 20 ranks and use each player's best record (earliest date if repeated).
 - GE: the team chart is the percentage of possible encounters solved (total solved / (80 x all players that week, including inactive ones)), grey before Trials and one colour after, with a dashed line at the Trials date. The leaderboard ranks by encounters solved, then trial level, then expedition points. The All-Time table ranks the highest trial completed (all 80 encounters solved).
-- Guild Treasury: goods under 100,000 are listed in the order of the GuildGoods file; if there are none, the 5 lowest goods are shown instead.
+- Guild Treasury: goods under 100,000 are listed in the order of the GuildGoods file; if there are none, the 5 lowest goods are shown instead. On **en19 only**, the Total Stock by Era and Goods in stock charts each have a "From 2026" / "Before 2026" toggle (default: From 2026; the two toggles work independently, and the Era dropdown lists only eras that have snapshots in the chosen period). No snapshots exist between 2025-09-22 and 2026-09-28 and stock grew a lot in that time, so one chart flattened the earlier years. The toggle is set up by `TREASURY_SPLIT` in `build.py` and appears only when there are snapshots on both sides of the date. It needs no weekly action: new snapshots join the "From 2026" side automatically.
 - Great Buildings: latest file only. Blue = the level went up (or the building is new) since the previous file; players who were not in the previous file are not marked. Gold = the highest level of that building (all tied owners). A ranking section below ranks the owners of a chosen building.
 - Guild Buildings: total guild goods per player and age (columns in the order of the eras in GuildGoods, short forms from `ERA_SHORT`), a Total row and column, a Num Members row from the Eras file, a ranking of members by total goods, and a Goods Watchlist by Age (ages with at least one member, lowest goods per member first).
 - Event League Reports: one section per event (Year + Event), with servers as rows (`en5:East-Nagach`) and the point thresholds for each league level as columns.

@@ -196,6 +196,10 @@ def event_leagues(folder):
             events.append({"year": year, "event": event, "type": ", ".join(dict.fromkeys(g["Type"])), "leagues": leagues, "servers": servers})
     return {"events": events}
 
+# Treasury "Total Stock by Era" gets a Before / From toggle for dashboards listed here: en19 has no data between 2025-09-22 and
+# 2026-09-28 and its stock roughly doubled meanwhile, so one chart flattens the earlier years. Other dashboards are not listed.
+TREASURY_SPLIT = {"en19": "2026-01-01"}
+
 DASHBOARDS = ["en19", "en5"]    # one folder per dashboard: data/<name>/{treasury,qi,gbg,ge}; sections without files are simply left out
 
 def build(dash):
@@ -203,7 +207,8 @@ def build(dash):
     t = load(f"{base}/treasury", "GuildGoods")
     if not t.empty and "eraID" not in t: t["eraID"] = t["era"].map(ERA_ID)
     out["treasury"] = {"rows": [] if t.empty else t.sort_values(["date", "eraID"], kind="stable")
-                       [["date", "eraID", "era", "good", "produceable", "instock"]].to_dict("records")}
+                       [["date", "eraID", "era", "good", "produceable", "instock"]].to_dict("records"),
+                       "meta": {"split": TREASURY_SPLIT.get(dash)}}
     out["qi"] = scores(load(f"{base}/qi", "QI"), "Player_ID", "Player", {"a": "Actions", "s": "Progress"})
     out["gbg"] = scores(load(f"{base}/gbg", "GBG", gbg_columns), "player_id", "player", {"n": "negotiations", "b": "battles", "s": "total"})
     out["ge"] = guild_expeditions(f"{base}/ge")

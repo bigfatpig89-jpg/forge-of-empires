@@ -79,6 +79,12 @@
   select { font:inherit; padding:8px 12px; border:1px solid var(--line); border-radius:6px; background:var(--panel); min-width:220px; max-width:100%; }
   select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
   .picker { margin:8px 0 4px; }
+  .rngpick { display:inline-flex; margin:8px 0 4px; border:1px solid var(--line); border-radius:6px; overflow:hidden; background:var(--panel); }
+  .rngpick input { position:absolute; opacity:0; pointer-events:none; }
+  .rngpick label { padding:8px 16px; cursor:pointer; font-size:14px; }
+  .rngpick label + input + label { border-left:1px solid var(--line); }
+  .rngpick input:checked + label { background:var(--accent); color:#fff; }
+  .rngpick input:focus-visible + label { outline:2px solid var(--accent); outline-offset:-2px; }
   .tbl-wrap { overflow-x:auto; padding-bottom:8px; }
   table.tbl { border-collapse:collapse; font-size:14px; min-width:320px; }
   .tbl th, .tbl td { text-align:left; padding:6px 24px 6px 0; border-bottom:1px solid var(--line); }
@@ -138,13 +144,22 @@ const lineLayout = dates => ({...base, xaxis:{...base.xaxis, range:[shift(dates[
 
 /* ---------- Guild Treasury ---------- */
 const LOW_STOCK = 100000;    // goods below this quantity are listed in the Guild Treasury low-stock table
-function treasury({rows}) {
+const COLORWAY = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf"];    // Plotly's default colours, so an era keeps its colour in every view
+function treasury({rows, meta}) {
   const dates = [...new Set(rows.map(r => r.date))].sort();
+  const split = meta?.split, before = split ? dates.filter(d => d < split) : [], from = split ? dates.filter(d => d >= split) : [];
+  const toggle = before.length > 0 && from.length > 0;      // Before / From toggle only where build.py sets a split date (en19) and both sides have data
+  const sl = split && split.endsWith("-01-01") ? split.slice(0, 4) : split;
+  const rangeHtml = name => `<div class="rngpick" role="radiogroup" aria-label="Period"><input type="radio" name="${name}" id="${name}-from" value="from" checked><label for="${name}-from">From ${sl}</label><input type="radio" name="${name}" id="${name}-before" value="before"><label for="${name}-before">Before ${sl}</label></div>`;
+  const periodOf = name => !toggle ? dates : document.querySelector(`input[name="${name}"]:checked`).value === "before" ? before : from;    // the dates of the chosen period
   const eras = [...new Map(rows.map(r => [r.eraID, r.era])).entries()].sort((a, b) => a[0] - b[0]);
   $("summary").textContent = `${dates.length} weekly snapshots, ${dates[0]} to ${dates.at(-1)}.`;
   $("view").innerHTML =
-    card("Total Stock by Era", "Total goods in stock for each era at every weekly snapshot. Lines break where snapshots are missing.", "stock", "", "tall") +
-    card("Goods in stock", "Stock of each of the era's goods at every weekly snapshot.", "goods", picker("era", "Era")) +
+    card("Total Stock by Era", toggle ? `Total goods in stock for each era at every weekly snapshot. No snapshots were collected between ${before.at(-1)} and ${from[0]}, and stock grew a lot in that time, so the two periods are shown separately: use the buttons to switch. Lines break where snapshots are missing.`
+                                      : "Total goods in stock for each era at every weekly snapshot. Lines break where snapshots are missing.", "stock",
+         toggle ? rangeHtml("stockrange") : "", "tall") +
+    card("Goods in stock", toggle ? "Stock of each of the era's goods at every weekly snapshot. As in Total Stock by Era above, the two periods are shown separately: use the buttons to switch. Only eras with snapshots in the chosen period are listed."
+                                  : "Stock of each of the era's goods at every weekly snapshot.", "goods", (toggle ? rangeHtml("goodsrange") : "") + picker("era", "Era")) +
     `<section><h2 id="lowTitle"></h2><p id="lowNote"></p><div id="low" class="tbl-wrap"></div></section>`;
   const last = dates.at(-1), latest = rows.filter(r => r.date === last), low = latest.filter(r => r.instock < LOW_STOCK);   // keeps the order of the GuildGoods file
   const lowest = [...latest].sort((x, y) => x.instock - y.instock).slice(0, 5);                                        // the 5 lowest goods, lowest first
@@ -157,17 +172,33 @@ function treasury({rows}) {
   const totals = {};
   rows.forEach(r => { ((totals[r.eraID] ??= {})[r.date] ??= 0); totals[r.eraID][r.date] += r.instock; });
   const L = lineLayout(dates);
-  Plotly.newPlot("stock", eras.filter(([id]) => totals[id]).map(([id, name]) =>
-    ({name, mode:"lines+markers", marker:{size:7}, ...series(dates, totals[id]), connectgaps:false})), L, cfg);
-  const sel = fill("era", eras.map(([id, name]) => [id, name]));
-  const draw = () => {
-    const sub = rows.filter(r => r.eraID == sel.value);
-    Plotly.react("goods", [...new Set(sub.map(r => r.good))].map(g => {
-      const m = {}; sub.filter(r => r.good === g).forEach(r => m[r.date] = r.instock);
-      return {name:g, mode:"lines+markers", marker:{size:7}, ...series(dates, m), connectgaps:false};
-    }), L, cfg);
+  const withData = eras.filter(([id]) => totals[id]);        // each era's colour comes from its place in this list, the same in every view
+  const drawStock = () => {
+    const ds = periodOf("stockrange");
+    Plotly.react("stock", withData.map(([id, name], i) => ({id, name, i})).filter(e => ds.some(d => d in totals[e.id])).map(({id, name, i}) =>
+      ({name, mode:"lines+markers", marker:{size:7, color:COLORWAY[i % COLORWAY.length]}, line:{color:COLORWAY[i % COLORWAY.length]}, ...series(ds, totals[id]), connectgaps:false})),
+      toggle ? lineLayout(ds) : L, cfg);
   };
-  sel.onchange = draw; draw();
+  if (toggle) document.querySelectorAll('input[name="stockrange"]').forEach(el => el.onchange = drawStock);
+  drawStock();
+  const sel = $("era");
+  const fillEras = ds => {                                   // only the eras that have snapshots in the chosen period; keeps the selected era when it is still listed
+    const keep = sel.value; sel.innerHTML = "";
+    fill("era", eras.filter(([id]) => ds.some(d => d in totals[id])));
+    if ([...sel.options].some(o => o.value === keep)) sel.value = keep;
+  };
+  const draw = () => {
+    const ds = periodOf("goodsrange"), inDs = new Set(ds);
+    const all = rows.filter(r => r.eraID == sel.value), goods = [...new Set(all.map(r => r.good))];     // a good's colour comes from its place among all of the era's goods, the same in every view
+    const sub = all.filter(r => inDs.has(r.date));
+    Plotly.react("goods", goods.map((g, i) => ({g, i})).filter(({g}) => sub.some(r => r.good === g)).map(({g, i}) => {
+      const m = {}; sub.filter(r => r.good === g).forEach(r => m[r.date] = r.instock);
+      return {name:g, mode:"lines+markers", marker:{size:7, color:COLORWAY[i % COLORWAY.length]}, line:{color:COLORWAY[i % COLORWAY.length]}, ...series(ds, m), connectgaps:false};
+    }), toggle ? lineLayout(ds) : L, cfg);
+  };
+  sel.onchange = draw;
+  if (toggle) document.querySelectorAll('input[name="goodsrange"]').forEach(el => el.onchange = () => { fillEras(periodOf("goodsrange")); draw(); });
+  fillEras(periodOf("goodsrange")); draw();
 }
 
 /* ---------- Quantum Incursions and Guild Battlegrounds (active players only) ---------- */
