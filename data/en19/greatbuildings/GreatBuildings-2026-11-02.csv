@@ -1,0 +1,569 @@
+﻿gbname;city_entity_id;member;level;max_level;invested_forge_points;forge_points_for_level_up
+Statue of Zeus;X_BronzeAge_Landmark2;Luke OSG;88;100;0;3588
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;Luke OSG;82;97;1539;3640
+Castel del Monte;X_LateMiddleAge_Landmark3;Luke OSG;82;90;177;4246
+Observatory;X_AllAge_EasterBonus4;Luke OSG;103;106;10;6622
+Alcatraz;X_ProgressiveEra_Landmark1;Luke OSG;83;89;335;5160
+The Arc;X_FutureEra_Landmark1;Luke OSG;175;219;53321;58471
+Château Frontenac;X_ProgressiveEra_Landmark2;Luke OSG;90;104;54;6134
+Arctic Orangery;X_ArcticFuture_Landmark2;Luke OSG;83;90;664;6901
+A.I. Core;X_SpaceAgeJupiterMoon_Landmark1;Luke OSG;56;56;0;4437
+Saturn VI Gate HYDRA;X_SpaceAgeTitan_Landmark3;Luke OSG;45;45;0;9682
+Cosmic Catalyst;X_SpaceAgeSpaceHub_Landmark2;Luke OSG;22;22;0;15909
+Observatory;X_AllAge_EasterBonus4;St. Christopher;64;64;0;2528
+Château Frontenac;X_ProgressiveEra_Landmark2;St. Christopher;69;71;13;3652
+The Arc;X_FutureEra_Landmark1;St. Christopher;178;179;51662;62966
+Arctic Orangery;X_ArcticFuture_Landmark2;St. Christopher;45;45;0;2701
+The Kraken;X_OceanicFuture_Landmark2;St. Christopher;46;46;0;2893
+Seed Vault;X_ArcticFuture_Landmark3;St. Christopher;46;47;53;2768
+The Blue Galaxy;X_OceanicFuture_Landmark3;St. Christopher;49;50;164;3115
+Space Carrier;X_SpaceAgeAsteroidBelt_Landmark1;St. Christopher;51;51;0;3668
+The Virgo Project;X_SpaceAgeMars_Landmark2;St. Christopher;34;35;226;2318
+Himeji Castle;X_VirtualFuture_Landmark2;St. Christopher;33;33;0;2189
+Saturn VI Gate HYDRA;X_SpaceAgeTitan_Landmark3;St. Christopher;71;71;0;18398
+Star Gazer;X_SpaceAgeMars_Landmark1;St. Christopher;42;42;0;2824
+Stellar Warship;X_SpaceAgeSpaceHub_Landmark1;St. Christopher;51;52;12863;40425
+Statue of Zeus;X_BronzeAge_Landmark2;St. Christopher;50;64;0;1404
+Temple of Relics;X_AllAge_Expedition;St. Christopher;58;60;14;2180
+The Arc;X_FutureEra_Landmark1;Shamuss;151;450;31400;32327
+The Blue Galaxy;X_OceanicFuture_Landmark3;Shamuss;123;200;635;19364
+Statue of Zeus;X_BronzeAge_Landmark2;RaunchyMoose;65;65;0;2033
+The Arc;X_FutureEra_Landmark1;RaunchyMoose;183;184;1782;71241
+Château Frontenac;X_ProgressiveEra_Landmark2;RaunchyMoose;146;147;22331;24449
+Alcatraz;X_ProgressiveEra_Landmark1;RaunchyMoose;82;82;0;5035
+Observatory;X_AllAge_EasterBonus4;RaunchyMoose;135;135;0;14593
+Arctic Orangery;X_ArcticFuture_Landmark2;RaunchyMoose;149;150;35162;35210
+The Blue Galaxy;X_OceanicFuture_Landmark3;RaunchyMoose;102;102;0;11529
+The Arc;X_FutureEra_Landmark1;Calinka;139;139;0;24037
+St. Mark's Basilica;X_HighMiddleAge_Landmark1;Calinka;10;10;0;667
+Observatory;X_AllAge_EasterBonus4;Calinka;51;51;0;1834
+Château Frontenac;X_ProgressiveEra_Landmark2;Calinka;121;150;3354;13188
+Seed Vault;X_ArcticFuture_Landmark3;Calinka;18;18;0;1387
+Space Carrier;X_SpaceAgeAsteroidBelt_Landmark1;Calinka;91;92;8556;9847
+A.I. Core;X_SpaceAgeJupiterMoon_Landmark1;Calinka;24;24;0;2014
+Statue of Zeus;X_BronzeAge_Landmark2;Calinka;10;10;0;523
+Temple of Relics;X_AllAge_Expedition;Calinka;139;141;4825;16108
+The Arc;X_FutureEra_Landmark1;S*R*;80;80;0;5600
+Temple of Relics;X_AllAge_Expedition;S*R*;196;200;8696;65808
+Château Frontenac;X_ProgressiveEra_Landmark2;S*R*;169;169;0;43142
+Lighthouse of Alexandria;X_IronAge_Landmark2;S*R*;31;32;673;947
+Statue of Zeus;X_BronzeAge_Landmark2;Seleukus the Bloody;74;74;0;2539
+Galata Tower;X_EarlyMiddleAge_Landmark3;Seleukus the Bloody;46;46;0;1621
+Lighthouse of Alexandria;X_IronAge_Landmark2;Seleukus the Bloody;59;59;0;1891
+Observatory;X_AllAge_EasterBonus4;Seleukus the Bloody;74;74;0;3236
+Temple of Relics;X_AllAge_Expedition;Seleukus the Bloody;70;70;0;2932
+Château Frontenac;X_ProgressiveEra_Landmark2;Seleukus the Bloody;22;22;0;1145
+St. Mark's Basilica;X_HighMiddleAge_Landmark1;Seleukus the Bloody;17;17;0;792
+Royal Albert Hall;X_IndustrialAge_Landmark1;Seleukus the Bloody;21;21;0;1063
+The Arc;X_FutureEra_Landmark1;Seleukus the Bloody;59;59;0;3334
+Alcatraz;X_ProgressiveEra_Landmark1;Seleukus the Bloody;72;72;0;3933
+Truce Tower;X_TomorrowEra_Landmark2;Seleukus the Bloody;70;70;0;4195
+Terracotta Army;X_VirtualFuture_Landmark1;Seleukus the Bloody;62;62;0;4479
+Seed Vault;X_ArcticFuture_Landmark3;Seleukus the Bloody;62;62;0;4109
+Statue of Zeus;X_BronzeAge_Landmark2;Pillowcase;77;80;140;2734
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;Pillowcase;77;77;0;3217
+Temple of Relics;X_AllAge_Expedition;Pillowcase;45;45;0;1582
+Castel del Monte;X_LateMiddleAge_Landmark3;Pillowcase;58;58;0;2348
+The Arc;X_FutureEra_Landmark1;Pillowcase;100;110;0;9176
+Observatory;X_AllAge_EasterBonus4;Pillowcase;74;75;3165;3236
+Château Frontenac;X_ProgressiveEra_Landmark2;Pillowcase;57;57;0;2716
+The Blue Galaxy;X_OceanicFuture_Landmark3;Pillowcase;36;36;0;2260
+Oracle of Delphi;X_AllAge_Oracle;chathuradias;12;13;0;700
+Château Frontenac;X_ProgressiveEra_Landmark2;chathuradias;41;54;20;1830
+Galata Tower;X_EarlyMiddleAge_Landmark3;chathuradias;19;19;0;833
+Arctic Orangery;X_ArcticFuture_Landmark2;chathuradias;20;30;2;1457
+The Arc;X_FutureEra_Landmark1;chathuradias;120;195;13508;15036
+The Blue Galaxy;X_OceanicFuture_Landmark3;chathuradias;53;63;384;3439
+Statue of Zeus;X_BronzeAge_Landmark2;chathuradias;62;71;1761;1888
+Temple of Relics;X_AllAge_Expedition;chathuradias;68;79;1188;2791
+The Arc;X_FutureEra_Landmark1;GoosestJoose;178;179;29774;62966
+Alcatraz;X_ProgressiveEra_Landmark1;GoosestJoose;99;99;0;7660
+Statue of Zeus;X_BronzeAge_Landmark2;GoosestJoose;78;78;0;2803
+Château Frontenac;X_ProgressiveEra_Landmark2;GoosestJoose;22;23;1126;1145
+Lighthouse of Alexandria;X_IronAge_Landmark2;weppy7;29;88;0;902
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;weppy7;102;289;0;5964
+Castel del Monte;X_LateMiddleAge_Landmark3;weppy7;106;219;4649;7680
+Observatory;X_AllAge_EasterBonus4;weppy7;81;83;3760;3847
+The Arc;X_FutureEra_Landmark1;weppy7;165;400;28199;45677
+Alcatraz;X_ProgressiveEra_Landmark1;weppy7;103;109;8304;8456
+Statue of Zeus;X_BronzeAge_Landmark2;weppy7;108;127;2249;5879
+Alcatraz;X_ProgressiveEra_Landmark1;wooman;68;112;1909;3563
+Statue of Zeus;X_BronzeAge_Landmark2;wooman;69;266;22;2244
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;wooman;71;156;22;2774
+Temple of Relics;X_AllAge_Expedition;wooman;69;177;2665;2860
+Lighthouse of Alexandria;X_IronAge_Landmark2;wooman;71;112;22;2543
+Castel del Monte;X_LateMiddleAge_Landmark3;wooman;70;162;122;3157
+The Arc;X_FutureEra_Landmark1;wooman;130;459;2392;19247
+Observatory;X_AllAge_EasterBonus4;wooman;69;145;22;2860
+Truce Tower;X_TomorrowEra_Landmark2;wooman;70;74;10;4195
+Château Frontenac;X_ProgressiveEra_Landmark2;wooman;71;112;182;3837
+The Blue Galaxy;X_OceanicFuture_Landmark3;wooman;71;72;23;5363
+Arctic Orangery;X_ArcticFuture_Landmark2;wooman;67;67;0;4649
+Space Carrier;X_SpaceAgeAsteroidBelt_Landmark1;wooman;15;17;279;1508
+The Arc;X_FutureEra_Landmark1;Player;113;114;190;12649
+The Blue Galaxy;X_OceanicFuture_Landmark3;Player;34;35;30;2151
+Oracle of Delphi;X_AllAge_Oracle;Player;14;14;0;736
+Statue of Zeus;X_BronzeAge_Landmark2;Player;80;80;0;2945
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;Player;71;74;0;2774
+Lighthouse of Alexandria;X_IronAge_Landmark2;Player;19;19;0;705
+Observatory;X_AllAge_EasterBonus4;Player;77;77;0;3485
+Château Frontenac;X_ProgressiveEra_Landmark2;Player;36;65;0;1617
+Galata Tower;X_EarlyMiddleAge_Landmark3;Rogue Maverick 021;44;50;300;1543
+Statue of Zeus;X_BronzeAge_Landmark2;Rogue Maverick 021;41;41;0;1124
+Observatory;X_AllAge_EasterBonus4;Rogue Maverick 021;69;70;2706;2860
+The Arc;X_FutureEra_Landmark1;Rogue Maverick 021;116;210;0;13622
+The Arc;X_FutureEra_Landmark1;slynder;80;80;0;5600
+The Blue Galaxy;X_OceanicFuture_Landmark3;slynder;52;52;0;3355
+Château Frontenac;X_ProgressiveEra_Landmark2;slynder;132;140;16413;17303
+Statue of Zeus;X_BronzeAge_Landmark2;slynder;140;140;0;12954
+Temple of Relics;X_AllAge_Expedition;slynder;150;150;0;21134
+Truce Tower;X_TomorrowEra_Landmark2;zaxxxs;97;99;6762;8170
+The Arc;X_FutureEra_Landmark1;zaxxxs;119;201;11599;14669
+Alcatraz;X_ProgressiveEra_Landmark1;zaxxxs;90;94;4897;6134
+Observatory;X_AllAge_EasterBonus4;zaxxxs;93;99;4571;5173
+Space Carrier;X_SpaceAgeAsteroidBelt_Landmark1;zaxxxs;91;99;6665;9847
+Temple of Relics;X_AllAge_Expedition;zaxxxs;95;104;3395;5435
+The Kraken;X_OceanicFuture_Landmark2;zaxxxs;80;84;6519;6697
+Château Frontenac;X_ProgressiveEra_Landmark2;zaxxxs;82;94;5023;5035
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;FallonAngel;28;29;100;960
+Galata Tower;X_EarlyMiddleAge_Landmark3;FallonAngel;19;19;0;833
+Castel del Monte;X_LateMiddleAge_Landmark3;FallonAngel;34;34;0;1298
+Observatory;X_AllAge_EasterBonus4;FallonAngel;32;32;0;1147
+The Arc;X_FutureEra_Landmark1;FallonAngel;74;75;874;4829
+Château Frontenac;X_ProgressiveEra_Landmark2;FallonAngel;27;27;0;1295
+Space Carrier;X_SpaceAgeAsteroidBelt_Landmark1;FallonAngel;11;11;0;1366
+Statue of Zeus;X_BronzeAge_Landmark2;FallonAngel;59;60;300;1753
+Temple of Relics;X_AllAge_Expedition;FallonAngel;30;31;620;1092
+Alcatraz;X_ProgressiveEra_Landmark1;FallonAngel;33;33;0;1502
+Oracle of Delphi;X_AllAge_Oracle;Dunadan;10;10;0;667
+Tower of Babel;X_BronzeAge_Landmark1;Dunadan;21;21;0;686
+Lighthouse of Alexandria;X_IronAge_Landmark2;Dunadan;18;18;0;687
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;Dunadan;19;20;445;769
+Royal Albert Hall;X_IndustrialAge_Landmark1;Dunadan;16;16;0;940
+Capitol;X_IndustrialAge_Landmark2;Dunadan;16;17;0;940
+Alcatraz;X_ProgressiveEra_Landmark1;Dunadan;19;19;0;1063
+Galata Tower;X_EarlyMiddleAge_Landmark3;Dunadan;18;19;0;812
+St. Mark's Basilica;X_HighMiddleAge_Landmark1;Dunadan;16;17;0;773
+Frauenkirche of Dresden;X_ColonialAge_Landmark1;Dunadan;18;18;0;925
+The Arc;X_FutureEra_Landmark1;Dunadan;14;19;517;1098
+Saint Basil's Cathedral;X_LateMiddleAge_Landmark1;Dunadan;17;17;0;853
+The Habitat;X_PostModernEra_Landmark2;Dunadan;9;13;0;880
+Statue of Zeus;X_BronzeAge_Landmark2;johnnylaw7;65;68;1604;2033
+Tower of Babel;X_BronzeAge_Landmark1;johnnylaw7;22;25;58;704
+Temple of Relics;X_AllAge_Expedition;johnnylaw7;32;32;0;1147
+Lighthouse of Alexandria;X_IronAge_Landmark2;johnnylaw7;25;29;0;817
+Alcatraz;X_ProgressiveEra_Landmark1;johnnylaw7;27;27;0;1295
+Castel del Monte;X_LateMiddleAge_Landmark3;johnnylaw7;51;51;0;1975
+Observatory;X_AllAge_EasterBonus4;johnnylaw7;34;35;133;1206
+The Arc;X_FutureEra_Landmark1;johnnylaw7;92;93;7399;7531
+Galata Tower;X_EarlyMiddleAge_Landmark3;johnnylaw7;23;24;0;919
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;johnnylaw7;41;46;1087;1323
+Château Frontenac;X_ProgressiveEra_Landmark2;johnnylaw7;31;32;1355;1429
+Truce Tower;X_TomorrowEra_Landmark2;johnnylaw7;23;23;0;1315
+Saint Basil's Cathedral;X_LateMiddleAge_Landmark1;johnnylaw7;26;26;0;1066
+Château Frontenac;X_ProgressiveEra_Landmark2;tan vedra;108;111;0;9567
+The Arc;X_FutureEra_Landmark1;tan vedra;101;121;8788;9406
+Seed Vault;X_ArcticFuture_Landmark3;tan vedra;138;141;15188;26836
+The Blue Galaxy;X_OceanicFuture_Landmark3;tan vedra;106;109;249;12726
+Space Carrier;X_SpaceAgeAsteroidBelt_Landmark1;tan vedra;43;43;0;3010
+Temple of Relics;X_AllAge_Expedition;tan vedra;101;102;10;6303
+Alcatraz;X_ProgressiveEra_Landmark1;Sawitanto;70;72;22;3744
+The Arc;X_FutureEra_Landmark1;Sawitanto;60;87;33;3418
+Observatory;X_AllAge_EasterBonus4;Sawitanto;64;65;33;2528
+Galata Tower;X_EarlyMiddleAge_Landmark3;Sawitanto;61;67;1239;2348
+Seed Vault;X_ArcticFuture_Landmark3;Sawitanto;60;64;33;3911
+Truce Tower;X_TomorrowEra_Landmark2;Sawitanto;62;64;33;3443
+Château Frontenac;X_ProgressiveEra_Landmark2;Sawitanto;62;90;1735;3073
+Saint Basil's Cathedral;X_LateMiddleAge_Landmark1;Sawitanto;62;64;33;2591
+Arctic Orangery;X_ArcticFuture_Landmark2;Sawitanto;60;65;33;3911
+The Blue Galaxy;X_OceanicFuture_Landmark3;Sawitanto;59;62;33;3988
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;Sawitanto;94;122;2069;4895
+The Kraken;X_OceanicFuture_Landmark2;Sawitanto;60;63;33;4087
+Himeji Castle;X_VirtualFuture_Landmark2;Sawitanto;59;61;33;4159
+The Virgo Project;X_SpaceAgeMars_Landmark2;Sawitanto;60;60;0;4404
+Space Carrier;X_SpaceAgeAsteroidBelt_Landmark1;Sawitanto;92;97;432;10094
+Statue of Zeus;X_BronzeAge_Landmark2;Sawitanto;101;127;1782;4945
+Temple of Relics;X_AllAge_Expedition;Sawitanto;63;64;37;2467
+Castel del Monte;X_LateMiddleAge_Landmark3;Sawitanto;86;103;187;4687
+Terracotta Army;X_VirtualFuture_Landmark1;Sawitanto;75;85;3251;6174
+Observatory;X_AllAge_EasterBonus4;ArthurSchopenhauer;22;23;411;897
+The Arc;X_FutureEra_Landmark1;ArthurSchopenhauer;56;56;0;3096
+Castel del Monte;X_LateMiddleAge_Landmark3;ArthurSchopenhauer;15;16;90;812
+Oracle of Delphi;X_AllAge_Oracle;ArthurSchopenhauer;10;10;0;667
+Statue of Zeus;X_BronzeAge_Landmark2;ArthurSchopenhauer;43;43;0;1181
+Tower of Babel;X_BronzeAge_Landmark1;ArthurSchopenhauer;26;26;0;777
+Lighthouse of Alexandria;X_IronAge_Landmark2;ArthurSchopenhauer;22;23;155;759
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;ArthurSchopenhauer;21;22;66;807
+Temple of Relics;X_AllAge_Expedition;ArthurSchopenhauer;17;17;0;792
+Oracle of Delphi;X_AllAge_Oracle;solothemith;15;15;0;754
+Lighthouse of Alexandria;X_IronAge_Landmark2;solothemith;83;95;0;3420
+Château Frontenac;X_ProgressiveEra_Landmark2;solothemith;99;107;7077;7660
+Temple of Relics;X_AllAge_Expedition;solothemith;34;34;0;1206
+Observatory;X_AllAge_EasterBonus4;solothemith;30;31;0;1092
+Galata Tower;X_EarlyMiddleAge_Landmark3;solothemith;61;74;0;2348
+Lotus Temple;X_ContemporaryEra_Landmark1;solothemith;45;55;0;2141
+The Blue Galaxy;X_OceanicFuture_Landmark3;solothemith;50;55;2652;3193
+Himeji Castle;X_VirtualFuture_Landmark2;solothemith;28;28;0;1935
+Space Needle;X_ModernEra_Landmark1;solothemith;24;41;746;1275
+Château Frontenac;X_ProgressiveEra_Landmark2;magray;112;115;4052;10560
+The Arc;X_FutureEra_Landmark1;magray;89;90;1072;6994
+Temple of Relics;X_AllAge_Expedition;magray;18;18;0;812
+Oracle of Delphi;X_AllAge_Oracle;Pax-Romana;10;10;0;667
+Tower of Babel;X_BronzeAge_Landmark1;Pax-Romana;48;48;0;1336
+Lighthouse of Alexandria;X_IronAge_Landmark2;Pax-Romana;45;45;0;1338
+Galata Tower;X_EarlyMiddleAge_Landmark3;Pax-Romana;46;46;0;1621
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;Pax-Romana;44;44;0;1424
+Hagia Sophia;X_EarlyMiddleAge_Landmark1;Pax-Romana;38;38;0;1228
+St. Mark's Basilica;X_HighMiddleAge_Landmark1;Pax-Romana;44;44;0;1543
+Castel del Monte;X_LateMiddleAge_Landmark3;Pax-Romana;55;55;0;2180
+Château Frontenac;X_ProgressiveEra_Landmark2;Pax-Romana;62;62;0;3073
+Cape Canaveral;X_PostModernEra_Landmark1;Pax-Romana;39;41;0;1846
+Innovation Tower;X_ContemporaryEra_Landmark2;Pax-Romana;45;45;0;2141
+The Arc;X_FutureEra_Landmark1;Pax-Romana;43;46;1686;2246
+Arctic Orangery;X_ArcticFuture_Landmark2;Pax-Romana;51;51;0;3132
+The Blue Galaxy;X_OceanicFuture_Landmark3;Pax-Romana;34;34;0;2151
+The Kraken;X_OceanicFuture_Landmark2;Pax-Romana;26;26;0;1766
+Statue of Zeus;X_BronzeAge_Landmark2;Pax-Romana;69;69;0;2244
+Alcatraz;X_ProgressiveEra_Landmark1;Pax-Romana;49;49;0;2229
+Oracle of Delphi;X_AllAge_Oracle;Bob Fossil;11;11;0;683
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;Bob Fossil;28;28;0;960
+The Arc;X_FutureEra_Landmark1;Bob Fossil;112;118;5905;12341
+Alcatraz;X_ProgressiveEra_Landmark1;Bob Fossil;19;37;0;1063
+Statue of Zeus;X_BronzeAge_Landmark2;Bob Fossil;34;34;0;946
+Observatory;X_AllAge_EasterBonus4;Bob Fossil;36;37;0;1267
+Temple of Relics;X_AllAge_Expedition;Bob Fossil;34;34;0;1206
+Château Frontenac;X_ProgressiveEra_Landmark2;Bob Fossil;45;45;0;2020
+Seed Vault;X_ArcticFuture_Landmark3;Bob Fossil;86;87;1471;7432
+Statue of Zeus;X_BronzeAge_Landmark2;adamray68;13;31;0;563
+The Arc;X_FutureEra_Landmark1;adamray68;90;100;10;7169
+Château Frontenac;X_ProgressiveEra_Landmark2;adamray68;181;190;36850;58021
+Temple of Relics;X_AllAge_Expedition;adamray68;100;100;0;6149
+Seed Vault;X_ArcticFuture_Landmark3;adamray68;105;107;6431;11880
+Observatory;X_AllAge_EasterBonus4;adamray68;74;100;0;3236
+A.I. Core;X_SpaceAgeJupiterMoon_Landmark1;adamray68;63;63;0;5274
+Himeji Castle;X_VirtualFuture_Landmark2;adamray68;58;58;0;4058
+Space Carrier;X_SpaceAgeAsteroidBelt_Landmark1;adamray68;48;48;0;3406
+Voyager V1;X_TomorrowEra_Landmark1;Redbobo;11;11;0;978
+Truce Tower;X_TomorrowEra_Landmark2;Redbobo;12;12;0;1002
+The Arc;X_FutureEra_Landmark1;Redbobo;45;45;0;2360
+Innovation Tower;X_ContemporaryEra_Landmark2;Redbobo;12;12;0;948
+Lotus Temple;X_ContemporaryEra_Landmark1;Redbobo;13;13;0;972
+Rain Forest Project;X_FutureEra_Landmark2;Redbobo;4;10;160;400
+Space Needle;X_ModernEra_Landmark1;Redbobo;12;12;0;948
+Arctic Orangery;X_ArcticFuture_Landmark2;Redbobo;2;10;84;230
+The Arc;X_FutureEra_Landmark1;npl123;56;73;2718;3096
+Château Frontenac;X_ProgressiveEra_Landmark2;npl123;45;74;919;2020
+Oracle of Delphi;X_AllAge_Oracle;npl123;7;10;0;460
+Seed Vault;X_ArcticFuture_Landmark3;npl123;81;100;2820;6569
+The Blue Galaxy;X_OceanicFuture_Landmark3;npl123;13;48;354;1281
+Temple of Relics;X_AllAge_Expedition;npl123;20;75;696;853
+Observatory;X_AllAge_EasterBonus4;Cyril the Hunter 879;38;59;0;1331
+The Arc;X_FutureEra_Landmark1;Cyril the Hunter 879;127;430;2766;17873
+Castel del Monte;X_LateMiddleAge_Landmark3;Cyril the Hunter 879;100;168;0;6622
+Statue of Zeus;X_BronzeAge_Landmark2;Cyril the Hunter 879;72;226;790;2417
+Temple of Relics;X_AllAge_Expedition;Cyril the Hunter 879;63;91;2202;2467
+Observatory;X_AllAge_EasterBonus4;SirGims;124;133;688;11122
+The Arc;X_FutureEra_Landmark1;SirGims;116;200;3693;13622
+Statue of Zeus;X_BronzeAge_Landmark2;SirGims;33;34;20;923
+The Arc;X_FutureEra_Landmark1;akisz;109;183;2000;11460
+Château Frontenac;X_ProgressiveEra_Landmark2;akisz;105;149;2000;8884
+The Blue Galaxy;X_OceanicFuture_Landmark3;akisz;83;86;2000;7212
+Castel del Monte;X_LateMiddleAge_Landmark3;akisz;60;70;0;2467
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;akisz;60;69;50;2114
+Statue of Zeus;X_BronzeAge_Landmark2;akisz;87;302;1000;3500
+Temple of Relics;X_AllAge_Expedition;akisz;81;82;1400;3847
+The Blue Galaxy;X_OceanicFuture_Landmark3;RocaBlanca;78;81;341;6374
+Space Carrier;X_SpaceAgeAsteroidBelt_Landmark1;RocaBlanca;39;39;0;2727
+Statue of Zeus;X_BronzeAge_Landmark2;RocaBlanca;13;14;203;563
+Royal Albert Hall;X_IndustrialAge_Landmark1;RocaBlanca;14;14;0;894
+The Habitat;X_PostModernEra_Landmark2;RocaBlanca;13;14;33;972
+Deal Castle;X_ColonialAge_Landmark2;RocaBlanca;15;15;0;859
+Observatory;X_AllAge_EasterBonus4;RocaBlanca;13;13;0;718
+The Kraken;X_OceanicFuture_Landmark2;RocaBlanca;38;42;1397;2374
+Terracotta Army;X_VirtualFuture_Landmark1;RocaBlanca;31;31;0;2084
+The Virgo Project;X_SpaceAgeMars_Landmark2;RocaBlanca;20;20;0;1641
+Flying Island;X_SpaceAgeVenus_Landmark1;RocaBlanca;13;13;0;1491
+Lighthouse of Alexandria;X_IronAge_Landmark2;spikeblockbite;42;53;0;1243
+Galata Tower;X_EarlyMiddleAge_Landmark3;spikeblockbite;31;50;0;1120
+Truce Tower;X_TomorrowEra_Landmark2;spikeblockbite;24;45;10;1347
+Château Frontenac;X_ProgressiveEra_Landmark2;spikeblockbite;50;100;0;2285
+Seed Vault;X_ArcticFuture_Landmark3;spikeblockbite;25;55;10;1648
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;spikeblockbite;43;70;0;1390
+St. Mark's Basilica;X_HighMiddleAge_Landmark1;spikeblockbite;22;22;0;897
+Gaea Statue;X_ArcticFuture_Landmark1;spikeblockbite;11;11;0;1167
+The Habitat;X_PostModernEra_Landmark2;spikeblockbite;11;11;0;925
+The Kraken;X_OceanicFuture_Landmark2;spikeblockbite;13;31;10;1281
+Himeji Castle;X_VirtualFuture_Landmark2;spikeblockbite;21;24;10;1628
+Temple of Relics;X_AllAge_Expedition;spikeblockbite;41;55;0;1433
+The Arc;X_FutureEra_Landmark1;spikeblockbite;55;160;0;3021
+The Blue Galaxy;X_OceanicFuture_Landmark3;spikeblockbite;36;40;0;2260
+Castel del Monte;X_LateMiddleAge_Landmark3;Simoncelly86;39;41;1222;1469
+Observatory;X_AllAge_EasterBonus4;Simoncelly86;41;45;1;1433
+Atomium;X_ModernEra_Landmark2;Simoncelly86;13;14;1;972
+The Kraken;X_OceanicFuture_Landmark2;Simoncelly86;11;11;0;1219
+The Arc;X_FutureEra_Landmark1;Simoncelly86;103;131;87;9882
+Cape Canaveral;X_PostModernEra_Landmark1;Simoncelly86;11;15;1;925
+Arctic Orangery;X_ArcticFuture_Landmark2;Simoncelly86;52;57;0;3210
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;Simoncelly86;18;18;0;750
+St. Mark's Basilica;X_HighMiddleAge_Landmark1;Simoncelly86;11;12;0;683
+The Blue Galaxy;X_OceanicFuture_Landmark3;Simoncelly86;23;26;0;1640
+Château Frontenac;X_ProgressiveEra_Landmark2;Simoncelly86;33;37;0;1502
+Statue of Zeus;X_BronzeAge_Landmark2;Simoncelly86;62;101;1387;1888
+Alcatraz;X_ProgressiveEra_Landmark1;Simoncelly86;25;27;0;1233
+Alcatraz;X_ProgressiveEra_Landmark1;Scovei;40;45;0;1785
+Cape Canaveral;X_PostModernEra_Landmark1;Scovei;16;16;0;1047
+Statue of Zeus;X_BronzeAge_Landmark2;Scovei;70;170;200;2300
+The Arc;X_FutureEra_Landmark1;Scovei;91;185;0;7348
+Observatory;X_AllAge_EasterBonus4;Scovei;31;38;460;1120
+Temple of Relics;X_AllAge_Expedition;Scovei;75;114;621;3317
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;Scovei;53;67;0;1779
+Galata Tower;X_EarlyMiddleAge_Landmark3;Scovei;41;41;0;1433
+Castel del Monte;X_LateMiddleAge_Landmark3;Scovei;65;87;0;2791
+Lighthouse of Alexandria;X_IronAge_Landmark2;Scovei;33;35;612;995
+Saint Basil's Cathedral;X_LateMiddleAge_Landmark1;Scovei;37;41;0;1398
+Château Frontenac;X_ProgressiveEra_Landmark2;Scovei;85;97;0;5422
+Truce Tower;X_TomorrowEra_Landmark2;Scovei;15;17;600;1079
+Arctic Orangery;X_ArcticFuture_Landmark2;Scovei;25;30;300;1648
+The Blue Galaxy;X_OceanicFuture_Landmark3;Scovei;40;43;2290;2495
+The Kraken;X_OceanicFuture_Landmark2;Scovei;10;10;0;1189
+Observatory;X_AllAge_EasterBonus4;Tomsk the older;76;77;0;3400
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;Tomsk the older;83;84;0;3731
+Galata Tower;X_EarlyMiddleAge_Landmark3;Tomsk the older;34;35;170;1206
+The Arc;X_FutureEra_Landmark1;Tomsk the older;106;107;1176;10642
+Seed Vault;X_ArcticFuture_Landmark3;Tomsk the older;30;31;0;1865
+Statue of Zeus;X_BronzeAge_Landmark2;Tomsk the older;104;105;0;5326
+Temple of Relics;X_AllAge_Expedition;Tomsk the older;39;40;120;1364
+Oracle of Delphi;X_AllAge_Oracle;ShadowSt;10;10;0;667
+Temple of Relics;X_AllAge_Expedition;ShadowSt;10;10;0;667
+The Arc;X_FutureEra_Landmark1;Abazee the Resourceful;135;140;3373;21777
+Observatory;X_AllAge_EasterBonus4;Abazee the Resourceful;60;60;0;2290
+Statue of Zeus;X_BronzeAge_Landmark2;Abazee the Resourceful;76;84;2194;2668
+Castel del Monte;X_LateMiddleAge_Landmark3;Abazee the Resourceful;100;109;4681;6622
+Alcatraz;X_ProgressiveEra_Landmark1;Abazee the Resourceful;67;68;41;3476
+Tower of Babel;X_BronzeAge_Landmark1;Abazee the Resourceful;34;34;0;946
+Château Frontenac;X_ProgressiveEra_Landmark2;Abazee the Resourceful;75;81;0;4235
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;Abazee the Resourceful;41;46;1131;1323
+Temple of Relics;X_AllAge_Expedition;Abazee the Resourceful;10;10;0;667
+The Arc;X_FutureEra_Landmark1;Binzishere;81;82;3161;5740
+Observatory;X_AllAge_EasterBonus4;Binzishere;21;21;0;875
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;Binzishere;34;35;0;1113
+Château Frontenac;X_ProgressiveEra_Landmark2;Binzishere;29;29;0;1361
+Castel del Monte;X_LateMiddleAge_Landmark3;Binzishere;30;31;899;1176
+Saint Basil's Cathedral;X_LateMiddleAge_Landmark1;Binzishere;16;16;0;833
+Galata Tower;X_EarlyMiddleAge_Landmark3;Binzishere;15;17;205;754
+Alcatraz;X_ProgressiveEra_Landmark1;Binzishere;22;23;1035;1145
+Statue of Zeus;X_BronzeAge_Landmark2;Binzishere;28;28;0;816
+Temple of Relics;X_AllAge_Expedition;Binzishere;20;21;97;853
+Oracle of Delphi;X_AllAge_Oracle;Thomas the Vengeful 1055;10;10;0;667
+Observatory;X_AllAge_EasterBonus4;DukeOfTexas;86;130;0;4352
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;DukeOfTexas;68;127;0;2576
+Lighthouse of Alexandria;X_IronAge_Landmark2;DukeOfTexas;27;27;0;858
+The Arc;X_FutureEra_Landmark1;DukeOfTexas;106;317;2120;10642
+Statue of Zeus;X_BronzeAge_Landmark2;DukeOfTexas;82;153;0;3094
+Temple of Relics;X_AllAge_Expedition;DukeOfTexas;67;79;0;2723
+Oracle of Delphi;X_AllAge_Oracle;Shinigami;7;10;122;460
+Statue of Zeus;X_BronzeAge_Landmark2;Shinigami;13;13;0;563
+Temple of Relics;X_AllAge_Expedition;Shinigami;22;22;0;897
+Oracle of Delphi;X_AllAge_Oracle;Emperor MAUA;17;17;0;792
+Observatory;X_AllAge_EasterBonus4;Emperor MAUA;19;20;650;833
+Saint Basil's Cathedral;X_LateMiddleAge_Landmark1;Emperor MAUA;12;12;0;754
+Galata Tower;X_EarlyMiddleAge_Landmark3;Emperor MAUA;13;13;0;718
+Statue of Zeus;X_BronzeAge_Landmark2;KobNob;13;18;244;563
+St. Mark's Basilica;X_HighMiddleAge_Landmark1;KobNob;14;15;0;736
+Château Frontenac;X_ProgressiveEra_Landmark2;KobNob;36;36;0;1617
+Royal Albert Hall;X_IndustrialAge_Landmark1;KobNob;16;17;32;940
+Truce Tower;X_TomorrowEra_Landmark2;KobNob;11;13;0;978
+The Arc;X_FutureEra_Landmark1;KobNob;43;43;0;2246
+Arctic Orangery;X_ArcticFuture_Landmark2;KobNob;11;12;875;1167
+Rain Forest Project;X_FutureEra_Landmark2;KobNob;15;16;85;1125
+Voyager V1;X_TomorrowEra_Landmark1;KobNob;2;14;0;190
+Space Needle;X_ModernEra_Landmark1;KobNob;1;17;0;100
+Seed Vault;X_ArcticFuture_Landmark3;KobNob;17;17;0;1353
+The Blue Galaxy;X_OceanicFuture_Landmark3;KobNob;21;21;0;1561
+Oracle of Delphi;X_AllAge_Oracle;YasoAmin;13;13;0;718
+Temple of Relics;X_AllAge_Expedition;YasoAmin;11;11;0;683
+Statue of Zeus;X_BronzeAge_Landmark2;YasoAmin;24;24;0;739
+Lighthouse of Alexandria;X_IronAge_Landmark2;YasoAmin;18;18;0;687
+Tower of Babel;X_BronzeAge_Landmark1;YasoAmin;16;16;0;607
+The Arc;X_FutureEra_Landmark1;YasoAmin;20;20;0;1273
+The Blue Galaxy;X_OceanicFuture_Landmark3;YasoAmin;12;12;0;1250
+Notre Dame;X_HighMiddleAge_Landmark3;YasoAmin;15;15;0;754
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;YasoAmin;16;16;0;714
+Galata Tower;X_EarlyMiddleAge_Landmark3;YasoAmin;14;14;0;736
+Château Frontenac;X_ProgressiveEra_Landmark2;YasoAmin;16;16;0;987
+Capitol;X_IndustrialAge_Landmark2;YasoAmin;12;12;0;851
+Truce Tower;X_TomorrowEra_Landmark2;YasoAmin;11;11;0;978
+Innovation Tower;X_ContemporaryEra_Landmark2;YasoAmin;6;12;0;560
+Statue of Zeus;X_BronzeAge_Landmark2;Flovas;67;67;0;2136
+Temple of Relics;X_AllAge_Expedition;Flovas;90;90;0;4804
+Oracle of Delphi;X_AllAge_Oracle;Tommytwoparrots;10;10;0;667
+Statue of Zeus;X_BronzeAge_Landmark2;Tommytwoparrots;27;27;0;796
+Tower of Babel;X_BronzeAge_Landmark1;Tommytwoparrots;12;12;0;550
+Lighthouse of Alexandria;X_IronAge_Landmark2;Tommytwoparrots;12;12;0;593
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;Tommytwoparrots;14;14;0;679
+Castel del Monte;X_LateMiddleAge_Landmark3;Tommytwoparrots;15;15;0;812
+Observatory;X_AllAge_EasterBonus4;Tommytwoparrots;12;12;0;700
+Saint Basil's Cathedral;X_LateMiddleAge_Landmark1;Tommytwoparrots;11;11;0;736
+Château Frontenac;X_ProgressiveEra_Landmark2;Tommytwoparrots;10;10;0;851
+Alcatraz;X_ProgressiveEra_Landmark1;Tommytwoparrots;11;11;0;873
+Oracle of Delphi;X_AllAge_Oracle;BuddyKane;13;13;0;718
+Lighthouse of Alexandria;X_IronAge_Landmark2;BuddyKane;22;23;0;759
+Royal Albert Hall;X_IndustrialAge_Landmark1;BuddyKane;18;19;0;987
+Innovation Tower;X_ContemporaryEra_Landmark2;BuddyKane;24;24;0;1275
+The Habitat;X_PostModernEra_Landmark2;BuddyKane;23;26;0;1244
+The Arc;X_FutureEra_Landmark1;BuddyKane;65;68;50;3867
+Statue of Zeus;X_BronzeAge_Landmark2;BuddyKane;25;30;10;758
+Oracle of Delphi;X_AllAge_Oracle;Pyrrhos the Spider 1116;12;13;10;700
+Lighthouse of Alexandria;X_IronAge_Landmark2;Pyrrhos the Spider 1116;13;26;20;608
+St. Mark's Basilica;X_HighMiddleAge_Landmark1;Pyrrhos the Spider 1116;17;17;0;792
+Alcatraz;X_ProgressiveEra_Landmark1;Pyrrhos the Spider 1116;18;30;0;1037
+Château Frontenac;X_ProgressiveEra_Landmark2;Pyrrhos the Spider 1116;21;67;321;1117
+The Arc;X_FutureEra_Landmark1;Pyrrhos the Spider 1116;76;94;0;5074
+The Blue Galaxy;X_OceanicFuture_Landmark3;Pyrrhos the Spider 1116;44;53;102;2753
+Arctic Orangery;X_ArcticFuture_Landmark2;Pyrrhos the Spider 1116;10;17;10;1138
+Himeji Castle;X_VirtualFuture_Landmark2;Pyrrhos the Spider 1116;11;11;0;1272
+Rain Forest Project;X_FutureEra_Landmark2;Pyrrhos the Spider 1116;9;11;288;970
+Statue of Zeus;X_BronzeAge_Landmark2;Pyrrhos the Spider 1116;26;44;0;777
+Temple of Relics;X_AllAge_Expedition;Pyrrhos the Spider 1116;21;28;214;875
+Statue of Zeus;X_BronzeAge_Landmark2;ddraigcoch99;27;27;0;796
+The Arc;X_FutureEra_Landmark1;ddraigcoch99;85;86;4747;6336
+Temple of Relics;X_AllAge_Expedition;ddraigcoch99;17;17;0;792
+Lighthouse of Alexandria;X_IronAge_Landmark2;VN number 1;19;25;201;705
+Galata Tower;X_EarlyMiddleAge_Landmark3;VN number 1;11;19;0;683
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;VN number 1;15;26;0;696
+Château Frontenac;X_ProgressiveEra_Landmark2;VN number 1;56;69;0;2650
+St. Mark's Basilica;X_HighMiddleAge_Landmark1;VN number 1;20;20;0;853
+The Arc;X_FutureEra_Landmark1;VN number 1;73;149;0;4711
+Alcatraz;X_ProgressiveEra_Landmark1;VN number 1;21;26;0;1117
+Himeji Castle;X_VirtualFuture_Landmark2;VN number 1;10;12;1032;1241
+Castel del Monte;X_LateMiddleAge_Landmark3;VN number 1;13;34;188;773
+Royal Albert Hall;X_IndustrialAge_Landmark1;VN number 1;11;11;0;830
+The Habitat;X_PostModernEra_Landmark2;VN number 1;11;11;0;925
+Observatory;X_AllAge_EasterBonus4;VN number 1;14;17;400;736
+The Blue Galaxy;X_OceanicFuture_Landmark3;VN number 1;14;22;0;1313
+Statue of Zeus;X_BronzeAge_Landmark2;VN number 1;18;38;80;637
+Temple of Relics;X_AllAge_Expedition;VN number 1;24;24;0;942
+Oracle of Delphi;X_AllAge_Oracle;davie-uk2;9;12;315;650
+Tower of Babel;X_BronzeAge_Landmark1;davie-uk2;9;11;408;510
+Observatory;X_AllAge_EasterBonus4;davie-uk2;10;10;0;667
+Lighthouse of Alexandria;X_IronAge_Landmark2;davie-uk2;5;10;225;290
+Colosseum;X_IronAge_Landmark1;davie-uk2;1;10;0;60
+Galata Tower;X_EarlyMiddleAge_Landmark3;davie-uk2;1;10;0;40
+Statue of Zeus;X_BronzeAge_Landmark2;davie-uk2;8;11;0;450
+Château Frontenac;X_ProgressiveEra_Landmark2;Edgars93;104;113;6199;8667
+Statue of Zeus;X_BronzeAge_Landmark2;Edgars93;11;11;0;536
+The Arc;X_FutureEra_Landmark1;Edgars93;80;80;0;5600
+Alcatraz;X_ProgressiveEra_Landmark1;Edgars93;11;11;0;873
+The Blue Galaxy;X_OceanicFuture_Landmark3;Edgars93;81;85;29;6864
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;Heardred;18;18;0;750
+Lighthouse of Alexandria;X_IronAge_Landmark2;Heardred;10;10;0;564
+Observatory;X_AllAge_EasterBonus4;Heardred;10;10;0;667
+Château Frontenac;X_ProgressiveEra_Landmark2;Heardred;15;15;0;963
+The Arc;X_FutureEra_Landmark1;Heardred;28;29;224;1551
+Seed Vault;X_ArcticFuture_Landmark3;Heardred;10;10;0;1138
+Statue of Zeus;X_BronzeAge_Landmark2;Heardred;15;15;0;592
+Temple of Relics;X_AllAge_Expedition;Heardred;12;12;0;700
+Galata Tower;X_EarlyMiddleAge_Landmark3;Heardred;13;13;0;718
+Alcatraz;X_ProgressiveEra_Landmark1;Heardred;19;19;0;1063
+Tower of Babel;X_BronzeAge_Landmark1;Srki96;10;10;0;523
+Lighthouse of Alexandria;X_IronAge_Landmark2;Srki96;10;10;0;564
+Statue of Zeus;X_BronzeAge_Landmark2;Srki96;11;11;0;536
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;Srki96;10;10;0;615
+Observatory;X_AllAge_EasterBonus4;Yanahee;11;11;0;683
+Statue of Zeus;X_BronzeAge_Landmark2;Yanahee;12;12;0;550
+Castel del Monte;X_LateMiddleAge_Landmark3;Yanahee;16;16;0;833
+Oracle of Delphi;X_AllAge_Oracle;Eirene y;10;10;0;667
+St. Mark's Basilica;X_HighMiddleAge_Landmark1;Eirene y;10;10;0;667
+The Arc;X_FutureEra_Landmark1;shirali;157;158;12018;37489
+Château Frontenac;X_ProgressiveEra_Landmark2;shirali;100;100;0;7852
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;shirali;100;100;0;5676
+Castel del Monte;X_LateMiddleAge_Landmark3;shirali;100;100;0;6622
+The Blue Galaxy;X_OceanicFuture_Landmark3;shirali;100;100;0;10974
+Himeji Castle;X_VirtualFuture_Landmark2;shirali;100;100;0;11447
+Observatory;X_AllAge_EasterBonus4;shirali;100;100;0;6149
+Space Carrier;X_SpaceAgeAsteroidBelt_Landmark1;shirali;100;100;0;12298
+Cape Canaveral;X_PostModernEra_Landmark1;shirali;100;100;0;8325
+Arctic Orangery;X_ArcticFuture_Landmark2;shirali;100;100;0;10501
+Seed Vault;X_ArcticFuture_Landmark3;shirali;100;100;0;10501
+A.I. Core;X_SpaceAgeJupiterMoon_Landmark1;shirali;100;100;0;13149
+Statue of Zeus;X_BronzeAge_Landmark2;shirali;100;100;0;4825
+Temple of Relics;X_AllAge_Expedition;shirali;100;100;0;6149
+Oracle of Delphi;X_AllAge_Oracle;littletony;8;10;0;550
+Statue of Zeus;X_BronzeAge_Landmark2;littletony;1;10;10;60
+Oracle of Delphi;X_AllAge_Oracle;AtilaLT;10;10;0;667
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;AtilaLT;13;13;0;663
+Château Frontenac;X_ProgressiveEra_Landmark2;AtilaLT;14;15;64;940
+Observatory;X_AllAge_EasterBonus4;AtilaLT;10;10;0;667
+The Arc;X_FutureEra_Landmark1;AtilaLT;11;12;961;1020
+Statue of Zeus;X_BronzeAge_Landmark2;AtilaLT;13;13;0;563
+Temple of Relics;X_AllAge_Expedition;AtilaLT;12;12;0;700
+Oracle of Delphi;X_AllAge_Oracle;Euroc;6;10;0;370
+Tower of Babel;X_BronzeAge_Landmark1;Euroc;6;10;2;330
+Statue of Zeus;X_BronzeAge_Landmark2;Euroc;6;10;2;330
+Oracle of Delphi;X_AllAge_Oracle;Aedesia the Sly 1700;5;10;60;290
+Statue of Zeus;X_BronzeAge_Landmark2;Aedesia the Sly 1700;5;10;0;270
+Oracle of Delphi;X_AllAge_Oracle;Galerius the Just 1197;12;12;0;700
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;Galerius the Just 1197;11;11;0;631
+Castel del Monte;X_LateMiddleAge_Landmark3;Galerius the Just 1197;5;10;83;360
+Lighthouse of Alexandria;X_IronAge_Landmark2;Senga;59;100;0;1891
+Observatory;X_AllAge_EasterBonus4;Senga;110;110;0;7871
+Château Frontenac;X_ProgressiveEra_Landmark2;Senga;69;75;1951;3652
+The Arc;X_FutureEra_Landmark1;Senga;140;206;166;24638
+Galata Tower;X_EarlyMiddleAge_Landmark3;Senga;34;44;0;1206
+Castel del Monte;X_LateMiddleAge_Landmark3;Senga;107;115;2057;7872
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;Senga;107;118;2657;6747
+Saint Basil's Cathedral;X_LateMiddleAge_Landmark1;Senga;66;68;976;2860
+Space Carrier;X_SpaceAgeAsteroidBelt_Landmark1;Senga;95;96;2612;10870
+Statue of Zeus;X_BronzeAge_Landmark2;Senga;115;147;1969;6988
+Terracotta Army;X_VirtualFuture_Landmark1;Senga;123;129;78;20198
+The Arc;X_FutureEra_Landmark1;Texas Crusader;107;110;488;10908
+Observatory;X_AllAge_EasterBonus4;Texas Crusader;83;83;0;4041
+Alcatraz;X_ProgressiveEra_Landmark1;Texas Crusader;30;30;0;1395
+Temple of Relics;X_AllAge_Expedition;Texas Crusader;25;25;0;965
+The Arc;X_FutureEra_Landmark1;Arion1325;45;45;0;2360
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;Arion1325;17;17;0;732
+Observatory;X_AllAge_EasterBonus4;Arion1325;17;17;0;792
+Château Frontenac;X_ProgressiveEra_Landmark2;Arion1325;31;32;898;1429
+Statue of Zeus;X_BronzeAge_Landmark2;Arion1325;25;25;0;758
+Temple of Relics;X_AllAge_Expedition;Arion1325;12;12;0;700
+Oracle of Delphi;X_AllAge_Oracle;shiv302;5;10;40;290
+Statue of Zeus;X_BronzeAge_Landmark2;Moaddib1304;5;10;38;270
+The Arc;X_FutureEra_Landmark1;zaffira;41;41;0;2138
+The Blue Galaxy;X_OceanicFuture_Landmark3;zaffira;15;15;0;1346
+Seed Vault;X_ArcticFuture_Landmark3;zaffira;14;15;404;1256
+Château Frontenac;X_ProgressiveEra_Landmark2;zaffira;7;10;446;630
+Statue of Zeus;X_BronzeAge_Landmark2;zaffira;25;26;48;758
+Temple of Relics;X_AllAge_Expedition;zaffira;13;13;0;718
+Oracle of Delphi;X_AllAge_Oracle;Autolycus the Great;10;10;0;667
+Observatory;X_AllAge_EasterBonus4;Autolycus the Great;50;51;1731;1789
+The Arc;X_FutureEra_Landmark1;Autolycus the Great;119;181;10;14669
+Arctic Orangery;X_ArcticFuture_Landmark2;Autolycus the Great;33;33;0;2008
+Château Frontenac;X_ProgressiveEra_Landmark2;Autolycus the Great;60;60;0;2925
+Deal Castle;X_ColonialAge_Landmark2;Autolycus the Great;16;16;0;880
+Statue of Zeus;X_BronzeAge_Landmark2;Autolycus the Great;31;31;0;879
+Temple of Relics;X_AllAge_Expedition;Autolycus the Great;60;61;395;2290
+Oracle of Delphi;X_AllAge_Oracle;Feline Lady;10;10;0;667
+Observatory;X_AllAge_EasterBonus4;Feline Lady;52;53;1226;1880
+The Arc;X_FutureEra_Landmark1;Feline Lady;119;181;13951;14669
+Arctic Orangery;X_ArcticFuture_Landmark2;Feline Lady;33;33;0;2008
+Château Frontenac;X_ProgressiveEra_Landmark2;Feline Lady;60;60;0;2925
+Deal Castle;X_ColonialAge_Landmark2;Feline Lady;16;16;0;880
+Statue of Zeus;X_BronzeAge_Landmark2;Feline Lady;28;28;0;816
+Temple of Relics;X_AllAge_Expedition;Feline Lady;60;61;540;2290
+Statue of Zeus;X_BronzeAge_Landmark2;Augurs;38;39;30;1044
+The Arc;X_FutureEra_Landmark1;Augurs;105;106;1139;10382
+Observatory;X_AllAge_EasterBonus4;Augurs;64;65;280;2528
+Castel del Monte;X_LateMiddleAge_Landmark3;Augurs;57;57;0;2291
+Temple of Relics;X_AllAge_Expedition;Augurs;12;12;0;700
+Alcatraz;X_ProgressiveEra_Landmark1;Augurs;32;33;868;1465
+Château Frontenac;X_ProgressiveEra_Landmark2;Augurs;83;84;1264;5160
+Galata Tower;X_EarlyMiddleAge_Landmark3;Oldboldfool;11;11;0;683
+Cathedral of Aachen;X_EarlyMiddleAge_Landmark2;Oldboldfool;16;16;0;714
+The Arc;X_FutureEra_Landmark1;Oldboldfool;43;43;0;2246
+Observatory;X_AllAge_EasterBonus4;Oldboldfool;11;11;0;683
+Castel del Monte;X_LateMiddleAge_Landmark3;Oldboldfool;15;15;0;812
+Saint Basil's Cathedral;X_LateMiddleAge_Landmark1;Oldboldfool;10;10;0;718
+Château Frontenac;X_ProgressiveEra_Landmark2;Oldboldfool;3;10;0;260
+Notre Dame;X_HighMiddleAge_Landmark3;Oldboldfool;10;10;0;667
+Statue of Zeus;X_BronzeAge_Landmark2;Oldboldfool;19;19;0;653
+Temple of Relics;X_AllAge_Expedition;Oldboldfool;12;12;0;700
