@@ -1,6 +1,6 @@
 # RMoose's Forge of Empires Assortment: Project Overview
 
-*Last updated: 2026-10-29. Added a Content-Security-Policy, build warnings for ignored files, a tracked-files-only `make_zip.sh`, and the en19 Treasury From / Before 2026 toggles; fixed the Event League Reports page.*
+*Last updated: 2026-11-09. Added the Significant Game Changes page (`#/updates`, data in `data/updates/`). Earlier: added a Content-Security-Policy, build warnings for ignored files, a tracked-files-only `make_zip.sh`, and the en19 Treasury From / Before 2026 toggles; fixed the Event League Reports page.*
 
 A reference for anyone (including Claude) picking this project up. It describes what the site is, how it is built, where everything lives, the conventions agreed so far, and the gotchas found along the way.
 
@@ -14,7 +14,7 @@ A public, static website that tracks two Forge of Empires (FoE) guilds, plus a f
 | Live site | https://bigfatpig89-jpg.github.io/forge-of-empires/ |
 | Repo | `bigfatpig89-jpg/forge-of-empires` on GitHub (branch `main`, Pages serves the `docs/` folder) |
 | Dashboards | **en19 (Uceria)**: Team Targets. **en5 (East-Nagach)**: Freyja's Warriors |
-| Tools | Guild Expeditions Report Generator, Guild Contributions Processor, Event League Reports |
+| Tools and pages | Guild Expeditions Report Generator, Guild Contributions Processor, Event League Reports, Significant Game Changes |
 | Owner's setup | macOS, Terminal, Chrome, Anaconda Python 3.13, git over HTTPS with a personal access token |
 | Status | Unofficial fan site. Footer says "This website is not affiliated with InnoGames." |
 
@@ -41,6 +41,7 @@ data/
   en19/ and en5/         one folder per dashboard
     treasury/  qi/  gbg/  ge/  greatbuildings/  guildbuildings/  eras/  members/
   events/                event league CSVs (shared, not per dashboard)
+  updates/               significant game changes CSV (shared): Date;Time;Description;Link
 docs/                    the website (served by GitHub Pages)
   index.html             the whole app
   plotly.min.js          charting library
@@ -48,7 +49,7 @@ docs/                    the website (served by GitHub Pages)
   .nojekyll
   data/
     dashboards.json      {"en19": [sections with data], "en5": [...]}
-    en19/*.json  en5/*.json  events.json
+    en19/*.json  en5/*.json  events.json  updates.json
 .gitignore               includes data/*/members/ and **/[Mm]ember*.csv (raw member CSVs must never be committed)
 ```
 
@@ -56,9 +57,9 @@ Two different `data` folders exist: **`data/`** (input CSVs) and **`docs/data/`*
 
 ## 4. Site map
 
-Hash routes: `#/` (menu), `#/<dashboard>/<section>`, `#/report`, `#/contributions`, `#/events`. Old links like `#qi` redirect to `#/en19/qi`. A top bar shows the site title and tabs (en19, en5, Report Generator, Contributions Processor, Event League Reports). Inside a dashboard a sidebar lists its sections; **a section appears only when `dashboards.json` says it has data**, so the sidebar is driven by `build.py`, not by `index.html`.
+Hash routes: `#/` (menu), `#/<dashboard>/<section>`, `#/report`, `#/contributions`, `#/events`, `#/updates`. Old links like `#qi` redirect to `#/en19/qi`. A top bar shows the site title and tabs (en19, en5, Report Generator, Contributions Processor, Event League Reports, Significant Game Changes). Inside a dashboard a sidebar lists its sections; **a section appears only when `dashboards.json` says it has data**, so the sidebar is driven by `build.py`, not by `index.html`.
 
-Main-menu cards carry a top line: **Dashboard** (en19, en5), **Tool** (Report Generator, Contributions Processor) or **Data** (Event League Reports). The server name (for example "en19 (Uceria)") is a subtitle under the card title.
+Main-menu cards carry a top line: **Dashboard** (en19, en5), **Tool** (Report Generator, Contributions Processor), **Data** (Event League Reports) or **Updates** (Significant Game Changes). The server name (for example "en19 (Uceria)") is a subtitle under the card title.
 
 Footer: the "All data is pulled using FoE Helper/Forge Hammer as soon after Monday 8am server time as possible." line shows on dashboard pages only. "Your data is not saved on this site and will be cleared once you leave the page." shows on the two upload tools. The InnoGames disclaimer shows everywhere.
 
@@ -78,6 +79,7 @@ Footer: the "All data is pulled using FoE Helper/Forge Hammer as soon after Mond
 
 - **Guild Expeditions Report Generator** (`#/report`): upload a GE CSV (default name `Participation.csv`; the file name does not matter). Produces a text report (date, ranking and guild power typed in, expedition points summed, counts of members who completed level 5 down to "did not start"), plus the uploaded data below. Level thresholds: 80, 64-79, 48-63, 32-47, 16-31, 1-15, 0 encounters. No "only" wording.
 - **Guild Contributions Processor** (`#/contributions`): upload a Guild Treasury contributions log (Player ID, Player name, Era, Good, Amount, Message, Date/Time). One row per player, one column per message type, Grand Total column, Total row, negatives in red brackets.
+- **Significant Game Changes** (`#/updates`, card kicker "Updates"): reads `data/updates/*.csv` (Date as YYYY-MM-DD, optional Time as HH:MM server time, Description, optional Link). Entries are listed newest first as "5 Nov 2026, 13:00 Server Time" followed by the description; with a Link the description is the clickable text (new tab, `rel="noopener noreferrer"`). Only `http://` and `https://` links are accepted (checked in `build.py` and again in the page). Shows only the InnoGames footer line. First entry: 5 Nov 2026, 13:00, Great Building Prestige Update.
 - **Event League Reports** (`#/events`): reads `data/events/*.csv` (Year, Event, Type, Server, ServerName, then one column per league level). One section per Year + Event: "Event: 2026 Fellowship", "Minigame Type: ...", then servers as rows (`en5:East-Nagach`) and league thresholds as columns.
 
 ## 5. Data folders and file formats
@@ -95,6 +97,7 @@ All dashboard CSVs are `;` separated, usually UTF-8 with a BOM and Windows line 
 | Eras | `eras/` | `Eras-YYYY-MM-DD.csv` | eraId, era, numberOfMembers, treasuryGoods, memberPoints (only numberOfMembers is used, for Num Members) |
 | Members | `members/` | `Member-YYYY-MM-DD.csv` | rank, member_id, member, points, eraID, eraName, guildgoods, activity_warnings, messages, gex_participation, gbg_participation, qi_participation (Forge Hammer only), won_battles, guildmember |
 | Events | `data/events/` | any name | Year, Event, Type, Server, ServerName, league columns (comma or semicolon separated) |
+| Updates | `data/updates/` | any name (`.csv`) | Date, Time (optional), Description, Link (optional); `;` separated |
 
 Naming is strict: `build.py` globs on the prefix (`QI-*.csv` and so on). A file that does not match (wrong prefix, `.CSV`, `.xlsx`) is not read, and `build.py` prints `WARNING: <file> is ignored` for it, so read the build output before pushing. A section printing 0 rows means a wrong folder or file name. A file name without a date, or an unreadable GE week, stops the build with a plain message.
 

@@ -7,7 +7,7 @@ Dashboards and small tools for two Forge of Empires guilds. Live site: https://b
 | `en19` | Team Targets (en19, Uceria) |
 | `en5` | Freyja's Warriors (en5, East-Nagach) |
 
-The site opens on a main menu. Each dashboard has a sidebar with its sections (a section appears once it has data): Guild Treasury, Quantum Incursions (QI), Guild Battlegrounds (GBG), Guild Expeditions (GE), Great Buildings, Guild Buildings and Members (password protected). The menu also links to three tools that run in the browser (nothing is saved): the Guild Expeditions Report Generator (`#/report`), the Guild Contributions Processor (`#/contributions`) and the Event League Reports page (`#/events`).
+The site opens on a main menu. Each dashboard has a sidebar with its sections (a section appears once it has data): Guild Treasury, Quantum Incursions (QI), Guild Battlegrounds (GBG), Guild Expeditions (GE), Great Buildings, Guild Buildings and Members (password protected). The menu also links to three tools that run in the browser (nothing is saved): the Guild Expeditions Report Generator (`#/report`), the Guild Contributions Processor (`#/contributions`) and the Event League Reports page (`#/events`), plus the Significant Game Changes page (`#/updates`), a dated list of important game updates.
 
 This is an unofficial fan site and is not affiliated with InnoGames. A fuller description of the project is in `RMoose_FoE_Assortment_Project_Overview.md`.
 
@@ -32,6 +32,7 @@ Note the two different `data` folders: `data/` holds the CSV inputs, `docs/data/
    | Eras (for the Num Members row) | `data/<dashboard>/eras/` | `Eras-YYYY-MM-DD.csv` |
    | Members | `data/<dashboard>/members/` | `Member-YYYY-MM-DD.csv` |
    | Event leagues (shared) | `data/events/` | any name (`.csv`) |
+   | Significant game changes (shared) | `data/updates/` | any name (`.csv`, for example `updates.csv`) |
 
    `<dashboard>` is `en19` or `en5`. QI comes every two weeks and GBG once per season; the rest weekly. Missed weeks are fine, and charts break the line where data is missing.
 
@@ -77,10 +78,11 @@ Dashboard CSVs are `;`-separated. They are read with a BOM-safe encoding, so the
 | Eras | eraId, era, numberOfMembers, ... (only `numberOfMembers` is used) |
 | Members | rank, member_id, member, points, eraID, eraName, guildgoods, activity_warnings, messages, gex_participation, gbg_participation, qi_participation, won_battles, guildmember |
 | Event leagues | Year, Event, Type, Server, ServerName, then one column per league level |
+| Significant game changes | Date (YYYY-MM-DD), Time (optional, 24-hour server time such as 13:00), Description, Link (optional, must start with `https://` or `http://`). `;`-separated. |
 
 ## Files in the project
 
-- `build.py`: reads every CSV and writes `docs/data/<dashboard>/*.json`, `docs/data/dashboards.json` (the sections that have data for each dashboard) and `docs/data/events.json`.
+- `build.py`: reads every CSV and writes `docs/data/<dashboard>/*.json`, `docs/data/dashboards.json` (the sections that have data for each dashboard), `docs/data/events.json` and `docs/data/updates.json`.
 - `eras.py`: maps era names to eraIDs (used only when a treasury file has no `eraID` column).
 - `gb_short_forms.csv`: Great Building short forms (`Great Building;Short form`). A new Great Building prints a warning and shows its full name until a row is added.
 - `docs/index.html`: the whole site (menu, sidebar, all sections and tools). A Content-Security-Policy `<meta>` tag near the top limits what the page may load or send (see "Security notes").
@@ -129,6 +131,7 @@ To use it, run from the project folder:
 - Great Buildings: latest file only. Blue = the level went up (or the building is new) since the previous file; players who were not in the previous file are not marked. Gold = the highest level of that building (all tied owners). A ranking section below ranks the owners of a chosen building.
 - Guild Buildings: total guild goods per player and age (columns in the order of the eras in GuildGoods, short forms from `ERA_SHORT`), a Total row and column, a Num Members row from the Eras file, a ranking of members by total goods, and a Goods Watchlist by Age (ages with at least one member, lowest goods per member first).
 - Event League Reports: one section per event (Year + Event), with servers as rows (`en5:East-Nagach`) and the point thresholds for each league level as columns.
+- Significant Game Changes (`#/updates`): entries newest first, each showing the date, the server time if given (`5 Nov 2026, 13:00 Server Time`) and the description. When a Link is given the description is the clickable text and opens in a new tab. To add an entry, add a row to `data/updates/updates.csv` and run `python3 build.py`. The build stops with a plain message if a date or time cannot be read, and ignores (with a warning) a link that does not start with `https://` or `http://`.
 - Guild Expeditions Report Generator: upload a GE CSV (the file name does not matter) to get a text report to copy. Guild Contributions Processor: upload a treasury contributions log to get each player's totals by contribution type.
 
 ## Security notes

@@ -1,4 +1,4 @@
-"""Build docs/data/*.json for the dashboard from the CSVs in data/treasury, data/qi, data/gbg and data/ge."""
+"""Build docs/data/*.json for the site from the CSVs in data/ (dashboards, events and updates)."""
 import base64, csv, datetime as dt, getpass, json, os, re, unicodedata, pandas as pd
 from pathlib import Path
 from eras import ERA_ID
@@ -196,6 +196,29 @@ def event_leagues(folder):
             events.append({"year": year, "event": event, "type": ", ".join(dict.fromkeys(g["Type"])), "leagues": leagues, "servers": servers})
     return {"events": events}
 
+def game_updates(folder):
+    """Significant game changes from the CSV files in data/updates (any file name, ';' separated).
+    Columns: Date (YYYY-MM-DD), Time (optional, e.g. 13:00, server time), Description, Link (optional, http:// or https:// only). Newest first."""
+    rows = []
+    warn_unmatched(folder, "*.csv")
+    for f in sorted(Path(folder).glob("*.csv")):
+        df = pd.read_csv(f, sep=";", encoding="utf-8-sig", dtype=str, keep_default_na=False)
+        df.columns = [c.strip() for c in df.columns]
+        missing = [c for c in ("Date", "Description") if c not in df]
+        if missing: raise SystemExit(f"{f}: missing column(s) {', '.join(missing)} (expected Date;Time;Description;Link)")
+        for n, r in enumerate(df.to_dict("records"), 2):                      # n = the row's line number in the file
+            date, time, text, link = (r.get(c, "").strip() for c in ("Date", "Time", "Description", "Link"))
+            if not date and not text and not time and not link: continue     # skip blank lines
+            try: dt.date.fromisoformat(date)
+            except ValueError: raise SystemExit(f"{f} line {n}: the date '{date}' must look like 2026-11-05 (YYYY-MM-DD)")
+            if time and not re.fullmatch(r"([01]?\d|2[0-3]):[0-5]\d", time): raise SystemExit(f"{f} line {n}: the time '{time}' must look like 13:00")
+            if not text: raise SystemExit(f"{f} line {n}: the Description is empty")
+            if link and not re.match(r"https?://", link, re.I):
+                print(f"  WARNING: {f} line {n}: the link is ignored (it must start with https:// or http://)"); link = ""
+            rows.append({"date": date, "time": time.zfill(5) if time else "", "text": text, "link": link})
+    rows.sort(key=lambda r: (r["date"], r["time"]), reverse=True)
+    return {"updates": rows}
+
 # Treasury "Total Stock by Era" gets a Before / From toggle for dashboards listed here: en19 has no data between 2025-09-22 and
 # 2026-09-28 and its stock roughly doubled meanwhile, so one chart flattens the earlier years. Other dashboards are not listed.
 TREASURY_SPLIT = {"en19": "2026-01-01"}
@@ -233,4 +256,6 @@ def build(dash):
 manifest = {dash: build(dash) for dash in DASHBOARDS}
 Path("docs/data/dashboards.json").write_text(json.dumps(manifest))
 ev = event_leagues("data/events"); Path("docs/data/events.json").write_text(json.dumps(ev))
-print("events", len(ev["events"]), "events")   # tells the page which sections to show for each dashboard
+print("events", len(ev["events"]), "events")
+up = game_updates("data/updates"); Path("docs/data/updates.json").write_text(json.dumps(up))
+print("updates", len(up["updates"]), "entries")   # tells the page which sections to show for each dashboard

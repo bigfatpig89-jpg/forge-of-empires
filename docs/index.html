@@ -85,6 +85,12 @@
   .rngpick label + input + label { border-left:1px solid var(--line); }
   .rngpick input:checked + label { background:var(--accent); color:#fff; }
   .rngpick input:focus-visible + label { outline:2px solid var(--accent); outline-offset:-2px; }
+  .upd-list { list-style:none; margin:0; padding:0 0 8px; }
+  .upd-item { padding:12px 0; border-bottom:1px solid var(--line); }
+  .upd-item:last-child { border-bottom:0; }
+  .upd-when { font-weight:600; font-size:14px; color:var(--accent); }
+  .upd-text { margin:2px 0 0; }
+  .upd-text a { color:var(--accent); }
   .tbl-wrap { overflow-x:auto; padding-bottom:8px; }
   table.tbl { border-collapse:collapse; font-size:14px; min-width:320px; }
   .tbl th, .tbl td { text-align:left; padding:6px 24px 6px 0; border-bottom:1px solid var(--line); }
@@ -105,7 +111,7 @@
 </head>
 <body>
 <div class="top"><a class="site" href="#/">RMoose's Forge of Empires Assortment</a>
-  <div class="tabs"><a href="#/en19" data-t="en19">en19 (Uceria)</a><a href="#/en5" data-t="en5">en5 (East-Nagach)</a><a href="#/report" data-t="report">Report Generator</a><a href="#/contributions" data-t="contributions">Contributions Processor</a><a href="#/events" data-t="events">Event League Reports</a></div></div>
+  <div class="tabs"><a href="#/en19" data-t="en19">en19 (Uceria)</a><a href="#/en5" data-t="en5">en5 (East-Nagach)</a><a href="#/report" data-t="report">Report Generator</a><a href="#/contributions" data-t="contributions">Contributions Processor</a><a href="#/events" data-t="events">Event League Reports</a><a href="#/updates" data-t="updates">Significant Game Changes</a></div></div>
 <div class="app" id="app">
   <nav aria-label="Sections" id="side"></nav>
   <div class="content">
@@ -560,15 +566,25 @@ const menu = man => {
   $("view").innerHTML = `<div class="cards">${tiles}
   <a class="tile" href="#/report"><div class="kicker">Tool</div><h2>Guild Expeditions Report Generator</h2><p>Upload a Guild Expeditions CSV file and get a report ready to copy.</p></a>
   <a class="tile" href="#/contributions"><div class="kicker">Tool</div><h2>Guild Contributions Processor</h2><p>Upload a Guild Treasury contributions CSV file and get each player's totals by contribution type.</p></a>
-  <a class="tile" href="#/events"><div class="kicker">Data</div><h2>Event League Reports</h2><p>Point thresholds for each league level, by server.</p></a></div>`; };
+  <a class="tile" href="#/events"><div class="kicker">Data</div><h2>Event League Reports</h2><p>Point thresholds for each league level, by server.</p></a>
+  <a class="tile" href="#/updates"><div class="kicker">Updates</div><h2>Significant Game Changes</h2><p>Dated notes on important changes to the game.</p></a></div>`; };
 
-/* ---------- routing: #/  #/<dashboard>/<section>  #/report  #/contributions ---------- */
+/* ---------- routing: #/  #/<dashboard>/<section>  #/report  #/contributions  #/events  #/updates ---------- */
 const cache = {};
 function eventLeagues({events}) {     // one section per Year + Event: servers as rows, league thresholds as columns
   $("view").innerHTML = !events.length ? "<section><p>No event data yet.</p></section>" : events.map(e => `<section><h2>Event: ${escHtml(e.year)} ${escHtml(e.event)}</h2>
     <p>Minigame Type: ${escHtml(e.type)}</p>
     <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Server</th>${e.leagues.map(l => `<th class="num">${escHtml(l)}</th>`).join("")}</tr></thead><tbody>${
       e.servers.map(sv => `<tr><td>${escHtml(sv.server)}:${escHtml(sv.name)}</td>${sv.values.map(v => `<td class="num">${typeof v === "number" ? fmt.format(v) : escHtml(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></section>`).join("");
+}
+
+const MON3 = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const safeUrl = u => /^https?:\/\//i.test(u) ? u : "";      // only http(s) links become clickable
+function gameUpdates({updates}) {     // newest first (build.py sorts them); date, optional server time, then the description
+  $("view").innerHTML = !updates.length ? "<section><p>No updates yet.</p></section>" : `<section><ul class="upd-list">${updates.map(u => {
+    const [y, m, d] = u.date.split("-").map(Number), url = safeUrl(u.link || ""), text = escHtml(u.text);
+    return `<li class="upd-item"><div class="upd-when">${d} ${MON3[m - 1]} ${y}${u.time ? `, ${escHtml(u.time)} Server Time` : ""}</div><p class="upd-text">${
+      url ? `<a href="${escHtml(url)}" target="_blank" rel="noopener noreferrer">${text}</a>` : text}</p></li>`; }).join("")}</ul></section>`;
 }
 
 async function route() {
@@ -596,6 +612,11 @@ async function route() {
     $("title").textContent = document.title = "Event League Reports"; $("summary").textContent = "Point thresholds needed to reach each league level.";
     $("status").textContent = "Loading…";
     try { const d = await (await fetch("data/events.json", {cache:"no-cache"})).json(); $("status").textContent = ""; eventLeagues(d); }
+    catch (err) { $("status").textContent = "Something went wrong: " + err.message; } }
+  else if (a === "updates") {
+    $("title").textContent = document.title = "Significant Game Changes"; $("summary").textContent = "Important changes to the game, newest first.";
+    $("status").textContent = "Loading…";
+    try { const d = await (await fetch("data/updates.json", {cache:"no-cache"})).json(); $("status").textContent = ""; gameUpdates(d); }
     catch (err) { $("status").textContent = "Something went wrong: " + err.message; } }
   else if (a === "contributions") { $("title").textContent = document.title = "Guild Contributions Processor"; contributions(); }
   else { $("title").textContent = document.title = SITE; $("summary").textContent = "Choose a dashboard or tool."; menu(man); }
