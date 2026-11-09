@@ -111,7 +111,7 @@
 </head>
 <body>
 <div class="top"><a class="site" href="#/">RMoose's Forge of Empires Assortment</a>
-  <div class="tabs"><a href="#/en19" data-t="en19">en19 (Uceria)</a><a href="#/en5" data-t="en5">en5 (East-Nagach)</a><a href="#/report" data-t="report">Report Generator</a><a href="#/contributions" data-t="contributions">Contributions Processor</a><a href="#/events" data-t="events">Event League Reports</a><a href="#/updates" data-t="updates">Significant Game Changes</a></div></div>
+  <div class="tabs"><a href="#/en19" data-t="en19">en19 (Uceria)</a><a href="#/en5" data-t="en5">en5 (East-Nagach)</a><a href="#/report" data-t="report">GE Report Generator</a><a href="#/contributions" data-t="contributions">Contributions Processor</a><a href="#/events" data-t="events">Event League Reports</a><a href="#/updates" data-t="updates">Updates</a></div></div>
 <div class="app" id="app">
   <nav aria-label="Sections" id="side"></nav>
   <div class="content">
@@ -251,7 +251,12 @@ function scoreboard(key, {names, rows: allRows, meta}) {
     card(TT.board, cap ? `Active players in the selected week, ranked by encounters solved, then trial level, then expedition points.${tnote}` : "Active players in the selected season.",
          "board", picker("date", `${S.round[0].toUpperCase() + S.round.slice(1)} ended`)) +
     card(TT.player, cap ? `The selected player's solved encounters in every week they were in the guild, including weeks with none.${tnote}`
-                        : `The selected player's score in every ${S.round} they were active.`, "player", picker("who", "Player"));
+                        : `The selected player's score in every ${S.round} they were active.`, "player", picker("who", "Player")) +
+    (cap ? `<section><h2>Report Generator</h2><p>Choose a week to get its Guild Expeditions report, ready to copy. It counts every player in the guild that week, including inactive ones. Ranking and Guild Power are not in the data, so type them in.</p>
+      <div class="fields"><div class="picker"><label for="grweek">Week</label><select id="grweek"></select></div></div>
+      <div class="fields"><label for="grrank">Ranking</label><input type="text" id="grrank" size="10"><label for="grpower">Guild Power</label><input type="text" id="grpower" size="16"></div>
+      <textarea id="grout" rows="12" aria-label="Report text" readonly></textarea>
+      <div class="fields"><button type="button" id="grcopy">Copy report</button><span id="grmsg" role="status"></span></div></section>` : "");
 
   // team chart
   const tot = {}, cnt = {}, ros = {};
@@ -330,6 +335,17 @@ function scoreboard(key, {names, rows: allRows, meta}) {
       {...lineLayout(dates), barmode:"stack", showlegend:S.parts({}).length > 1}, cfg);
   };
   wsel.onchange = hist; hist();
+
+  // report generator (GE only): the same report as the Report Generator tool, for any week in the data
+  if (cap) {
+    const gsel = fill("grweek", [...dates].reverse().map(d => [d, d]));
+    const draw = () => { const r = allRows.filter(x => x.date === gsel.value).map(x => ({solved:x.s, points:x.p || 0}));
+      $("grout").value = geReportDate(gsel.value) + "\n" + geReportText(r, $("grrank").value, $("grpower").value); $("grmsg").textContent = ""; };
+    gsel.onchange = $("grrank").oninput = $("grpower").oninput = draw; draw();
+    $("grcopy").onclick = async () => { const t = $("grout").value;
+      try { await navigator.clipboard.writeText(t); } catch { $("grout").select(); document.execCommand("copy"); }
+      $("grmsg").textContent = "Copied"; };
+  }
 }
 
 /* ---------- Guild Expeditions Report Generator ---------- */
@@ -348,6 +364,15 @@ function parseCsv(text) {
   return out;
 }
 const escHtml = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;"}[c]));
+const geReportText = (r, rank, power) => {      // r = [{solved, points}] for one week (every player in the file, including 0 encounters)
+  const n = (lo, hi) => r.filter(x => x.solved >= lo && x.solved <= hi).length, m = k => `${k} ${k === 1 ? "member" : "members"}`;
+  return [`Ranking: ${rank}`, `Expedition Points: ${fmt.format(r.reduce((a, x) => a + x.points, 0))}`, `Guild Power: ${power}`,
+    `${m(n(80, 1e9))} completed level 5 (80 encounters)`, `${m(n(64, 79))} completed level 4 (64-79 encounters)`,
+    `${m(n(48, 63))} completed level 3 (48-63 encounters)`, `${m(n(32, 47))} completed level 2 (32-47 encounters)`,
+    `${m(n(16, 31))} completed level 1 (16-31 encounters)`, `${m(n(1, 15))} did not complete level 1 (1-15 encounters)`,
+    `${m(n(0, 0))} did not start (0 encounters)`].join("\n");
+};
+const geReportDate = wk => { const [y, mo, d] = wk.split("-").map(Number); return `Date: ${ord(d)} ${FULL[mo - 1]} ${y}`; };
 function report() {
   $("view").innerHTML = `<section><h2>Guild Expeditions report</h2>
     <p>Upload a Guild Expeditions CSV file (by default called Participation.csv). It is read in your browser and is not uploaded anywhere.</p>
@@ -360,14 +385,8 @@ function report() {
   let rows = [];
   const draw = () => {
     const wk = $("rweek").value; if (!rows.length || !wk) return;
-    const r = rows.filter(x => x.week === wk), n = (lo, hi) => r.filter(x => x.solved >= lo && x.solved <= hi).length;
-    const m = k => `${k} ${k === 1 ? "member" : "members"}`, [y, mo, d] = wk.split("-").map(Number);
-    $("rout").value = [`Date: ${ord(d)} ${FULL[mo - 1]} ${y}`, `Ranking: ${$("rrank").value}`,
-      `Expedition Points: ${fmt.format(r.reduce((a, x) => a + x.points, 0))}`, `Guild Power: ${$("rpower").value}`,
-      `${m(n(80, 1e9))} completed level 5 (80 encounters)`, `${m(n(64, 79))} completed level 4 (64-79 encounters)`,
-      `${m(n(48, 63))} completed level 3 (48-63 encounters)`, `${m(n(32, 47))} completed level 2 (32-47 encounters)`,
-      `${m(n(16, 31))} completed level 1 (16-31 encounters)`, `${m(n(1, 15))} did not complete level 1 (1-15 encounters)`,
-      `${m(n(0, 0))} did not start (0 encounters)`].join("\n");
+    const r = rows.filter(x => x.week === wk);
+    $("rout").value = geReportDate(wk) + "\n" + geReportText(r, $("rrank").value, $("rpower").value);
     const head = rows.head, num = head.map((_, i) => r.every(x => /^-?[\d,.]+$/.test(x.cells[i] ?? "")));
     $("rtbl").innerHTML = `<table class="tbl"><thead><tr>${head.map((t, i) => `<th${num[i] ? ' class="num"' : ""}>${escHtml(t)}</th>`).join("")}</tr></thead><tbody>${
       r.map(x => `<tr>${head.map((_, i) => `<td${num[i] ? ' class="num"' : ""}>${escHtml(x.cells[i] ?? "")}</td>`).join("")}</tr>`).join("")}</tbody></table>`;

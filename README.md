@@ -132,7 +132,8 @@ To use it, run from the project folder:
 - Guild Buildings: total guild goods per player and age (columns in the order of the eras in GuildGoods, short forms from `ERA_SHORT`), a Total row and column, a Num Members row from the Eras file, a ranking of members by total goods, and a Goods Watchlist by Age (ages with at least one member, lowest goods per member first).
 - Event League Reports: one section per event (Year + Event), with servers as rows (`en5:East-Nagach`) and the point thresholds for each league level as columns.
 - Significant Game Changes (`#/updates`): entries newest first, each showing the date, the server time if given (`5 Nov 2026, 13:00 Server Time`) and the description. When a Link is given the description is the clickable text and opens in a new tab. To add an entry, add a row to `data/updates/updates.csv` and run `python3 build.py`. The build stops with a plain message if a date or time cannot be read, and ignores (with a warning) a link that does not start with `https://` or `http://`.
-- Guild Expeditions Report Generator: upload a GE CSV (the file name does not matter) to get a text report to copy. Guild Contributions Processor: upload a treasury contributions log to get each player's totals by contribution type.
+- Guild Expeditions page, Report Generator section (below Player History, both dashboards): pick any week in the data to get the same text report as the Report Generator tool, with a Copy button. Ranking and Guild Power are not in the data, so they are typed in (they stay when the week changes). It counts every player in the guild that week, including inactive ones. It needs no extra data or weekly action.
+- Guild Expeditions Report Generator (top bar: GE Report Generator): upload a GE CSV (the file name does not matter) to get a text report to copy. Guild Contributions Processor: upload a treasury contributions log to get each player's totals by contribution type.
 
 ## Security notes
 
