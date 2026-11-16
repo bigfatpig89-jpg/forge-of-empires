@@ -69,7 +69,7 @@ Dashboard CSVs are `;`-separated. They are read with a BOM-safe encoding, so the
 
 | Section | Columns |
 |---|---|
-| Treasury | eraID, era, good, produceable, instock |
+| Treasury | eraID, era, good, produceable (not used, see below), instock |
 | QI | Player_ID, Player, Actions, Progress (Progress is the per-season score) |
 | GBG | player_id, player, negotiations, battles, total, or the newer Player_ID, Player, Negotiations, Fights, Total, Attrition. Total = 2 x negotiations + battles. Cells like `1388 ↑ 15` are read as 1388. |
 | GE | gexWeek, player ID, player, expeditionPoints, solvedEncounters, rank, trial. The week comes from the `gexWeek` column, not the file name. |
@@ -79,6 +79,8 @@ Dashboard CSVs are `;`-separated. They are read with a BOM-safe encoding, so the
 | Members | rank, member_id, member, points, eraID, eraName, guildgoods, activity_warnings, messages, gex_participation, gbg_participation, qi_participation, won_battles, guildmember |
 | Event leagues | Year, Event, Type, Server, ServerName, then one column per league level |
 | Significant game changes | Date (YYYY-MM-DD), Time (optional, 24-hour server time such as 13:00), Description, Link (optional, must start with `https://` or `http://`). `;`-separated. |
+
+**The Treasury `produceable` column is not used.** The game only updates that value after every guild member's city has been visited, which is not done, so it would be out of date. `build.py` copies it into `treasury.json`, but the site never shows it; only `instock` is used.
 
 ## Files in the project
 
@@ -119,7 +121,10 @@ To use it, run from the project folder:
 
 - Put the member exports in `data/<dashboard>/members/`. `build.py` asks for the password when it runs (typing is hidden), or reads the `MEMBERS_PASSWORD` environment variable. It writes only an encrypted `members.json`; the browser decrypts it after the password is entered. The password is never stored in the repo. Use a long password (12+ characters). Needs `pip install cryptography`.
 - **Never commit the raw member CSVs.** `data/*/members/` and any `member*.csv` (anywhere in the project) are in `.gitignore`. Before pushing, `git status` should not list any member CSV. The data is not highly sensitive and the password is deliberately simple, so it keeps the section away from other guild members rather than from a determined attacker: the encrypted file is public and its password can be guessed offline.
-- Members table: red name and red cell when Last GE, Last GBG or Last QI is under its minimum. Top 10 gainers (points, percentage, battles won) compare the latest file with the previous one, and a button copies them as text.
+- Week selector (top of the page): lists every member file date (the Monday dates) and defaults to the latest. It controls every section on the page: the chosen week is compared with the file before it. The earliest file has nothing to compare with, so it shows only the Members table.
+- Members table: red name and red cell when Last GE, Last GBG or Last QI is under its minimum.
+- Membership Changes (just before Copy top 10 gainers): New members (in the chosen file but not the previous one) and Members who left (in the previous file but not the chosen one), each with name and ID, and Name Changes (members whose ID is in both files but whose name differs), with ID, Previous Name and Current Name. Members are matched by player ID, so a name change is listed under Name Changes and is not counted as a new member or a member who left. If a file skips a week, the changes cover the whole gap between the two files shown.
+- Top 10 gainers (points, percentage, battles won) compare the chosen file with the previous one, and a button copies them as text.
 - Two kinds of member file exist. FoE Helper files have no `qi_participation` column and their GE and GBG participation values are counters, not season points. For those files `build.py` fills Last GE, Last GBG and Last QI from the GE, GBG and QI files of the same week (QI and GBG: the latest season that ended on or before the file's date, within 14 days; blank if there is none). Forge Hammer files have `qi_participation` and are used as they are. The page explains this under the table.
 
 ## Notes on the pages

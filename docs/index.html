@@ -469,8 +469,8 @@ function membersPage(p) {
   $("mgo").onclick = go; $("mpw").onkeydown = e => { if (e.key === "Enter") go(); };
   $("mpw").focus();
 }
-function showMembers(d) {
-  const dates = [...new Set(d.rows.map(r => r.date))].sort(), ld = dates.at(-1), pd = dates.at(-2);
+function showMembers(d, sel) {                   // sel = the chosen week (a member file's date, a Monday); the latest file by default
+  const dates = [...new Set(d.rows.map(r => r.date))].sort(), ld = dates.includes(sel) ? sel : dates.at(-1), pd = dates[dates.indexOf(ld) - 1];   // pd = the file before the chosen one
   const cur = d.rows.filter(r => r.date === ld).sort((a, b) => a.rank - b.rank), prev = Object.fromEntries(d.rows.filter(r => r.date === pd).map(r => [r.id, r]));
   const T = (head, rows, num) => `<div class="tbl-wrap"><table class="tbl"><thead><tr>${head.map((t, i) => `<th${num[i] ? ' class="num"' : ""}>${escHtml(t)}</th>`).join("")}</tr></thead><tbody>${
     rows.map(r => `<tr>${r.map((c, i) => `<td${num[i] ? ' class="num"' : ""}>${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
@@ -481,7 +481,8 @@ function showMembers(d) {
   $("summary").textContent = `Member data from ${ld}` + (pd ? `, compared with ${pd}.` : ".");
   const fh = d.rows.filter(r => !r.filled).map(r => r.date).sort()[0], filled = cur.some(r => r.filled);
   const note = `<p style="margin-top:12px">About the files: member files exported by FoE Helper have no QI column, and their GE and GBG participation values were counters rather than season points. For those files, Last GE, Last GBG and Last QI are taken from the GE, GBG and QI files of the same week (blank where there is no such file). Member files from ForgeHammer${fh ? ` (from ${fh})` : ""} already contain all three season values. The file shown here (${ld}) ${filled ? "was filled in from the season files." : "is a ForgeHammer file."}</p>`;
-  let html = `<section><h2>Members</h2><p>Members with a red name are below the minimum for Last GE (${MIN.ge}), Last GBG (${MIN.gbg}) or Last QI (${MIN.qi}).</p>${
+  let html = `<section><h2>Week</h2><p>Choose the week (the Monday date of the member file). Every section below shows that week, compared with the file before it.</p>${picker("mweek", "Week")}</section>`
+    + `<section><h2>Members</h2><p>Members with a red name are below the minimum for Last GE (${MIN.ge}), Last GBG (${MIN.gbg}) or Last QI (${MIN.qi}).</p>${
     T(["Rank", "ID", "Name", "Points", "Era", "Last GE", "Last GBG", "Last QI", "Battles Won"], info, [1, 1, 0, 1, 0, 1, 1, 1, 1])}${note}</section>`;
   let text = "";
   if (pd) {
@@ -491,6 +492,12 @@ function showMembers(d) {
     const byPts = top(both, gain), byPct = top(both.filter(r => r.p0 > 0), r => (r.p1 - r.p0) / r.p0), byBat = top(both, bat);
     const sec = (title, head, list, c1, c0, g) => `<section><h2>${title}</h2><p>Compared with the previous file (${pd}). Members who were not in both files are left out.</p>${
       T(["Name", `${head} ${ld}`.replace(/^/, "Current "), `Previous ${head} ${pd}`, g[0]], list.map(r => [escHtml(r.name), fmt.format(r[c1]), fmt.format(r[c0]), g[1](r)]), [0, 1, 1, 1])}</section>`;
+    const curIds = new Set(cur.map(r => r.id)), joined = cur.filter(r => !prev[r.id]), left = d.rows.filter(r => r.date === pd && !curIds.has(r.id)).sort((a, b) => a.rank - b.rank);   // matched by ID, so a name change is not a join or a leave
+    const chg = list => list.length ? T(["Name", "ID"], list.map(r => [escHtml(r.name), r.id]), [0, 1]) : "<p>None.</p>";
+    const renamed = cur.filter(r => prev[r.id] && prev[r.id].name !== r.name);                    // in both files with the same ID but a different name
+    const ren = renamed.length ? T(["ID", "Previous Name", "Current Name"], renamed.map(r => [r.id, escHtml(prev[r.id].name), escHtml(r.name)]), [1, 0, 0]) : "<p>None.</p>";
+    html += `<section><h2>Membership Changes</h2><p>Compared with the previous file (${pd}). Members are matched by player ID, so a name change is listed under Name Changes and does not count as a new member or a member who left. New members are shown with their name in ${ld}, members who left with their name in ${pd}.</p>
+      <h3>New members (${joined.length})</h3>${chg(joined)}<h3 style="margin-top:16px">Members who left (${left.length})</h3>${chg(left)}<h3 style="margin-top:16px">Name Changes (${renamed.length})</h3>${ren}</section>`;
     html += `<section><h2>Copy top 10 gainers</h2><p>Copies the three top 10 lists below as text, with each member's name and gain only.</p><div class="fields"><button type="button" id="mcopy">Copy top 10 gainers</button><span id="mcmsg" role="status"></span></div></section>`
       + sec("Top 10 gainers: points", "Points", byPts, "p1", "p0", ["Gain", r => fmt.format(gain(r))])
       + sec("Top 10 gainers: percentage", "Points", byPct, "p1", "p0", ["% Gain", pct])
@@ -498,8 +505,10 @@ function showMembers(d) {
     const block = (t, list, f) => { const w = Math.max(0, ...list.map(r => [...r.name].length));     // names padded to one width so the values start in the same column
       return `${t} (${pd} to ${ld})\n` + list.map(r => `${r.name}${" ".repeat(w - [...r.name].length)}  ${f(r)}`).join("\n"); };
     text = [block("Top 10 gainers: points", byPts, r => fmt.format(gain(r))), block("Top 10 gainers: percentage", byPct, pct), block("Top 10 gainers: battles won", byBat, r => fmt.format(bat(r)))].join("\n\n");
-  } else html += "<section><h2>Top 10 gainers</h2><p>Two member files are needed to compare weeks.</p></section>";
+  } else html += "<section><h2>Membership Changes and Top 10 gainers</h2><p>This is the earliest member file, so there is no previous file to compare with.</p></section>";
   $("view").innerHTML = html;
+  const wsel = fill("mweek", [...dates].reverse().map(x => [x, x])); wsel.value = ld;
+  wsel.onchange = () => { showMembers(d, wsel.value); $("mweek").focus(); };
   if (pd) $("mcopy").onclick = async () => {
     try { await navigator.clipboard.writeText(text); }
     catch { const t = document.createElement("textarea"); t.value = text; document.body.append(t); t.select(); document.execCommand("copy"); t.remove(); }
