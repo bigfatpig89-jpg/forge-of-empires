@@ -53,11 +53,17 @@ def season_lookup(rows):
     for r in rows: by.setdefault(r["date"], {})[r["id"]] = r["s"]
     return by
 
-def season_value(by, date, pid, exact):
-    """What a member scored in the GE week / QI or GBG season that matches a member file's date (None if there is no such season)."""
+def season_key(by, date, exact):
+    """The date of the GE week / QI or GBG season that matches a member file's date (None if there is no such season).
+    GE: the week of the same Monday. QI and GBG: the latest completed season dated on or before the member file, within 14 days."""
     mon = dt.date.fromisoformat(date); mon -= dt.timedelta(days=mon.weekday())        # files dated Tuesday belong to that Monday
     ok = [d for d in by if (d == mon.isoformat() if exact else 0 <= (mon - dt.date.fromisoformat(d)).days <= 14)]
-    return by[max(ok)].get(pid, 0) if ok else None                                  # QI/GBG: the latest season that ended on or before the file
+    return max(ok) if ok else None
+
+def season_value(by, date, pid, exact):
+    """What a member scored in that week / season (0 if not listed, None if there is no such season)."""
+    k = season_key(by, date, exact)
+    return None if k is None else by[k].get(pid, 0)
 
 GB_ERAS = ["BronzeAge", "IronAge", "EarlyMiddleAge", "HighMiddleAge", "LateMiddleAge", "ColonialAge", "IndustrialAge", "ProgressiveEra", "ModernEra",
            "PostModernEra", "ContemporaryEra", "TomorrowEra", "FutureEra", "ArcticFuture", "OceanicFuture", "VirtualFuture", "SpaceAgeMars",
@@ -106,26 +112,26 @@ def guild_buildings(folder, eras_folder):
 
 def members(folder, out):
     """Member exports (Member-YYYY-MM-DD.csv); the date comes from the file name.
-    FoE Helper files (no qi_participation column) hold counters instead of season points, so their
-    Last GE / GBG / QI values are filled in from the GE, GBG and QI files of the same week."""
+    The member files' own GE / GBG / QI participation columns are NOT used: FoE Helper files hold counters, and ForgeHammer files can be
+    out of date when the completed season rankings were not visited first. Last GE / GBG / QI always come from the GE, GBG and QI files
+    (which are saved after visiting the completed rankings): the GE week of the same Monday, and the latest completed QI / GBG season."""
     ge, gbg, qi = (season_lookup(out[k]["rows"]) for k in ("ge", "gbg", "qi"))
     opt = lambda v: None if v is None or pd.isna(v) else int(v)
-    rows = []
+    rows, src = [], {}
     warn_unmatched(folder, "Member-*.csv")
     for f in sorted(Path(folder).glob("Member-*.csv")):
         df = pd.read_csv(f, sep=";", encoding="utf-8-sig")
         if "guildmember" in df: df = df[df["guildmember"] != 0]            # keep current members only
-        helper = "qi_participation" not in df                               # ForgeHammer files have this column, FoE Helper files do not
         date = file_date(f)
+        src[date] = {k: season_key(by, date, k == "ge") for k, by in (("ge", ge), ("gbg", gbg), ("qi", qi))}     # which GE week / seasons the values come from
+        for k, label in (("ge", "GE"), ("gbg", "GBG"), ("qi", "QI")):
+            if src[date][k] is None: print(f"  WARNING: {f}: no {label} file matches this date, so Last {label} is left blank")
         for r in df.to_dict("records"):
             row = {"date": date, "id": int(r["member_id"]), "rank": int(r["rank"]), "name": r["member"], "points": int(r["points"]),
-                   "era": r.get("eraName"), "ge": opt(r.get("gex_participation")), "gbg": opt(r.get("gbg_participation")),
-                   "qi": opt(r.get("qi_participation")), "wb": opt(r.get("won_battles"))}
-            if helper:
-                pid = row["id"]; row.update(ge=season_value(ge, date, pid, True), gbg=season_value(gbg, date, pid, False),
-                                            qi=season_value(qi, date, pid, False), filled=True)
+                   "era": r.get("eraName"), "wb": opt(r.get("won_battles"))}
+            pid = row["id"]; row.update(ge=season_value(ge, date, pid, True), gbg=season_value(gbg, date, pid, False), qi=season_value(qi, date, pid, False))
             rows.append(row)
-    return {"rows": rows}
+    return {"rows": rows, "src": src}
 
 ITER = 600_000
 _password = None

@@ -19,6 +19,16 @@ Note the two different `data` folders: `data/` holds the CSV inputs, `docs/data/
 
 ## Weekly update
 
+**Order of pulling the data (from Monday 23 Nov 2026).** Collect the exports in this order, using FoE Helper / Forge Hammer, as soon after Monday 8am server time as possible:
+
+1. Visit the completed GE and GBG / QI season rankings first. This updates the participation values in the Member export, and gives the GE, GBG and QI exports.
+2. Visit each member's city. This updates the data in the Great Buildings, Guild Buildings and Guild Treasury exports.
+3. Download the remaining exports: Member and Eras.
+
+Before 23 Nov 2026 the member cities were not visited, and the Member export was sometimes taken before the completed rankings (so its participation numbers could be out of date).
+
+Then, with the exports saved:
+
 1. Save each new export in the matching folder, named with the snapshot date (use the Monday):
 
    | Section | Folder | File name |
@@ -76,11 +86,11 @@ Dashboard CSVs are `;`-separated. They are read with a BOM-safe encoding, so the
 | Great Buildings | gbname, city_entity_id, member, level, max_level, ... (only `level` is shown) |
 | Guild Buildings | building, level, eraId, era, member, guildPower, guildGoods (only `guildGoods` is used) |
 | Eras | eraId, era, numberOfMembers, ... (only `numberOfMembers` is used) |
-| Members | rank, member_id, member, points, eraID, eraName, guildgoods, activity_warnings, messages, gex_participation, gbg_participation, qi_participation, won_battles, guildmember |
+| Members | rank, member_id, member, points, eraID, eraName, guildgoods, activity_warnings, messages, gex_participation, gbg_participation, qi_participation (these three are not used, see Members section), won_battles, guildmember |
 | Event leagues | Year, Event, Type, Server, ServerName, then one column per league level |
 | Significant game changes | Date (YYYY-MM-DD), Time (optional, 24-hour server time such as 13:00), Description, Link (optional, must start with `https://` or `http://`). `;`-separated. |
 
-**The Treasury `produceable` column is not used.** The game only updates that value after every guild member's city has been visited, which is not done, so it would be out of date. `build.py` copies it into `treasury.json`, but the site never shows it; only `instock` is used.
+**The Treasury `produceable` column is not used.** The game only updates that value after every guild member's city has been visited. That was not done before 23 Nov 2026, so the values in the older files are out of date. From 23 Nov 2026 the weekly order of pulling the data includes visiting each member's city, so the value is accurate in files from that date on. `build.py` still copies it into `treasury.json`, but the site never shows it; only `instock` is used. If it is ever used, ignore the files dated before 2026-11-23.
 
 ## Files in the project
 
@@ -125,7 +135,7 @@ To use it, run from the project folder:
 - Members table: red name and red cell when Last GE, Last GBG or Last QI is under its minimum.
 - Membership Changes (just before Copy top 10 gainers): New members (in the chosen file but not the previous one) and Members who left (in the previous file but not the chosen one), each with name and ID, and Name Changes (members whose ID is in both files but whose name differs), with ID, Previous Name and Current Name. Members are matched by player ID, so a name change is listed under Name Changes and is not counted as a new member or a member who left. If a file skips a week, the changes cover the whole gap between the two files shown.
 - Top 10 gainers (points, percentage, battles won) compare the chosen file with the previous one, and a button copies them as text.
-- Two kinds of member file exist. FoE Helper files have no `qi_participation` column and their GE and GBG participation values are counters, not season points. For those files `build.py` fills Last GE, Last GBG and Last QI from the GE, GBG and QI files of the same week (QI and GBG: the latest season that ended on or before the file's date, within 14 days; blank if there is none). Forge Hammer files have `qi_participation` and are used as they are. The page explains this under the table.
+- **Last GE, Last GBG and Last QI always come from the GE, GBG and QI files, never from the member file** (even though, with the order of pulling data from 23 Nov 2026, the Member export should now be up to date too). The member file's own `gex_participation`, `gbg_participation` and `qi_participation` columns are ignored: FoE Helper files hold running counters, and Forge Hammer files can be out of date if the completed season rankings were not visited before exporting. The GE, GBG and QI files are saved after visiting the completed rankings, so they are reliable. Last GE is the GE week of the same Monday. Last GBG and Last QI are the latest completed season dated on or before the member file, within 14 days, so mid-season the last completed season is shown. A player not listed in that file shows 0; where no matching file exists the value is blank. `build.py` prints a `WARNING` for each member file and section with no matching file, and the page states under the table which week or season each value comes from. So save the GE, GBG and QI files for the same Monday before building.
 
 ## Notes on the pages
 
