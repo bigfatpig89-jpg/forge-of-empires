@@ -48,6 +48,10 @@ def scores(df, id_col, name_col, cols):
     return {"names": {str(k): v for k, v in names.items()},
             "rows": df[["date", "id"] + list(cols)].sort_values(["date", "s"], ascending=[True, False]).to_dict("records")}
 
+def listed_ids(df, id_col):
+    """Every player ID that a QI / GBG file lists on each date, zero scores included (scores() keeps only the active players)."""
+    return {} if df.empty else {d: set(g[id_col].dropna().astype(int)) for d, g in df.groupby("date")}
+
 def season_lookup(rows):
     by = {}
     for r in rows: by.setdefault(r["date"], {})[r["id"]] = r["s"]
@@ -62,10 +66,13 @@ def season_key(by, date):
     ok = [d for d in by if d <= monday_of(date).isoformat()]
     return max(ok) if ok else None
 
-def season_value(by, date, pid):
-    """What a member scored in that week / season (0 if not listed, None if there is no such season)."""
-    k = season_key(by, date)
-    return None if k is None else by[k].get(pid, 0)
+def season_value(by, listed, date, pid):
+    """What a member scored in that week / season: the score, 0 if the file lists the player without a score, "NEW" if the file does not
+    list the player at all (for example, they joined after the season began), None if there is no such season."""
+    k = season_key(listed, date)
+    if k is None: return None
+    if pid in by.get(k, {}): return by[k][pid]
+    return 0 if pid in listed[k] else "NEW"
 
 GB_ERAS = ["BronzeAge", "IronAge", "EarlyMiddleAge", "HighMiddleAge", "LateMiddleAge", "ColonialAge", "IndustrialAge", "ProgressiveEra", "ModernEra",
            "PostModernEra", "ContemporaryEra", "TomorrowEra", "FutureEra", "ArcticFuture", "OceanicFuture", "VirtualFuture", "SpaceAgeMars",
@@ -112,13 +119,15 @@ def guild_buildings(folder, eras_folder):
     return {"eras": [{"id": int(r.eraId), "name": r.era, "short": ERA_SHORT.get(int(r.eraId), r.era)} for r in eras.itertuples()], "members": members,
             "rows": [{"date": r.date, "p": r.member, "e": int(r.eraId), "n": int(r.n), "g": int(r.g), "l": int(r.l)} for r in g.itertuples()]}
 
-def members(folder, out):
+def members(folder, out, listed):
     """Member exports (Member-YYYY-MM-DD.csv); the date comes from the file name.
     The member files' own GE / GBG / QI participation columns are NOT used: FoE Helper files hold counters, and ForgeHammer files can be
     out of date when the completed season rankings were not visited first. Last GE / GBG / QI always come from the GE, GBG and QI files
     (which are saved after visiting the completed rankings): the GE week of the same Monday, and the latest completed QI / GBG season.
-    If a file is missing, the latest earlier one is used (with a WARNING); blank only when there is no earlier file at all."""
+    If a file is missing, the latest earlier one is used (with a WARNING); blank only when there is no earlier file at all.
+    A member the file lists without a score shows 0; a member the file does not list at all (for example, joined after the season began) shows "NEW"."""
     ge, gbg, qi = (season_lookup(out[k]["rows"]) for k in ("ge", "gbg", "qi"))
+    L = {"ge": {d: set(v) for d, v in ge.items()}, "gbg": listed["gbg"], "qi": listed["qi"]}     # who each file lists (GE files list every player, zero scores included)
     opt = lambda v: None if v is None or pd.isna(v) else int(v)
     rows, src = [], {}
     warn_unmatched(folder, "Member-*.csv")
@@ -126,7 +135,7 @@ def members(folder, out):
         df = pd.read_csv(f, sep=";", encoding="utf-8-sig")
         if "guildmember" in df: df = df[df["guildmember"] != 0]            # keep current members only
         date = file_date(f)
-        src[date] = {k: season_key(by, date) for k, by in (("ge", ge), ("gbg", gbg), ("qi", qi))}     # which GE week / seasons the values come from
+        src[date] = {k: season_key(L[k], date) for k in ("ge", "gbg", "qi")}     # which GE week / seasons the values come from
         for k, label in (("ge", "GE"), ("gbg", "GBG"), ("qi", "QI")):
             used, age = src[date][k], None if src[date][k] is None else (monday_of(date) - dt.date.fromisoformat(src[date][k])).days
             if used is None: print(f"  WARNING: {f}: there is no {label} file on or before this date, so Last {label} is left blank")
@@ -134,7 +143,7 @@ def members(folder, out):
         for r in df.to_dict("records"):
             row = {"date": date, "id": int(r["member_id"]), "rank": int(r["rank"]), "name": r["member"], "points": int(r["points"]),
                    "era": r.get("eraName"), "wb": opt(r.get("won_battles"))}
-            pid = row["id"]; row.update(ge=season_value(ge, date, pid), gbg=season_value(gbg, date, pid), qi=season_value(qi, date, pid))
+            pid = row["id"]; row.update(ge=season_value(ge, L["ge"], date, pid), gbg=season_value(gbg, L["gbg"], date, pid), qi=season_value(qi, L["qi"], date, pid))
             rows.append(row)
     return {"rows": rows, "src": src}
 
@@ -243,8 +252,10 @@ def build(dash):
     out["treasury"] = {"rows": [] if t.empty else t.sort_values(["date", "eraID"], kind="stable")
                        [["date", "eraID", "era", "good", "produceable", "instock"]].to_dict("records"),
                        "meta": {"split": TREASURY_SPLIT.get(dash)}}
-    out["qi"] = scores(load(f"{base}/qi", "QI"), "Player_ID", "Player", {"a": "Actions", "s": "Progress"})
-    out["gbg"] = scores(load(f"{base}/gbg", "GBG", gbg_columns), "player_id", "player", {"n": "negotiations", "b": "battles", "s": "total"})
+    qi_df, gbg_df = load(f"{base}/qi", "QI"), load(f"{base}/gbg", "GBG", gbg_columns)
+    out["qi"] = scores(qi_df, "Player_ID", "Player", {"a": "Actions", "s": "Progress"})
+    out["gbg"] = scores(gbg_df, "player_id", "player", {"n": "negotiations", "b": "battles", "s": "total"})
+    listed = {"qi": listed_ids(qi_df, "Player_ID"), "gbg": listed_ids(gbg_df, "player_id")}
     out["ge"] = guild_expeditions(f"{base}/ge")
     out["greatbuildings"] = great_buildings(f"{base}/greatbuildings")
     out["guildbuildings"] = guild_buildings(f"{base}/guildbuildings", f"{base}/eras")
@@ -253,7 +264,7 @@ def build(dash):
         Path(f"docs/data/{dash}/{name}.json").write_text(json.dumps(d, separators=(",", ":")))
         print(dash, name, len(d["rows"]), "rows")
     sections = [name for name, d in out.items() if d["rows"]]       # the sections that have data
-    m = members(f"{base}/members", out)
+    m = members(f"{base}/members", out, listed)
     if m["rows"]:                                                    # members are only ever written encrypted
         pw = password()
         if not pw: print(dash, "members: no password given, section skipped")
