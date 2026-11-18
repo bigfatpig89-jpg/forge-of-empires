@@ -119,6 +119,8 @@ def guild_buildings(folder, eras_folder):
     return {"eras": [{"id": int(r.eraId), "name": r.era, "short": ERA_SHORT.get(int(r.eraId), r.era)} for r in eras.itertuples()], "members": members,
             "rows": [{"date": r.date, "p": r.member, "e": int(r.eraId), "n": int(r.n), "g": int(r.g), "l": int(r.l)} for r in g.itertuples()]}
 
+WARN_FROM = "2026-08-01"    # missing-season-file warnings are printed only for member files dated on or after this (older gaps are known and accepted)
+
 def members(folder, out, listed):
     """Member exports (Member-YYYY-MM-DD.csv); the date comes from the file name.
     The member files' own GE / GBG / QI participation columns are NOT used: FoE Helper files hold counters, and ForgeHammer files can be
@@ -138,6 +140,7 @@ def members(folder, out, listed):
         src[date] = {k: season_key(L[k], date) for k in ("ge", "gbg", "qi")}     # which GE week / seasons the values come from
         for k, label in (("ge", "GE"), ("gbg", "GBG"), ("qi", "QI")):
             used, age = src[date][k], None if src[date][k] is None else (monday_of(date) - dt.date.fromisoformat(src[date][k])).days
+            if date < WARN_FROM: continue
             if used is None: print(f"  WARNING: {f}: there is no {label} file on or before this date, so Last {label} is left blank")
             elif age > (0 if k == "ge" else 14): print(f"  WARNING: {f}: no {label} file for this date, so Last {label} uses the latest earlier one ({used})")
         for r in df.to_dict("records"):
