@@ -42,6 +42,12 @@
   .topkey { padding:0 6px; border-radius:4px; font-weight:600; color:#111; }
   .tbl tr.mem td { font-weight:600; }
   .tbl tr.newmem td { background:#dbeafe; }
+  .tbl td.evmax, span.evmax { background:#f4c430; font-weight:600; }
+  .tbl td.evmin, span.evmin { background:#ccfbf1; color:#0f766e; font-weight:600; }
+  .evkey span { padding:1px 6px; border-radius:3px; }
+  .evrow { display:flex; flex-wrap:wrap; gap:8px 28px; align-items:flex-start; }
+  .evtbl { flex:0 1 auto; max-width:100%; }
+  .evchart { flex:1 1 380px; min-width:0; }
   .tbl td.tc { font-weight:700; }
   .tbl.gbld th.num { white-space:normal; min-width:48px; font-size:12px; line-height:1.25; vertical-align:bottom; padding:6px 8px; }
   .tbl.gbld td.num { padding:6px 8px; }
@@ -601,11 +607,31 @@ const menu = man => {
 
 /* ---------- routing: #/  #/<dashboard>/<section>  #/report  #/contributions  #/events  #/updates ---------- */
 const cache = {};
-function eventLeagues({events}) {     // one section per Year + Event: servers as rows, league thresholds as columns
-  $("view").innerHTML = !events.length ? "<section><p>No event data yet.</p></section>" : events.map(e => `<section><h2>Event: ${escHtml(e.year)} ${escHtml(e.event)}</h2>
+const EV_COLORS = ["#0f766e", "#cd7f32", "#a8a8a8", "#f4c430", "#6b7fd7", "#d9534f"];    // one colour per league level, lowest first
+function eventLeagues({events}) {     // one section per Year + Event: servers as rows, league thresholds as columns, a stacked bar chart on the right
+  const num = v => typeof v === "number" && isFinite(v);
+  $("view").innerHTML = !events.length ? "<section><p>No event data yet.</p></section>" : events.map((e, k) => {
+    const lo = e.leagues.map((_, i) => Math.min(...e.servers.map(sv => sv.values[i]).filter(num)));      // lowest and highest threshold of each league
+    const hi = e.leagues.map((_, i) => Math.max(...e.servers.map(sv => sv.values[i]).filter(num)));
+    const cell = (v, i) => !num(v) ? `<td class="num">${escHtml(v)}</td>`
+      : `<td class="num${v === hi[i] && hi[i] !== lo[i] ? " evmax" : v === lo[i] && hi[i] !== lo[i] ? " evmin" : ""}">${fmt.format(v)}</td>`;
+    return `<section><h2>Event: ${escHtml(e.year)} ${escHtml(e.event)}</h2>
     <p>Minigame Type: ${escHtml(e.type)}</p>
-    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Server</th>${e.leagues.map(l => `<th class="num">${escHtml(l)}</th>`).join("")}</tr></thead><tbody>${
-      e.servers.map(sv => `<tr><td>${escHtml(sv.server)}:${escHtml(sv.name)}</td>${sv.values.map(v => `<td class="num">${typeof v === "number" ? fmt.format(v) : escHtml(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></section>`).join("");
+    <div class="evrow"><div class="evtbl"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>Server</th>${e.leagues.map(l => `<th class="num">${escHtml(l)}</th>`).join("")}</tr></thead><tbody>${
+      e.servers.map(sv => `<tr><td>${escHtml(sv.server)}:${escHtml(sv.name)}</td>${sv.values.map(cell).join("")}</tr>`).join("")}</tbody></table></div>
+      <p class="evkey"><span class="evmax">Gold</span> highest and <span class="evmin">teal</span> lowest in each league.</p></div>
+    <div class="evchart" id="evchart${k}"></div></div></section>`;
+  }).join("");
+  events.forEach((e, k) => {      // each bar is one server; a segment is the extra points needed to move up from the league below, so the bar ends at the top league's threshold
+    const names = e.servers.map(sv => `${escHtml(sv.server)}:${escHtml(sv.name)}`);
+    const traces = e.leagues.map((l, i) => ({type:"bar", orientation:"h", name:l, y:names, marker:{color:EV_COLORS[i % EV_COLORS.length]},
+      x:e.servers.map(sv => Math.max(0, (sv.values[i] || 0) - (i ? (sv.values[i - 1] || 0) : 0))),
+      customdata:e.servers.map(sv => sv.values[i]),
+      hovertemplate:`%{y}<br>${escHtml(l)}: %{customdata:,} points<extra></extra>`}));
+    Plotly.newPlot("evchart" + k, traces, {...base, barmode:"stack", hovermode:"closest", height:e.servers.length * 24 + 110,
+      margin:{t:10, r:16, b:40, l:110}, xaxis:{...base.xaxis, title:{text:"Points needed (each colour is the extra points to move up a league)", font:{size:12}}, tickformat:","},
+      yaxis:{...base.yaxis, autorange:"reversed", tickformat:"", automargin:true, rangemode:"normal"}, legend:{orientation:"h", y:1.02, yanchor:"bottom"}}, cfg);
+  });
 }
 
 const MON3 = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
