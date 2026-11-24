@@ -510,6 +510,10 @@ function showMembers(d, sel) {                   // sel = the chosen week (a mem
       + sec("Top 10 gainers: points", "Points", byPts, "p1", "p0", ["Gain", r => fmt.format(gain(r))])
       + sec("Top 10 gainers: percentage", "Points", byPct, "p1", "p0", ["% Gain", pct])
       + sec("Top 10 gainers: battles won", "Battles Won", byBat, "b1", "b0", ["Gain", r => fmt.format(bat(r))]);
+    const ms = v => v >= 1e9 ? Math.floor(v / 5e8) * 5e8 : Math.floor(v / 1e8) * 1e8;      // highest milestone reached: every 100 million below 1 billion, every 500 million from 1 billion
+    const hit = both.filter(r => ms(r.p1) > ms(r.p0)).sort((a, b) => ms(a.p1) - ms(b.p1) || a.p1 - b.p1);          // crossed at least one milestone this week; only the highest one counts
+    html += `<section><h2>Milestones</h2><p>Members whose points crossed a milestone since the previous file (${pd}), lowest milestone first. Milestones are every 100,000,000 below 1,000,000,000 and every 500,000,000 from 1,000,000,000. If several were crossed, only the highest is shown. Members who were not in both files are left out.</p>${
+      hit.length ? T(["Name", "Points", "Milestone crossed"], hit.map(r => [escHtml(r.name), fmt.format(r.p1), fmt.format(ms(r.p1))]), [0, 1, 1]) : "<p>No member crossed a milestone this week.</p>"}</section>`;
     const block = (t, list, f) => { const w = Math.max(0, ...list.map(r => [...r.name].length));     // names padded to one width so the values start in the same column
       return `${t} (${pd} to ${ld})\n` + list.map(r => `${r.name}${" ".repeat(w - [...r.name].length)}  ${f(r)}`).join("\n"); };
     text = [block("Top 10 gainers: points", byPts, r => fmt.format(gain(r))), block("Top 10 gainers: percentage", byPct, pct), block("Top 10 gainers: battles won", byBat, r => fmt.format(bat(r)))].join("\n\n");
